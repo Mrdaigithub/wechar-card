@@ -7,7 +7,7 @@
       <v-toolbar
         flat
         color="white">
-        <v-toolbar-title>奖品卡券管理</v-toolbar-title>
+        <v-toolbar-title>卡券管理</v-toolbar-title>
         <v-divider
           class="mx-2"
           inset
@@ -20,7 +20,7 @@
             slot="activator"
             color="primary"
             dark
-            class="mb-2">添加新卡券
+            class="mb-2">添加卡券
           </v-btn>
           <v-card>
             <v-card-title>
@@ -28,61 +28,64 @@
             </v-card-title>
             <v-card-text>
               <v-container grid-list-md>
-                <v-layout wrap>
-                  <v-flex
-                    xs12
-                    sm6
-                    md4>
-                    <v-text-field
-                      v-model="editedItem.shopName"
-                      label="卡券名称"/>
-                  </v-flex>
-                  <v-flex
-                    xs12
-                    sm6
-                    md4>
-                    <v-menu
-                      ref="menu"
-                      :close-on-content-click="false"
-                      v-model="menu"
-                      :nudge-right="40"
-                      lazy
-                      transition="scale-transition"
-                      offset-y
-                      full-width
-                      min-width="290px">
-                      <v-text-field
-                        slot="activator"
-                        v-model="editedItem.createdTime"
-                        label="有效期"
-                        prepend-icon="event"
-                        readonly/>
-                      <v-date-picker
-                        ref="picker"
-                        v-model="editedItem.createdTime"
-                        :max="new Date().toISOString().substr(0, 10)"
-                        locale="zh-cn"
-                        min="1950-01-01"
-                        @change="saveDate(editedItem.createdTime)"/>
-                    </v-menu>
-                  </v-flex>
-                  <v-flex
-                    xs12
-                    sm6
-                    md4>
-                    <v-text-field
-                      v-model="editedItem.remarks"
-                      label="备注"/>
-                  </v-flex>
-                  <v-flex
-                    xs12
-                    sm6
-                    md4>
-                    <v-switch
-                      v-model="editedItem.shopState"
-                      label="卡券状态"/>
-                  </v-flex>
-                </v-layout>
+                <el-form
+                  ref="editedItem"
+                  :model="editedItem"
+                  :rules="rules"
+                  label-width="80px"
+                  label-position="left">
+                  <v-layout wrap>
+                    <v-flex
+                      xs12
+                      sm6>
+                      <el-form-item
+                        label="卡券名称"
+                        prop="cardName">
+                        <el-input v-model="editedItem.cardName"/>
+                      </el-form-item>
+                    </v-flex>
+                    <v-flex
+                      xs12
+                      sm6>
+                      <el-form-item
+                        label="备注"
+                        prop="remarks">
+                        <el-input
+                          v-model="editedItem.remarks"/>
+                      </el-form-item>
+                    </v-flex>
+                    <v-flex
+                      xs12
+                      sm6>
+                      <el-form-item
+                        label="有效日期">
+                        <el-date-picker
+                          v-model="editedItem.startDateTime"
+                          type="datetime"
+                          placeholder="起 不填为倒计时模式"/>
+                      </el-form-item>
+                    </v-flex>
+                    <v-flex
+                      xs12
+                      sm6>
+                      <el-form-item
+                        label="有效日期"
+                        prop="endDateTime">
+                        <el-date-picker
+                          v-model="editedItem.endDateTime"
+                          type="datetime"
+                          placeholder="终"/>
+                      </el-form-item>
+                    </v-flex>
+                    <v-flex
+                      xs12
+                      sm6>
+                      <el-form-item label="卡券状态">
+                        <el-switch v-model="editedItem.cardState"/>
+                      </el-form-item>
+                    </v-flex>
+                  </v-layout>
+                </el-form>
               </v-container>
             </v-card-text>
             <v-card-actions>
@@ -92,6 +95,7 @@
                 @click="close">关闭
               </v-btn>
               <v-btn
+                :disabled="!valid"
                 color="red"
                 flat
                 @click="save">保存
@@ -110,7 +114,7 @@
       </v-content>
       <v-data-table
         :headers="headers"
-        :items="shopList"
+        :items="cardList"
         :search="search"
         :rows-per-page-items="[ 5, 10, 30]"
         rows-per-page-text="每页行数"
@@ -119,13 +123,12 @@
           slot="items"
           slot-scope="props">
           <td>{{ props.item.id }}</td>
-          <td class="text-xs-left">{{ props.item.shopName }}</td>
-          <td class="text-xs-left">
-            {{ props.item.CountdownMode ? `${props.item.endDate} ${props.item.endTime} 失效` :
-            `${props.item.startDate} ${props.item.startTime} -- ${props.item.endDate} ${props.item.endTime}` }}
-          </td>
-          <td class="text-xs-left">{{ props.item.shopState ? '启用' : '停用' }}</td>
+          <td class="text-xs-left">{{ props.item.cardName }}</td>
           <td class="text-xs-left">{{ props.item.remarks }}</td>
+          <td class="text-xs-left">{{ props.item.startDateTime ? `${formatDate(props.item.startDateTime)} -
+            ${formatDate(props.item.endDateTime)}` : `${formatDate(props.item.endDateTime)}` }}
+          </td>
+          <td class="text-xs-left">{{ props.item.cardState ? '有效' : '已失效' }}</td>
           <td class="justify-center layout px-0">
             <v-icon
               small
@@ -165,6 +168,7 @@ export default {
   name: "AdminCard",
   layout: 'admin',
   data: () => ({
+    valid: true,
     breadcrumbList: [
       {
         text: '主页',
@@ -172,7 +176,7 @@ export default {
         href: '/admin'
       },
       {
-        text: '奖品卡券管理',
+        text: '卡券管理',
         disabled: true,
         href: '/admin/card'
       },
@@ -180,88 +184,148 @@ export default {
     dialog: false,
     headers: [
       {text: 'ID', align: 'left', sortable: true, value: 'id'},
-      {text: '卡券名称', align: 'left', value: 'shopName'},
-      {text: '有效期', align: 'left', value: 'createdTime'},
-      {text: '卡券状态', align: 'left', value: 'shopState'},
+      {text: '卡券名称', align: 'left', value: 'cardName'},
       {text: '备注', align: 'left', value: 'remarks'},
-      {text: '操作', align: 'left', value: 'shopName', sortable: false},
+      {text: '有效期截止', align: 'left', value: 'endDateTime'},
+      {text: '卡券状态', align: 'left', value: 'cardState'},
+      {text: '操作', align: 'left', value: 'cardName', sortable: false},
     ],
-    shopList: [
+    cardList: [
       {
         id: 159,
-        shopName: '海底捞',
-        shopAddress: "地址地址",
-        CountdownMode: true,
-        startDate: "2018-12-20",
-        endDate: "2018-12-31",
-        startTime: "12:30:30",
-        endTime: "12:30:30",
-        shopState: true,
-        remarks: "备注备注备注备注备注备注"
+        cardName: '海底捞',
+        remarks: "备注备注备注备注备注备注",
+        startDateTime: null,
+        endDateTime: new Date(new Date().getTime() + 1000000000),
+        cardState: true
+      },
+      {
+        id: 1,
+        cardName: '海底捞',
+        remarks: "备注备注备注备注备注备注",
+        startDateTime: new Date(),
+        endDateTime: new Date(new Date().getTime() + 100000),
+        cardState: true
+      },
+      {
+        id: 2,
+        cardName: '海底捞',
+        remarks: "备注备注备注备注备注备注",
+        startDateTime: null,
+        endDateTime: new Date(new Date().getTime() + 1000000000),
+        cardState: true
+      },
+      {
+        id: 3,
+        cardName: '海底捞',
+        remarks: "备注备注备注备注备注备注",
+        startDateTime: new Date(),
+        endDateTime: new Date(new Date().getTime() + 100000),
+        cardState: true
+      },
+      {
+        id: 4,
+        cardName: '海底捞',
+        remarks: "备注备注备注备注备注备注",
+        startDateTime: new Date(),
+        endDateTime: new Date(new Date().getTime() + 1000000000),
+        cardState: true
+      },
+      {
+        id: 5,
+        cardName: '海底捞',
+        remarks: "备注备注备注备注备注备注",
+        startDateTime: null,
+        endDateTime: new Date(new Date().getTime() + 100000),
+        cardState: true
+      },
+      {
+        id: 6,
+        cardName: '海底捞',
+        remarks: "备注备注备注备注备注备注",
+        startDateTime: null,
+        endDateTime: new Date(new Date().getTime() + 1000000000),
+        cardState: true
       },
     ],
+    rules: {
+      cardName: [
+        {required: true, message: '请输入卡券名称', trigger: 'blur'},
+        {min: 2, max: 20, message: '长度在 2 到 20 个字符', trigger: 'change'},
+        {pattern: /^(\w|[\u4e00-\u9fa5])+$/, message: '请不要包含特殊字符', trigger: 'change'}
+      ],
+      remarks: [
+        {type: 'string', pattern: /^(\w|[\u4e00-\u9fa5])+$/, message: '请不要包含特殊字符', trigger: 'change'}
+      ],
+      endDateTime: [
+        {type: 'date', required: true, message: '请选择日期', trigger: 'blur'},
+      ],
+    },
     editedIndex: -1,
     editedItem: {
-      shopName: '',
-      createdTime: '',
-      shopState: false,
+      cardName: '',
       remarks: '',
+      startDateTime: '',
+      endDateTime: '',
+      cardState: false,
     },
     defaultItem: {
-      name: '',
-      createdTime: '',
-      shopState: false,
-      remarks: ''
+      cardName: '',
+      remarks: '',
+      startDateTime: '',
+      endDateTime: '',
+      cardState: false,
     },
-    date: null,
-    menu: false,
     search: '',
   }),
   computed: {
     formTitle() {
-      return this.editedIndex === -1 ? '添加新卡券' : '修改卡券'
+      return this.editedIndex === -1 ? '添加卡券' : '修改卡券'
     }
   },
   watch: {
     dialog(val) {
       val || this.close()
     },
-    menu(val) {
-      val && this.$nextTick(() => (this.$refs.picker.activePicker = 'YEAR'))
-    }
   },
   methods: {
     editItem(item) {
-      this.editedIndex = this.shopList.indexOf(item);
+      this.editedIndex = this.cardList.indexOf(item);
       this.editedItem = Object.assign({}, item);
       this.dialog = true
     },
     deleteItem(item) {
-      const index = this.shopList.indexOf(item);
-      confirm(`确定要删除 ${item.shopName} ?`) && this.shopList.splice(index, 1)
+      const index = this.cardList.indexOf(item);
+      confirm(`确定要删除 ${item.cardName} ?`) && this.cardList.splice(index, 1)
     },
     close() {
       this.dialog = false;
       setTimeout(() => {
         this.editedItem = Object.assign({}, this.defaultItem);
-        this.editedIndex = -1
-      }, 300)
+        this.editedIndex = -1;
+        this.$refs.editedItem.resetFields();
+        this.valid = true;
+      }, 100)
     },
     save() {
-      if (this.editedIndex > -1) {
-        Object.assign(this.shopList[this.editedIndex], this.editedItem)
-      } else {
-        this.shopList.push(this.editedItem)
-      }
-      this.close()
+      this.$refs.editedItem.validate((valid) => {
+        if (valid) {
+          if (this.editedIndex > -1) {
+            Object.assign(this.cardList[this.editedIndex], this.editedItem)
+          } else {
+            this.cardList.push(this.editedItem)
+          }
+          this.close()
+        }
+      });
     },
-    saveDate(date) {
-      this.$refs.menu.save(date)
+    formatDate(dateTimeObj) {
+      return `${dateTimeObj.getFullYear()}-${dateTimeObj.getMonth() + 1}-${new Date().getDate()} ${dateTimeObj.getHours()}:${dateTimeObj.getMinutes()}:${dateTimeObj.getSeconds()}`;
     }
   },
 }
 </script>
 
-<style scoped>
+<style scoped lang="stylus">
 
 </style>

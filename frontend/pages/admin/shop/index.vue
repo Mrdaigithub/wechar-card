@@ -20,7 +20,7 @@
             slot="activator"
             color="primary"
             dark
-            class="mb-2">添加新商家
+            class="mb-2">添加商家
           </v-btn>
           <v-card>
             <v-card-title>
@@ -28,104 +28,64 @@
             </v-card-title>
             <v-card-text>
               <v-container grid-list-md>
-                <v-form
-                  ref="form"
-                  v-model="valid"
-                  lazy-validation>
+                <el-form
+                  ref="editedItem"
+                  :model="editedItem"
+                  :rules="rules"
+                  label-width="80px"
+                  label-position="left">
                   <v-layout wrap>
                     <v-flex
                       xs12
                       sm6>
-                      <v-text-field
-                        v-model="editedItem.shopName"
-                        :rules="rules.nameRules"
-                        append-icon="shopping_cart"
-                        label="商家名称"/>
+                      <el-form-item
+                        label="商家名称"
+                        prop="shopName">
+                        <el-input v-model="editedItem.shopName"/>
+                      </el-form-item>
                     </v-flex>
                     <v-flex
                       xs12
                       sm6>
-                      <v-text-field
-                        v-model="editedItem.shopAddress"
-                        :rules="rules.locationRules"
-                        append-icon="gps_fixed"
-                        label="商家地址"/>
+                      <el-form-item
+                        label="商家地址"
+                        prop="shopAddress">
+                        <el-input
+                          v-model="editedItem.shopAddress"
+                          placeholder="城市名 (温州)"/>
+                      </el-form-item>
                     </v-flex>
                     <v-flex
                       xs12
                       sm6>
-                      <v-menu
-                        ref="dateMenu"
-                        :close-on-content-click="false"
-                        v-model="dateMenu"
-                        :nudge-right="40"
-                        lazy
-                        transition="scale-transition"
-                        offset-y
-                        full-width
-                        min-width="290px">
-                        <v-text-field
-                          slot="activator"
-                          :rules="rules.dateRules"
-                          v-model="editedItem.startDate"
-                          label="合作时间(日期)"
-                          append-icon="event"
-                          readonly/>
-                        <v-date-picker
-                          ref="picker"
-                          v-model="editedItem.startDate"
-                          locale="zh-cn"
-                          min="1950-01-01"
-                          @change="saveDate(editedItem.startDate)"/>
-                      </v-menu>
+                      <el-form-item
+                        label="备注"
+                        prop="remarks">
+                        <el-input
+                          v-model="editedItem.remarks"/>
+                      </el-form-item>
                     </v-flex>
                     <v-flex
                       xs12
                       sm6>
-                      <v-menu
-                        ref="timeMenu"
-                        :close-on-content-click="false"
-                        v-model="timeMenu"
-                        :nudge-right="40"
-                        :return-value.sync="editedItem.startTime"
-                        lazy
-                        transition="scale-transition"
-                        offset-y
-                        full-width
-                        max-width="290px"
-                        min-width="290px">
-                        <v-text-field
-                          slot="activator"
-                          :rules="rules.timeRules"
-                          v-model="editedItem.startTime"
-                          label="合作时间(时刻)"
-                          append-icon="access_time"
-                          readonly/>
-                        <v-time-picker
-                          v-if="timeMenu"
-                          v-model="editedItem.startTime"
-                          locale="zh-cn"
-                          full-width
-                          @change="$refs.timeMenu.save(editedItem.startTime)"/>
-                      </v-menu>
+                      <el-form-item
+                        label="合作日期"
+                        prop="startDateTime">
+                        <el-date-picker
+                          v-model="editedItem.startDateTime"
+                          type="datetime"
+                          placeholder="选择日期时间"/>
+                      </el-form-item>
                     </v-flex>
                     <v-flex
                       xs12
                       sm6>
-                      <v-text-field
-                        v-model="editedItem.remarks"
-                        append-icon="book"
-                        label="备注"/>
-                    </v-flex>
-                    <v-flex
-                      xs12
-                      sm6>
-                      <v-switch
-                        v-model="editedItem.shopState"
-                        label="商家状态"/>
+                      <el-form-item label="商家状态">
+                        <el-switch v-model="editedItem.shopState"/>
+                      </el-form-item>
                     </v-flex>
                   </v-layout>
-                </v-form>
+                </el-form>
               </v-container>
             </v-card-text>
             <v-card-actions>
@@ -165,7 +125,7 @@
           <td>{{ props.item.id }}</td>
           <td class="text-xs-left">{{ props.item.shopName }}</td>
           <td class="text-xs-left">{{ props.item.shopAddress }}</td>
-          <td class="text-xs-left">{{ `${props.item.startDate} -- ${props.item.startTime}` }}</td>
+          <td class="text-xs-left">{{ formatDate(props.item.startDateTime) }}</td>
           <td class="text-xs-left">{{ props.item.shopState ? '合作中' : '合作结束' }}</td>
           <td class="text-xs-left">{{ props.item.remarks }}</td>
           <td class="justify-center layout px-0">
@@ -203,13 +163,10 @@
 </template>
 
 <script>
-import rules from '~/utils/rules'
-
 export default {
   name: "AdminShop",
   layout: 'admin',
   data: () => ({
-    rules,
     valid: true,
     breadcrumbList: [
       {
@@ -228,7 +185,7 @@ export default {
       {text: 'ID', align: 'left', sortable: true, value: 'id'},
       {text: '商家名称', align: 'left', value: 'shopName'},
       {text: '商家地址', align: 'left', value: 'shopAddress'},
-      {text: '合作时间', align: 'left', value: 'createdTime'},
+      {text: '合作时间', align: 'left', value: 'startDateTimeTime'},
       {text: '商家状态', align: 'left', value: 'shopState'},
       {text: '备注', align: 'left', value: 'remarks'},
       {text: '操作', align: 'left', value: 'shopName', sortable: false},
@@ -237,101 +194,97 @@ export default {
       {
         id: 159,
         shopName: '海底捞',
-        shopAddress: "地址地址",
-        startDate: "2018-12-31",
-        startTime: "12:30:30",
+        shopAddress: '地址地址',
+        startDateTime: new Date(),
         shopState: true,
         remarks: "备注备注备注备注备注备注"
       },
       {
         id: 1,
         shopName: '海底捞',
-        shopAddress: "地址地址",
-        startDate: "2018-12-31",
-        startTime: "12:30:30",
+        shopAddress: '地址地址',
+        startDateTime: new Date(),
         shopState: true,
         remarks: "备注备注备注备注备注备注"
       },
       {
         id: 2,
         shopName: '海底捞',
-        shopAddress: "地址地址",
-        startDate: "2018-12-31",
-        startTime: "12:30:30",
+        shopAddress: '地址地址',
+        startDateTime: new Date(),
         shopState: true,
         remarks: "备注备注备注备注备注备注"
       },
       {
         id: 3,
         shopName: '海底捞',
-        shopAddress: "地址地址",
-        startDate: "2018-12-31",
-        startTime: "12:30:30",
+        shopAddress: '地址地址',
+        startDateTime: new Date(),
         shopState: true,
         remarks: "备注备注备注备注备注备注"
-      },
-      {
+      }, {
         id: 4,
         shopName: '海底捞',
-        shopAddress: "地址地址",
-        startDate: "2018-12-31",
-        startTime: "12:30:30",
+        shopAddress: '地址地址',
+        startDateTime: new Date(),
         shopState: true,
         remarks: "备注备注备注备注备注备注"
-      },
-      {
+      }, {
         id: 5,
         shopName: '海底捞',
-        shopAddress: "地址地址",
-        startDate: "2018-12-31",
-        startTime: "12:30:30",
+        shopAddress: '地址地址',
+        startDateTime: new Date(),
         shopState: true,
         remarks: "备注备注备注备注备注备注"
-      },
-      {
+      }, {
         id: 6,
         shopName: '海底捞',
-        shopAddress: "地址地址",
-        startDate: "2018-12-31",
-        startTime: "12:30:30",
+        shopAddress: '地址地址',
+        startDateTime: new Date(),
         shopState: true,
         remarks: "备注备注备注备注备注备注"
       },
-      {
-        id: 7,
-        shopName: '海底捞',
-        shopAddress: "地址地址",
-        startDate: "2018-12-31",
-        startTime: "12:30:30",
-        shopState: true,
-        remarks: "备注备注备注备注备注备注"
-      },
+
+
     ],
+    rules: {
+      shopName: [
+        {required: true, message: '请输入商家名称', trigger: 'blur'},
+        {min: 3, max: 20, message: '长度在 3 到 20 个字符', trigger: 'change'},
+        {pattern: /^(\w|[\u4e00-\u9fa5])+$/, message: '请不要包含特殊字符', trigger: 'change'}
+      ],
+      shopAddress: [
+        {required: true, message: '请输入商家地址', trigger: 'blur'},
+        {type: 'string', pattern: /^(\w|[\u4e00-\u9fa5])+$/, message: '请不要包含特殊字符', trigger: 'change'}
+      ],
+      remarks: [
+        {type: 'string', pattern: /^(\w|[\u4e00-\u9fa5])+$/, message: '请不要包含特殊字符', trigger: 'change'}
+      ],
+      startDateTime: [
+        {type: 'date', required: true, message: '请选择日期', trigger: 'blur'},
+      ],
+    },
     editedIndex: -1,
     editedItem: {
       shopName: '',
       shopAddress: '',
-      startDate: '',
-      startTime: '',
+      startDateTime: '',
       shopState: false,
       remarks: '',
     },
     defaultItem: {
-      name: '',
+      shopName: '',
       shopAddress: '',
-      startDate: '',
+      startDateTime: '',
       startTime: '',
       shopState: false,
       remarks: ''
     },
-    date: null,
-    dateMenu: false,
-    timeMenu: false,
     search: '',
   }),
   computed: {
     formTitle() {
-      return this.editedIndex === -1 ? '添加新商家' : '修改商家'
+      return this.editedIndex === -1 ? '添加商家' : '修改商家'
     }
   },
   watch: {
@@ -353,22 +306,26 @@ export default {
       this.dialog = false;
       setTimeout(() => {
         this.editedItem = Object.assign({}, this.defaultItem);
-        this.editedIndex = -1
-      }, 300);
-      this.$refs.form.reset();
-      this.valid = true;
+        this.editedIndex = -1;
+        this.$refs.editedItem.resetFields();
+        this.valid = true;
+      }, 100)
     },
     save() {
-      if (this.editedIndex > -1) {
-        Object.assign(this.shopList[this.editedIndex], this.editedItem)
-      } else {
-        this.shopList.push(this.editedItem)
-      }
-      this.close()
+      this.$refs.editedItem.validate((valid) => {
+        if (valid) {
+          if (this.editedIndex > -1) {
+            Object.assign(this.shopList[this.editedIndex], this.editedItem)
+          } else {
+            this.shopList.push(this.editedItem)
+          }
+          this.close()
+        }
+      });
     },
-    saveDate(date) {
-      this.$refs.dateMenu.save(date)
-    },
+    formatDate(dateTimeObj) {
+      return `${dateTimeObj.getFullYear()}-${dateTimeObj.getMonth() + 1}-${new Date().getDate()} ${dateTimeObj.getHours()}:${dateTimeObj.getMinutes()}:${dateTimeObj.getSeconds()}`;
+    }
   },
 }
 </script>

@@ -21,7 +21,7 @@
           href: '/admin'
         },
         {
-          text: '抽奖活动记录管理',
+          text: '核销记录管理',
           disabled: true,
           href: '/admin/log/lottery'
         },

@@ -7,14 +7,14 @@
 </template>
 
 <script>
-  export default {
-    data() {
-      return {
-        title: 'Loading...'
-      }
-    },
-    mounted() {
-      setTimeout(() => this.$router.push('/user/lottery'), 2000)
+export default {
+  data() {
+    return {
+      title: 'Loading...'
     }
+  },
+  mounted() {
+    this.$router.push('/user/lottery')
   }
+}
 </script>

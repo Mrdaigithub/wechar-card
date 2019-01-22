@@ -29,7 +29,8 @@ module.exports = {
   */
   css: [
     '~/assets/style/app.styl',
-    'swiper/dist/css/swiper.css'
+    'swiper/dist/css/swiper.css',
+    'element-ui/lib/theme-chalk/index.css'
   ],
 
   /*
@@ -37,6 +38,7 @@ module.exports = {
   */
   plugins: [
     '@/plugins/vuetify',
+    '@/plugins/element',
     {src: '@/plugins/swiper', ssr: false},
   ],
 

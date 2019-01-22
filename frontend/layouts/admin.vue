@@ -38,7 +38,7 @@
             <v-icon>card_giftcard</v-icon>
           </v-list-tile-action>
           <v-list-tile-content>
-            <v-list-tile-title>奖品卡券管理</v-list-tile-title>
+            <v-list-tile-title>卡券管理</v-list-tile-title>
           </v-list-tile-content>
         </v-list-tile>
         <v-list-tile @click="clickDrawerHandler('/admin/activity')">
@@ -94,7 +94,7 @@
             <v-icon>bookmarks</v-icon>
           </v-list-tile-action>
           <v-list-tile-content>
-            <v-list-tile-title>抽奖活动记录管理</v-list-tile-title>
+            <v-list-tile-title>核销记录管理</v-list-tile-title>
           </v-list-tile-content>
         </v-list-tile>
       </v-list>
