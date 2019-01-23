@@ -33,7 +33,7 @@
                   :model="editedItem"
                   :rules="rules"
                   label-width="80px"
-                  label-position="left">
+                  label-position="right">
                   <v-layout wrap>
                     <v-flex
                       xs12
@@ -82,7 +82,7 @@
       </v-content>
       <v-data-table
         :headers="headers"
-        :items="shopList"
+        :items="winningLogList"
         :search="search"
         :rows-per-page-items="[ 5, 10, 30]"
         rows-per-page-text="每页行数"
@@ -147,7 +147,7 @@
 
 <script>
   export default {
-    name: "AdminShop",
+    name: "AdminLogWinning",
     layout: 'admin',
     data: () => ({
       valid: true,
@@ -180,7 +180,7 @@
         {text: '备注', align: 'left', value: 'remarks'},
         {text: '操作', align: 'left', value: 'shopName', sortable: false},
       ],
-      shopList: [
+      winningLogList: [
         {
           id: 159,
           shopName: '商家名称',
@@ -300,13 +300,13 @@
     },
     methods: {
       editItem(item) {
-        this.editedIndex = this.shopList.indexOf(item);
+        this.editedIndex = this.winningLogList.indexOf(item);
         this.editedItem = Object.assign({}, item);
         this.dialog = true
       },
       deleteItem(item) {
-        const index = this.shopList.indexOf(item);
-        confirm(`确定要删除 ${item.shopName} ?`) && this.shopList.splice(index, 1)
+        const index = this.winningLogList.indexOf(item);
+        confirm(`确定要删除 ${item.shopName} ?`) && this.winningLogList.splice(index, 1)
       },
       close() {
         this.dialog = false;
@@ -321,16 +321,20 @@
         this.$refs.editedItem.validate((valid) => {
           if (valid) {
             if (this.editedIndex > -1) {
-              Object.assign(this.shopList[this.editedIndex], this.editedItem)
+              Object.assign(this.winningLogList[this.editedIndex], this.editedItem)
             } else {
-              this.shopList.push(this.editedItem)
+              this.winningLogList.push(JSON.parse(JSON.stringify(this.editedItem)))
             }
             this.close()
           }
         });
       },
       formatDate(dateTimeObj) {
-        return `${dateTimeObj.getFullYear()}-${dateTimeObj.getMonth() + 1}-${new Date().getDate()} ${dateTimeObj.getHours()}:${dateTimeObj.getMinutes()}:${dateTimeObj.getSeconds()}`;
+        if (!dateTimeObj) {
+          return '暂无';
+        }
+        dateTimeObj = new Date(dateTimeObj);
+        return dateTimeObj ? `${dateTimeObj.getFullYear()}-${dateTimeObj.getMonth() + 1}-${new Date().getDate()} ${dateTimeObj.getHours()}:${dateTimeObj.getMinutes()}:${dateTimeObj.getSeconds()}` : '暂无';
       }
     },
   }

@@ -32,8 +32,8 @@
                   ref="editedItem"
                   :model="editedItem"
                   :rules="rules"
-                  label-width="80px"
-                  label-position="left">
+                  label-width="90px"
+                  label-position="right">
                   <v-layout wrap>
                     <v-flex
                       xs12
@@ -61,6 +61,7 @@
                         label="有效日期">
                         <el-date-picker
                           v-model="editedItem.startDateTime"
+                          class="w100"
                           type="datetime"
                           placeholder="起 不填为倒计时模式"/>
                       </el-form-item>
@@ -73,8 +74,21 @@
                         prop="endDateTime">
                         <el-date-picker
                           v-model="editedItem.endDateTime"
+                          class="w100"
                           type="datetime"
                           placeholder="终"/>
+                      </el-form-item>
+                    </v-flex>
+                    <v-flex
+                      xs12
+                      sm6>
+                      <el-form-item
+                        label="中奖率"
+                        prop="cardProbability">
+                        <el-input-number
+                          v-model="editedItem.cardProbability"
+                          :min="0"
+                          :max="100"/>
                       </el-form-item>
                     </v-flex>
                     <v-flex
@@ -129,6 +143,7 @@
             ${formatDate(props.item.endDateTime)}` : `${formatDate(props.item.endDateTime)}` }}
           </td>
           <td class="text-xs-left">{{ props.item.cardState ? '有效' : '已失效' }}</td>
+          <td class="text-xs-left">{{ `${props.item.cardProbability}%` }}</td>
           <td class="justify-center layout px-0">
             <v-icon
               small
@@ -188,64 +203,63 @@ export default {
       {text: '备注', align: 'left', value: 'remarks'},
       {text: '有效期截止', align: 'left', value: 'endDateTime'},
       {text: '卡券状态', align: 'left', value: 'cardState'},
+      {text: '中奖率', align: 'left', value: 'cardProbability'},
       {text: '操作', align: 'left', value: 'cardName', sortable: false},
     ],
     cardList: [
       {
         id: 159,
-        cardName: '海底捞',
-        remarks: "备注备注备注备注备注备注",
+        cardName: '卡券名称',
+        remarks: "备注",
         startDateTime: null,
         endDateTime: new Date(new Date().getTime() + 1000000000),
-        cardState: true
+        cardState: true,
+        cardProbability: 10
       },
       {
         id: 1,
-        cardName: '海底捞',
-        remarks: "备注备注备注备注备注备注",
-        startDateTime: new Date(),
-        endDateTime: new Date(new Date().getTime() + 100000),
-        cardState: true
+        cardName: '卡券名称',
+        remarks: "备注",
+        startDateTime: null,
+        endDateTime: new Date(new Date().getTime() + 1000000000),
+        cardState: true,
+        cardProbability: 10
       },
       {
         id: 2,
-        cardName: '海底捞',
-        remarks: "备注备注备注备注备注备注",
+        cardName: '卡券名称',
+        remarks: "备注",
         startDateTime: null,
         endDateTime: new Date(new Date().getTime() + 1000000000),
-        cardState: true
+        cardState: true,
+        cardProbability: 10
       },
       {
         id: 3,
-        cardName: '海底捞',
-        remarks: "备注备注备注备注备注备注",
-        startDateTime: new Date(),
-        endDateTime: new Date(new Date().getTime() + 100000),
-        cardState: true
+        cardName: '卡券名称',
+        remarks: "备注",
+        startDateTime: null,
+        endDateTime: new Date(new Date().getTime() + 1000000000),
+        cardState: true,
+        cardProbability: 10
       },
       {
         id: 4,
-        cardName: '海底捞',
-        remarks: "备注备注备注备注备注备注",
-        startDateTime: new Date(),
+        cardName: '卡券名称',
+        remarks: "备注",
+        startDateTime: null,
         endDateTime: new Date(new Date().getTime() + 1000000000),
-        cardState: true
+        cardState: true,
+        cardProbability: 10
       },
       {
         id: 5,
-        cardName: '海底捞',
-        remarks: "备注备注备注备注备注备注",
-        startDateTime: null,
-        endDateTime: new Date(new Date().getTime() + 100000),
-        cardState: true
-      },
-      {
-        id: 6,
-        cardName: '海底捞',
-        remarks: "备注备注备注备注备注备注",
+        cardName: '卡券名称',
+        remarks: "备注",
         startDateTime: null,
         endDateTime: new Date(new Date().getTime() + 1000000000),
-        cardState: true
+        cardState: true,
+        cardProbability: 10
       },
     ],
     rules: {
@@ -259,7 +273,7 @@ export default {
       ],
       endDateTime: [
         {type: 'date', required: true, message: '请选择日期', trigger: 'blur'},
-      ],
+      ]
     },
     editedIndex: -1,
     editedItem: {
@@ -267,6 +281,7 @@ export default {
       remarks: '',
       startDateTime: '',
       endDateTime: '',
+      cardProbability: 0,
       cardState: false,
     },
     defaultItem: {
@@ -274,6 +289,7 @@ export default {
       remarks: '',
       startDateTime: '',
       endDateTime: '',
+      cardProbability: 0,
       cardState: false,
     },
     search: '',
@@ -313,14 +329,18 @@ export default {
           if (this.editedIndex > -1) {
             Object.assign(this.cardList[this.editedIndex], this.editedItem)
           } else {
-            this.cardList.push(this.editedItem)
+            this.cardList.push(JSON.parse(JSON.stringify(this.editedItem)))
           }
           this.close()
         }
       });
     },
     formatDate(dateTimeObj) {
-      return `${dateTimeObj.getFullYear()}-${dateTimeObj.getMonth() + 1}-${new Date().getDate()} ${dateTimeObj.getHours()}:${dateTimeObj.getMinutes()}:${dateTimeObj.getSeconds()}`;
+      if (!dateTimeObj) {
+        return '暂无';
+      }
+      dateTimeObj = new Date(dateTimeObj);
+      return dateTimeObj ? `${dateTimeObj.getFullYear()}-${dateTimeObj.getMonth() + 1}-${new Date().getDate()} ${dateTimeObj.getHours()}:${dateTimeObj.getMinutes()}:${dateTimeObj.getSeconds()}` : '暂无';
     }
   },
 }

@@ -27,7 +27,7 @@
                   :model="editedItem"
                   :rules="rules"
                   label-width="80px"
-                  label-position="left">
+                  label-position="right">
                   <v-layout wrap>
                     <v-flex
                       xs12
@@ -169,7 +169,7 @@
 
 <script>
   export default {
-    name: "Adminuser",
+    name: "AdminUser",
     layout: 'admin',
     data: () => ({
       valid: true,
@@ -349,14 +349,18 @@
             if (this.editedIndex > -1) {
               Object.assign(this.userList[this.editedIndex], this.editedItem)
             } else {
-              this.userList.push(this.editedItem)
+              this.userList.push(JSON.parse(JSON.stringify(this.editedItem)))
             }
             this.close()
           }
         });
       },
       formatDate(dateTimeObj) {
-        return `${dateTimeObj.getFullYear()}-${dateTimeObj.getMonth() + 1}-${new Date().getDate()} ${dateTimeObj.getHours()}:${dateTimeObj.getMinutes()}:${dateTimeObj.getSeconds()}`;
+        if (!dateTimeObj) {
+          return '暂无';
+        }
+        dateTimeObj = new Date(dateTimeObj);
+        return dateTimeObj ? `${dateTimeObj.getFullYear()}-${dateTimeObj.getMonth() + 1}-${new Date().getDate()} ${dateTimeObj.getHours()}:${dateTimeObj.getMinutes()}:${dateTimeObj.getSeconds()}` : '暂无';
       }
     },
   }

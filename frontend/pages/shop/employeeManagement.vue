@@ -12,7 +12,7 @@
         <v-flex
           v-for="(item, index) of employeeList"
           :key="index"
-          xs12
+          xs6
           sm6
           md6
           lg4>

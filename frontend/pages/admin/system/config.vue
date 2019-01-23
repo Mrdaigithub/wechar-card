@@ -7,11 +7,8 @@
       <v-card-text>
         <v-container grid-list-md>
           <el-form
-            ref="editedItem"
-            :model="editedItem"
-            :rules="rules"
             label-width="200px"
-            label-position="left">
+            label-position="right">
             <v-layout wrap>
               <v-flex
                 xs12
@@ -50,7 +47,7 @@
 
 <script>
   export default {
-    name: "SystemConfig",
+    name: "AdminSystemConfig",
     layout: 'admin',
     data: () => ({
       valid: true,
@@ -83,20 +80,7 @@
     watch: {},
     methods: {
       save() {
-        this.$refs.editedItem.validate((valid) => {
-          if (valid) {
-            if (this.editedIndex > -1) {
-              Object.assign(this.shopList[this.editedIndex], this.editedItem)
-            } else {
-              this.shopList.push(this.editedItem)
-            }
-            this.close()
-          }
-        });
       },
-      formatDate(dateTimeObj) {
-        return `${dateTimeObj.getFullYear()}-${dateTimeObj.getMonth() + 1}-${new Date().getDate()} ${dateTimeObj.getHours()}:${dateTimeObj.getMinutes()}:${dateTimeObj.getSeconds()}`;
-      }
     },
   }
 </script>

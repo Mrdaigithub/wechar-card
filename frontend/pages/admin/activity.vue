@@ -33,7 +33,7 @@
                   :model="editedItem"
                   :rules="rules"
                   label-width="80px"
-                  label-position="left">
+                  label-position="right">
                   <v-layout wrap>
                     <v-flex
                       xs12
@@ -73,8 +73,27 @@
                         prop="startDateTime">
                         <el-date-picker
                           v-model="editedItem.startDateTime"
+                          class="w100"
                           type="datetime"
                           placeholder="选择日期时间"/>
+                      </el-form-item>
+                    </v-flex>
+                    <v-flex
+                      xs12
+                      sm6>
+                      <el-form-item
+                        label="活动卡券">
+                        <el-select
+                          v-model="value5"
+                          class="w100"
+                          multiple
+                          placeholder="请选择">
+                          <el-option
+                            v-for="item in options"
+                            :key="item.value"
+                            :label="item.label"
+                            :value="item.value"/>
+                        </el-select>
                       </el-form-item>
                     </v-flex>
                     <v-flex
@@ -174,72 +193,52 @@
         v-model="activityProbabilityDialog"
         max-width="1200px">
         <v-card>
-          <v-card-title>
-            <span class="headline">当前卡券中奖率</span>
-          </v-card-title>
           <v-card-text>
             <v-container grid-list-md>
-              <el-form
-                ref="editedItem"
-                :model="editedItem"
-                :rules="rules"
-                label-width="80px"
-                label-position="left">
-                <v-layout wrap>
-                  <v-flex
-                    xs12
-                    sm6>
-                    <el-form-item
-                      label="活动名称"
-                      prop="activityProbability">
-                      <el-input
-                        v-model="editedItem.activityName"
-                        placeholder="请输入内容">
-                        <template slot="append">%</template>
-                      </el-input>
-                    </el-form-item>
-                  </v-flex>
-                  <v-flex
-                    xs12
-                    sm6>
-                    <el-form-item
-                      label="活动名称"
-                      prop="activityProbability">
-                      <el-input
-                        v-model="editedItem.activityName"
-                        placeholder="请输入内容">
-                        <template slot="append">%</template>
-                      </el-input>
-                    </el-form-item>
-                  </v-flex>
-                  <v-flex
-                    xs12
-                    sm6>
-                    <el-form-item
-                      label="活动名称"
-                      prop="activityProbability">
-                      <el-input
-                        v-model="editedItem.activityName"
-                        placeholder="请输入内容">
-                        <template slot="append">%</template>
-                      </el-input>
-                    </el-form-item>
-                  </v-flex>
-                  <v-flex
-                    xs12
-                    sm6>
-                    <el-form-item
-                      label="活动名称"
-                      prop="activityProbability">
-                      <el-input
-                        v-model="editedItem.activityName"
-                        placeholder="请输入内容">
-                        <template slot="append">%</template>
-                      </el-input>
-                    </el-form-item>
-                  </v-flex>
-                </v-layout>
-              </el-form>
+              <v-layout
+                row
+                wrap>
+                <v-flex
+                  v-for="(item, index) of cardList"
+                  :key="index"
+                  xs12
+                  sm6
+                  md6
+                  lg4>
+                  <v-card color="white">
+                    <v-layout row>
+                      <v-flex xs7>
+                        <v-card-title primary-name>
+                          <div>
+                            <div class="headline">{{ item.cardName }}</div>
+                            <v-tooltip top>
+                              <span slot="activator">{{ item.cardDescription }}</span>
+                              <span>卡券详情</span>
+                            </v-tooltip>
+                          </div>
+                        </v-card-title>
+                      </v-flex>
+                      <v-flex xs5>
+                        <v-img
+                          src="https://cdn.vuetifyjs.com/images/cards/halcyon.png"
+                          height="125px"
+                          contain
+                        />
+                      </v-flex>
+                    </v-layout>
+                    <v-divider light/>
+                    <v-card-actions class="pa-3">
+                      <v-tooltip top>
+                        <div slot="activator">
+                          {{ item.startDateTime ? `${formatDate(item.startDateTime)} -
+                          ${formatDate(item.endDateTime)}` : `${formatDate(item.endDateTime)}` }}
+                        </div>
+                        <span>有效期</span>
+                      </v-tooltip>
+                    </v-card-actions>
+                  </v-card>
+                </v-flex>
+              </v-layout>
             </v-container>
           </v-card-text>
           <v-card-actions>
@@ -247,12 +246,6 @@
             <v-btn
               flat
               @click="close">关闭
-            </v-btn>
-            <v-btn
-              :disabled="!valid"
-              color="red"
-              flat
-              @click="save">保存
             </v-btn>
           </v-card-actions>
         </v-card>
@@ -262,201 +255,266 @@
 </template>
 
 <script>
-  export default {
-    name: "AdminActivity",
-    layout: 'admin',
-    data: () => ({
-      valid: true,
-      breadcrumbList: [
-        {
-          text: '主页',
-          disabled: false,
-          href: '/admin'
-        },
-        {
-          text: '抽奖活动管理',
-          disabled: true,
-          href: '/admin/activity'
-        },
-      ],
-      dialog: false,
-      activityProbabilityDialog: false,
-      headers: [
-        {text: 'ID', align: 'left', sortable: true, value: 'id'},
-        {text: '活动名称', align: 'left', value: 'activityName'},
-        {text: '活动描述', align: 'left', value: 'activityDescription'},
-        {text: '活动缩略图', align: 'left', value: 'activityThumbnail'},
-        {text: '当前卡券中奖率', align: 'left', value: 'activityProbability'},
-        {text: '添加时间', align: 'left', value: 'createdAt'},
-        {text: '活动状态', align: 'left', value: 'activityState'},
-        {text: '参与人数', align: 'left', value: 'activityNum'},
-        {text: '备注', align: 'left', value: 'remarks'},
-        {text: '操作', align: 'left', value: 'id', sortable: false},
-      ],
-      activityList: [
-        {
-          id: 159,
-          activityName: '海底捞',
-          activityDescription: '活动描述活动描述活动描述',
-          activityThumbnail: "https://randomuser.me/api/portraits/men/85.jpg",
-          activityProbability: null,
-          createdAt: new Date(),
-          activityState: true,
-          activityNum: 100,
-          remarks: "备注备注备注备注备注备注"
-        },
-        {
-          id: 1,
-          activityName: '海底捞',
-          activityDescription: '活动描述活动描述活动描述',
-          activityThumbnail: "https://randomuser.me/api/portraits/men/85.jpg",
-          activityProbability: null,
-          createdAt: new Date(),
-          activityState: true,
-          activityNum: 100,
-          remarks: "备注备注备注备注备注备注"
-        },
-        {
-          id: 2,
-          activityName: '海底捞',
-          activityDescription: '活动描述活动描述活动描述',
-          activityThumbnail: "https://randomuser.me/api/portraits/men/85.jpg",
-          activityProbability: null,
-          createdAt: new Date(),
-          activityState: true,
-          activityNum: 100,
-          remarks: "备注备注备注备注备注备注"
-        },
-        {
-          id: 3,
-          activityName: '海底捞',
-          activityDescription: '活动描述活动描述活动描述',
-          activityThumbnail: "https://randomuser.me/api/portraits/men/85.jpg",
-          activityProbability: null,
-          createdAt: new Date(),
-          activityState: true,
-          activityNum: 100,
-          remarks: "备注备注备注备注备注备注"
-        },
-        {
-          id: 4,
-          activityName: '海底捞',
-          activityDescription: '活动描述活动描述活动描述',
-          activityThumbnail: "https://randomuser.me/api/portraits/men/85.jpg",
-          activityProbability: null,
-          createdAt: new Date(),
-          activityState: true,
-          activityNum: 100,
-          remarks: "备注备注备注备注备注备注"
-        },
-        {
-          id: 5,
-          activityName: '海底捞',
-          activityDescription: '活动描述活动描述活动描述',
-          activityThumbnail: "https://randomuser.me/api/portraits/men/85.jpg",
-          activityProbability: null,
-          createdAt: new Date(),
-          activityState: true,
-          activityNum: 100,
-          remarks: "备注备注备注备注备注备注"
-        },
-        {
-          id: 6,
-          activityName: '海底捞',
-          activityDescription: '活动描述活动描述活动描述',
-          activityThumbnail: "https://randomuser.me/api/portraits/men/85.jpg",
-          activityProbability: null,
-          createdAt: new Date(),
-          activityState: true,
-          activityNum: 100,
-          remarks: "备注备注备注备注备注备注"
-        },
-      ],
-      rules: {
-        activityName: [
-          {required: true, message: '请输入活动名称', trigger: 'blur'},
-          {min: 3, max: 20, message: '长度在 3 到 20 个字符', trigger: 'change'},
-          {pattern: /^(\w|[\u4e00-\u9fa5])+$/, message: '请不要包含特殊字符', trigger: 'change'}
-        ],
-        activityAddress: [
-          {required: true, message: '请输入活动地址', trigger: 'blur'},
-          {type: 'string', pattern: /^(\w|[\u4e00-\u9fa5])+$/, message: '请不要包含特殊字符', trigger: 'change'}
-        ],
-        remarks: [
-          {type: 'string', pattern: /^(\w|[\u4e00-\u9fa5])+$/, message: '请不要包含特殊字符', trigger: 'change'}
-        ],
-        startDateTime: [
-          {type: 'date', required: true, message: '请选择日期', trigger: 'blur'},
-        ],
-        activityProbability: [
-          {required: true, message: '请输入卡券中奖概率', trigger: 'blur'},
-          {type: 'number', message: '卡券中奖概率必须为数字值'}
-        ]
+export default {
+  name: "AdminActivity",
+  layout: 'admin',
+  data: () => ({
+    valid: true,
+    breadcrumbList: [
+      {
+        text: '主页',
+        disabled: false,
+        href: '/admin'
       },
-      editedIndex: -1,
-      editedItem: {
-        activityName: '',
-        activityAddress: '',
-        startDateTime: '',
-        activityState: false,
-        remarks: '',
+      {
+        text: '抽奖活动管理',
+        disabled: true,
+        href: '/admin/activity'
       },
-      defaultItem: {
-        activityName: '',
-        activityAddress: '',
-        startDateTime: '',
-        startTime: '',
-        activityState: false,
-        remarks: ''
+    ],
+    dialog: false,
+    activityProbabilityDialog: false,
+    headers: [
+      {text: 'ID', align: 'left', sortable: true, value: 'id'},
+      {text: '活动名称', align: 'left', value: 'activityName'},
+      {text: '活动描述', align: 'left', value: 'activityDescription'},
+      {text: '活动缩略图', align: 'left', value: 'activityThumbnail'},
+      {text: '当前卡券', align: 'left', value: 'activityProbability'},
+      {text: '添加时间', align: 'left', value: 'createdAt'},
+      {text: '活动状态', align: 'left', value: 'activityState'},
+      {text: '参与人数', align: 'left', value: 'activityNum'},
+      {text: '备注', align: 'left', value: 'remarks'},
+      {text: '操作', align: 'left', value: 'id', sortable: false},
+    ],
+    activityList: [
+      {
+        id: 159,
+        activityName: '海底捞',
+        activityDescription: '活动描述活动描述活动描述',
+        activityThumbnail: "https://randomuser.me/api/portraits/men/85.jpg",
+        activityProbability: null,
+        createdAt: new Date(),
+        activityState: true,
+        activityNum: 100,
+        remarks: "备注备注备注备注备注备注"
       },
-      search: '',
-    }),
-    computed: {
-      formTitle() {
-        return this.editedIndex === -1 ? '添加活动' : '修改活动'
-      }
+      {
+        id: 1,
+        activityName: '海底捞',
+        activityDescription: '活动描述活动描述活动描述',
+        activityThumbnail: "https://randomuser.me/api/portraits/men/85.jpg",
+        activityProbability: null,
+        createdAt: new Date(),
+        activityState: true,
+        activityNum: 100,
+        remarks: "备注备注备注备注备注备注"
+      },
+      {
+        id: 2,
+        activityName: '海底捞',
+        activityDescription: '活动描述活动描述活动描述',
+        activityThumbnail: "https://randomuser.me/api/portraits/men/85.jpg",
+        activityProbability: null,
+        createdAt: new Date(),
+        activityState: true,
+        activityNum: 100,
+        remarks: "备注备注备注备注备注备注"
+      },
+      {
+        id: 3,
+        activityName: '海底捞',
+        activityDescription: '活动描述活动描述活动描述',
+        activityThumbnail: "https://randomuser.me/api/portraits/men/85.jpg",
+        activityProbability: null,
+        createdAt: new Date(),
+        activityState: true,
+        activityNum: 100,
+        remarks: "备注备注备注备注备注备注"
+      },
+      {
+        id: 4,
+        activityName: '海底捞',
+        activityDescription: '活动描述活动描述活动描述',
+        activityThumbnail: "https://randomuser.me/api/portraits/men/85.jpg",
+        activityProbability: null,
+        createdAt: new Date(),
+        activityState: true,
+        activityNum: 100,
+        remarks: "备注备注备注备注备注备注"
+      },
+      {
+        id: 5,
+        activityName: '海底捞',
+        activityDescription: '活动描述活动描述活动描述',
+        activityThumbnail: "https://randomuser.me/api/portraits/men/85.jpg",
+        activityProbability: null,
+        createdAt: new Date(),
+        activityState: true,
+        activityNum: 100,
+        remarks: "备注备注备注备注备注备注"
+      },
+      {
+        id: 6,
+        activityName: '海底捞',
+        activityDescription: '活动描述活动描述活动描述',
+        activityThumbnail: "https://randomuser.me/api/portraits/men/85.jpg",
+        activityProbability: null,
+        createdAt: new Date(),
+        activityState: true,
+        activityNum: 100,
+        remarks: "备注备注备注备注备注备注"
+      },
+    ],
+    rules: {
+      activityName: [
+        {required: true, message: '请输入活动名称', trigger: 'blur'},
+        {min: 3, max: 20, message: '长度在 3 到 20 个字符', trigger: 'change'},
+        {pattern: /^(\w|[\u4e00-\u9fa5])+$/, message: '请不要包含特殊字符', trigger: 'change'}
+      ],
+      activityAddress: [
+        {required: true, message: '请输入活动地址', trigger: 'blur'},
+        {type: 'string', pattern: /^(\w|[\u4e00-\u9fa5])+$/, message: '请不要包含特殊字符', trigger: 'change'}
+      ],
+      remarks: [
+        {type: 'string', pattern: /^(\w|[\u4e00-\u9fa5])+$/, message: '请不要包含特殊字符', trigger: 'change'}
+      ],
+      startDateTime: [
+        {type: 'date', required: true, message: '请选择日期', trigger: 'blur'},
+      ],
+      activityProbability: [
+        {required: true, message: '请输入卡券中奖概率', trigger: 'blur'},
+        {type: 'number', message: '卡券中奖概率必须为数字值'}
+      ]
     },
-    watch: {
-      dialog(val) {
-        val || this.close()
+    cardList: [
+      {
+        id: 1,
+        cardName: '卡券1',
+        cardDescription: '卡券详情1卡券详情1卡券详情1卡券详情1卡券详情1',
+        startDateTime: null,
+        endDateTime: new Date(new Date().getTime() + 1000000000),
+        src: 'https://cdn.vuetifyjs.com/images/employeeList/house.jpg',
       },
+      {
+        id: 2,
+        cardName: '卡券1',
+        cardDescription: '卡券详情1卡券详情1卡券详情1卡券详情1卡券详情1',
+        startDateTime: null,
+        endDateTime: new Date(new Date().getTime() + 1000000000),
+        src: 'https://cdn.vuetifyjs.com/images/employeeList/house.jpg',
+      },
+      {
+        id: 3,
+        cardName: '卡券1',
+        cardDescription: '卡券详情1卡券详情1卡券详情1卡券详情1卡券详情1',
+        startDateTime: null,
+        endDateTime: new Date(new Date().getTime() + 1000000000),
+        src: 'https://cdn.vuetifyjs.com/images/employeeList/house.jpg',
+      },
+      {
+        id: 4,
+        cardName: '卡券1',
+        cardDescription: '卡券详情1卡券详情1卡券详情1卡券详情1卡券详情1',
+        startDateTime: null,
+        endDateTime: new Date(new Date().getTime() + 1000000000),
+        src: 'https://cdn.vuetifyjs.com/images/employeeList/house.jpg',
+      },
+      {
+        id: 5,
+        cardName: '卡券1',
+        cardDescription: '卡券详情1卡券详情1卡券详情1卡券详情1卡券详情1',
+        startDateTime: null,
+        endDateTime: new Date(new Date().getTime() + 1000000000),
+        src: 'https://cdn.vuetifyjs.com/images/employeeList/house.jpg',
+      },
+    ],
+    editedIndex: -1,
+    editedItem: {
+      activityName: '',
+      activityAddress: '',
+      startDateTime: '',
+      activityState: false,
+      remarks: '',
     },
-    methods: {
-      editItem(item) {
-        this.editedIndex = this.activityList.indexOf(item);
-        this.editedItem = Object.assign({}, item);
-        this.dialog = true
-      },
-      deleteItem(item) {
-        const index = this.activityList.indexOf(item);
-        confirm(`确定要删除 ${item.activityName} ?`) && this.activityList.splice(index, 1)
-      },
-      close() {
-        this.dialog = false;
-        setTimeout(() => {
-          this.editedItem = Object.assign({}, this.defaultItem);
-          this.editedIndex = -1;
-          this.$refs.editedItem.resetFields();
-          this.valid = true;
-        }, 100)
-      },
-      save() {
-        this.$refs.editedItem.validate((valid) => {
-          if (valid) {
-            if (this.editedIndex > -1) {
-              Object.assign(this.activityList[this.editedIndex], this.editedItem)
-            } else {
-              this.activityList.push(this.editedItem)
-            }
-            this.close()
+    defaultItem: {
+      activityName: '',
+      activityAddress: '',
+      startDateTime: '',
+      startTime: '',
+      activityState: false,
+      remarks: ''
+    },
+    search: '',
+
+    options: [{
+      value: '选项1',
+      label: '黄金糕'
+    }, {
+      value: '选项2',
+      label: '双皮奶'
+    }, {
+      value: '选项3',
+      label: '蚵仔煎'
+    }, {
+      value: '选项4',
+      label: '龙须面'
+    }, {
+      value: '选项5',
+      label: '北京烤鸭'
+    }],
+    value5: [],
+    value11: []
+  }),
+  computed: {
+    formTitle() {
+      return this.editedIndex === -1 ? '添加活动' : '修改活动'
+    }
+  },
+  watch: {
+    dialog(val) {
+      val || this.close()
+    },
+  },
+  methods: {
+    editItem(item) {
+      this.editedIndex = this.activityList.indexOf(item);
+      this.editedItem = Object.assign({}, item);
+      this.dialog = true
+    },
+    deleteItem(item) {
+      const index = this.activityList.indexOf(item);
+      confirm(`确定要删除 ${item.activityName} ?`) && this.activityList.splice(index, 1)
+    },
+    close() {
+      this.dialog = false;
+      setTimeout(() => {
+        this.editedItem = Object.assign({}, this.defaultItem);
+        this.editedIndex = -1;
+        this.$refs.editedItem.resetFields();
+        this.valid = true;
+      }, 100)
+    },
+    save() {
+      this.$refs.editedItem.validate((valid) => {
+        if (valid) {
+          if (this.editedIndex > -1) {
+            Object.assign(this.activityList[this.editedIndex], this.editedItem)
+          } else {
+            this.activityList.push(JSON.parse(JSON.stringify(this.editedItem)))
           }
-        });
-      },
-      formatDate(dateTimeObj) {
-        return `${dateTimeObj.getFullYear()}-${dateTimeObj.getMonth() + 1}-${new Date().getDate()} ${dateTimeObj.getHours()}:${dateTimeObj.getMinutes()}:${dateTimeObj.getSeconds()}`;
-      }
+          this.close()
+        }
+      });
     },
-  }
+    formatDate(dateTimeObj) {
+      if (!dateTimeObj) {
+        return '暂无';
+      }
+      dateTimeObj = new Date(dateTimeObj);
+      return dateTimeObj ? `${dateTimeObj.getFullYear()}-${dateTimeObj.getMonth() + 1}-${new Date().getDate()} ${dateTimeObj.getHours()}:${dateTimeObj.getMinutes()}:${dateTimeObj.getSeconds()}` : '暂无';
+    }
+  },
+}
 </script>
 
 <style scoped lang="stylus">

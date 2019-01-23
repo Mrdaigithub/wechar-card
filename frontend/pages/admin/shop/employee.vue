@@ -54,7 +54,7 @@
                   :model="editedItem"
                   :rules="rules"
                   label-width="80px"
-                  label-position="left">
+                  label-position="right">
                   <v-layout wrap>
                     <v-flex
                       xs12
@@ -84,6 +84,7 @@
                         prop="shopName">
                         <el-select
                           v-model="editedItem.shopName"
+                          class="w100"
                           filterable>
                           <el-option
                             v-for="item in shopNameOptions"
@@ -99,7 +100,9 @@
                       <el-form-item
                         label="人员岗位"
                         prop="userIdentity">
-                        <el-select v-model="editedItem.userIdentity">
+                        <el-select 
+                          v-model="editedItem.userIdentity" 
+                          class="w100">
                           <el-option
                             v-for="item in userIdentityOptions"
                             :key="item.value"
@@ -157,7 +160,7 @@
       </v-content>
       <v-data-table
         :headers="headers"
-        :items="userList"
+        :items="employeeList"
         :search="search"
         :rows-per-page-items="[ 5, 10, 30]"
         rows-per-page-text="每页行数"
@@ -220,7 +223,7 @@
 
 <script>
   export default {
-    name: "Adminuser",
+    name: "AdminShopEmployee",
     layout: 'admin',
     data: () => ({
       valid: true,
@@ -252,7 +255,7 @@
         {text: '备注', align: 'left', value: 'remarks'},
         {text: '操作', align: 'left', value: 'username', sortable: false},
       ],
-      userList: [
+      employeeList: [
         {
           id: 159,
           username: '店员名称',
@@ -389,13 +392,13 @@
     },
     methods: {
       editItem(item) {
-        this.editedIndex = this.userList.indexOf(item);
+        this.editedIndex = this.employeeList.indexOf(item);
         this.editedItem = Object.assign({}, item);
         this.dialog = true
       },
       deleteItem(item) {
-        const index = this.userList.indexOf(item);
-        confirm(`确定要删除 ${item.username} ?`) && this.userList.splice(index, 1)
+        const index = this.employeeList.indexOf(item);
+        confirm(`确定要删除 ${item.username} ?`) && this.employeeList.splice(index, 1)
       },
       close() {
         this.dialog = false;
@@ -410,16 +413,20 @@
         this.$refs.editedItem.validate((valid) => {
           if (valid) {
             if (this.editedIndex > -1) {
-              Object.assign(this.userList[this.editedIndex], this.editedItem)
+              Object.assign(this.employeeList[this.editedIndex], this.editedItem)
             } else {
-              this.userList.push(this.editedItem)
+              this.employeeList.push(JSON.parse(JSON.stringify(this.editedItem)))
             }
             this.close()
           }
         });
       },
       formatDate(dateTimeObj) {
-        return `${dateTimeObj.getFullYear()}-${dateTimeObj.getMonth() + 1}-${new Date().getDate()} ${dateTimeObj.getHours()}:${dateTimeObj.getMinutes()}:${dateTimeObj.getSeconds()}`;
+        if (!dateTimeObj) {
+          return '暂无';
+        }
+        dateTimeObj = new Date(dateTimeObj);
+        return dateTimeObj ? `${dateTimeObj.getFullYear()}-${dateTimeObj.getMonth() + 1}-${new Date().getDate()} ${dateTimeObj.getHours()}:${dateTimeObj.getMinutes()}:${dateTimeObj.getSeconds()}` : '暂无';
       }
     },
   }
