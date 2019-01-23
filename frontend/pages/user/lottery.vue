@@ -119,7 +119,7 @@
     <v-dialog
       v-model="qrCodeDialog"
       persistent
-      max-width="500px">
+      max-width="300px">
       <v-card>
         <v-card-title>
           <span>请将二维码交予老板核销</span>

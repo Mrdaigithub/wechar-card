@@ -64,7 +64,7 @@
     <v-dialog
       v-model="qrCodeDialog"
       persistent
-      max-width="500px">
+      max-width="300px">
       <v-card>
         <v-card-title>
           <span>员工扫描此二维码以添加</span>

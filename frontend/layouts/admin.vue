@@ -33,6 +33,14 @@
             <v-list-tile-title>主页</v-list-tile-title>
           </v-list-tile-content>
         </v-list-tile>
+        <v-list-tile @click="clickDrawerHandler('/admin/system/config')">
+          <v-list-tile-action>
+            <v-icon>settings</v-icon>
+          </v-list-tile-action>
+          <v-list-tile-content>
+            <v-list-tile-title>系统设置</v-list-tile-title>
+          </v-list-tile-content>
+        </v-list-tile>
         <v-list-tile @click="clickDrawerHandler('/admin/card')">
           <v-list-tile-action>
             <v-icon>card_giftcard</v-icon>
@@ -57,14 +65,6 @@
             <v-list-tile-title>用户管理</v-list-tile-title>
           </v-list-tile-content>
         </v-list-tile>
-        <v-list-tile @click="clickDrawerHandler('/admin/user/signin')">
-          <v-list-tile-action>
-            <v-icon>create</v-icon>
-          </v-list-tile-action>
-          <v-list-tile-content>
-            <v-list-tile-title>签到管理</v-list-tile-title>
-          </v-list-tile-content>
-        </v-list-tile>
         <v-list-tile @click="clickDrawerHandler('/admin/shop')">
           <v-list-tile-action>
             <v-icon>shopping_cart</v-icon>
@@ -87,14 +87,6 @@
           </v-list-tile-action>
           <v-list-tile-content>
             <v-list-tile-title>中奖记录管理</v-list-tile-title>
-          </v-list-tile-content>
-        </v-list-tile>
-        <v-list-tile @click="clickDrawerHandler('/admin/log/lottery')">
-          <v-list-tile-action>
-            <v-icon>bookmarks</v-icon>
-          </v-list-tile-action>
-          <v-list-tile-content>
-            <v-list-tile-title>核销记录管理</v-list-tile-title>
           </v-list-tile-content>
         </v-list-tile>
       </v-list>

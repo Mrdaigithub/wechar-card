@@ -40,7 +40,7 @@
     </v-layout>
     <v-dialog
       v-model="msgDialog"
-      max-width="500px">
+      max-width="300px">
       <v-card>
         <v-card-title>
           <span>签到成功{{ lotteryAdd?', 抽奖次数+1':null }}</span>
