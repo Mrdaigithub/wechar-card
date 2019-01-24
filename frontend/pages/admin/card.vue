@@ -138,11 +138,17 @@
           slot-scope="props">
           <td>{{ props.item.id }}</td>
           <td class="text-xs-left">{{ props.item.cardName }}</td>
+          <td class="text-xs-left">
+            <v-img
+              :src="props.item.cardThumbnail"
+              :lazy-src="props.item.cardThumbnail"
+              width="80px"/>
+          </td>
           <td class="text-xs-left">{{ props.item.remarks }}</td>
           <td class="text-xs-left">{{ props.item.startDateTime ? `${formatDate(props.item.startDateTime)} -
             ${formatDate(props.item.endDateTime)}` : `${formatDate(props.item.endDateTime)}` }}
           </td>
-          <td class="text-xs-left">{{ props.item.cardState ? '有效' : '已失效' }}</td>
+          <td class="text-xs-left">{{ props.item.cardState ? "有效" : "已失效" }}</td>
           <td class="text-xs-left">{{ `${props.item.cardProbability}%` }}</td>
           <td class="justify-center layout px-0">
             <v-icon
@@ -179,171 +185,181 @@
 </template>
 
 <script>
-export default {
-  name: "AdminCard",
-  layout: 'admin',
-  data: () => ({
-    valid: true,
-    breadcrumbList: [
-      {
-        text: '主页',
-        disabled: false,
-        href: '/admin'
-      },
-      {
-        text: '卡券管理',
-        disabled: true,
-        href: '/admin/card'
-      },
-    ],
-    dialog: false,
-    headers: [
-      {text: 'ID', align: 'left', sortable: true, value: 'id'},
-      {text: '卡券名称', align: 'left', value: 'cardName'},
-      {text: '备注', align: 'left', value: 'remarks'},
-      {text: '有效期截止', align: 'left', value: 'endDateTime'},
-      {text: '卡券状态', align: 'left', value: 'cardState'},
-      {text: '中奖率', align: 'left', value: 'cardProbability'},
-      {text: '操作', align: 'left', value: 'cardName', sortable: false},
-    ],
-    cardList: [
-      {
-        id: 159,
-        cardName: '卡券名称',
-        remarks: "备注",
-        startDateTime: null,
-        endDateTime: new Date(new Date().getTime() + 1000000000),
-        cardState: true,
-        cardProbability: 10
-      },
-      {
-        id: 1,
-        cardName: '卡券名称',
-        remarks: "备注",
-        startDateTime: null,
-        endDateTime: new Date(new Date().getTime() + 1000000000),
-        cardState: true,
-        cardProbability: 10
-      },
-      {
-        id: 2,
-        cardName: '卡券名称',
-        remarks: "备注",
-        startDateTime: null,
-        endDateTime: new Date(new Date().getTime() + 1000000000),
-        cardState: true,
-        cardProbability: 10
-      },
-      {
-        id: 3,
-        cardName: '卡券名称',
-        remarks: "备注",
-        startDateTime: null,
-        endDateTime: new Date(new Date().getTime() + 1000000000),
-        cardState: true,
-        cardProbability: 10
-      },
-      {
-        id: 4,
-        cardName: '卡券名称',
-        remarks: "备注",
-        startDateTime: null,
-        endDateTime: new Date(new Date().getTime() + 1000000000),
-        cardState: true,
-        cardProbability: 10
-      },
-      {
-        id: 5,
-        cardName: '卡券名称',
-        remarks: "备注",
-        startDateTime: null,
-        endDateTime: new Date(new Date().getTime() + 1000000000),
-        cardState: true,
-        cardProbability: 10
-      },
-    ],
-    rules: {
-      cardName: [
-        {required: true, message: '请输入卡券名称', trigger: 'blur'},
-        {min: 2, max: 20, message: '长度在 2 到 20 个字符', trigger: 'change'},
-        {pattern: /^(\w|[\u4e00-\u9fa5])+$/, message: '请不要包含特殊字符', trigger: 'change'}
+  export default {
+    name: "AdminCard",
+    layout: "admin",
+    data: () => ({
+      valid: true,
+      breadcrumbList: [
+        {
+          text: "主页",
+          disabled: false,
+          href: "/admin"
+        },
+        {
+          text: "卡券管理",
+          disabled: true,
+          href: "/admin/card"
+        },
       ],
-      remarks: [
-        {type: 'string', pattern: /^(\w|[\u4e00-\u9fa5])+$/, message: '请不要包含特殊字符', trigger: 'change'}
+      dialog: false,
+      headers: [
+        {text: "ID", align: "left", sortable: true, value: "id"},
+        {text: "卡券名称", align: "left", value: "cardName"},
+        {text: "卡券缩略图", align: "left", value: "cardThumbnail"},
+        {text: "备注", align: "left", value: "remarks"},
+        {text: "有效期截止", align: "left", value: "endDateTime"},
+        {text: "卡券状态", align: "left", value: "cardState"},
+        {text: "中奖率", align: "left", value: "cardProbability"},
+        {text: "操作", align: "left", value: "cardName", sortable: false},
       ],
-      endDateTime: [
-        {type: 'date', required: true, message: '请选择日期', trigger: 'blur'},
-      ]
-    },
-    editedIndex: -1,
-    editedItem: {
-      cardName: '',
-      remarks: '',
-      startDateTime: '',
-      endDateTime: '',
-      cardProbability: 0,
-      cardState: false,
-    },
-    defaultItem: {
-      cardName: '',
-      remarks: '',
-      startDateTime: '',
-      endDateTime: '',
-      cardProbability: 0,
-      cardState: false,
-    },
-    search: '',
-  }),
-  computed: {
-    formTitle() {
-      return this.editedIndex === -1 ? '添加卡券' : '修改卡券'
-    }
-  },
-  watch: {
-    dialog(val) {
-      val || this.close()
-    },
-  },
-  methods: {
-    editItem(item) {
-      this.editedIndex = this.cardList.indexOf(item);
-      this.editedItem = Object.assign({}, item);
-      this.dialog = true
-    },
-    deleteItem(item) {
-      const index = this.cardList.indexOf(item);
-      confirm(`确定要删除 ${item.cardName} ?`) && this.cardList.splice(index, 1)
-    },
-    close() {
-      this.dialog = false;
-      setTimeout(() => {
-        this.editedItem = Object.assign({}, this.defaultItem);
-        this.editedIndex = -1;
-        this.$refs.editedItem.resetFields();
-        this.valid = true;
-      }, 100)
-    },
-    save() {
-      this.$refs.editedItem.validate((valid) => {
-        if (valid) {
-          if (this.editedIndex > -1) {
-            Object.assign(this.cardList[this.editedIndex], this.editedItem)
-          } else {
-            this.cardList.push(JSON.parse(JSON.stringify(this.editedItem)))
-          }
-          this.close()
-        }
-      });
-    },
-    formatDate(dateTimeObj) {
-      if (!dateTimeObj) {
-        return '暂无';
+      cardList: [
+        {
+          id: 159,
+          cardName: "卡券名称",
+          cardThumbnail: "https://randomuser.me/api/portraits/men/85.jpg",
+          remarks: "备注",
+          startDateTime: null,
+          endDateTime: new Date(new Date().getTime() + 1000000000),
+          cardState: true,
+          cardProbability: 10
+        },
+        {
+          id: 1,
+          cardName: "卡券名称",
+          cardThumbnail: "https://randomuser.me/api/portraits/men/85.jpg",
+          remarks: "备注",
+          startDateTime: null,
+          endDateTime: new Date(new Date().getTime() + 1000000000),
+          cardState: true,
+          cardProbability: 10
+        },
+        {
+          id: 2,
+          cardName: "卡券名称",
+          cardThumbnail: "https://randomuser.me/api/portraits/men/85.jpg",
+          remarks: "备注",
+          startDateTime: null,
+          endDateTime: new Date(new Date().getTime() + 1000000000),
+          cardState: true,
+          cardProbability: 10
+        },
+        {
+          id: 3,
+          cardName: "卡券名称",
+          cardThumbnail: "https://randomuser.me/api/portraits/men/85.jpg",
+          remarks: "备注",
+          startDateTime: null,
+          endDateTime: new Date(new Date().getTime() + 1000000000),
+          cardState: true,
+          cardProbability: 10
+        },
+        {
+          id: 4,
+          cardName: "卡券名称",
+          cardThumbnail: "https://randomuser.me/api/portraits/men/85.jpg",
+          remarks: "备注",
+          startDateTime: null,
+          endDateTime: new Date(new Date().getTime() + 1000000000),
+          cardState: true,
+          cardProbability: 10
+        },
+        {
+          id: 5,
+          cardName: "卡券名称",
+          cardThumbnail: "https://randomuser.me/api/portraits/men/85.jpg",
+          remarks: "备注",
+          startDateTime: null,
+          endDateTime: new Date(new Date().getTime() + 1000000000),
+          cardState: true,
+          cardProbability: 10
+        },
+      ],
+      rules: {
+        cardName: [
+          {required: true, message: "请输入卡券名称", trigger: "blur"},
+          {min: 2, max: 20, message: "长度在 2 到 20 个字符", trigger: "change"},
+          {pattern: /^(\w|[\u4e00-\u9fa5])+$/, message: "请不要包含特殊字符", trigger: "change"}
+        ],
+        remarks: [
+          {type: "string", pattern: /^(\w|[\u4e00-\u9fa5])+$/, message: "请不要包含特殊字符", trigger: "change"}
+        ],
+        endDateTime: [
+          {type: "date", required: true, message: "请选择日期", trigger: "blur"},
+        ]
+      },
+      editedIndex: -1,
+      editedItem: {
+        cardName: "",
+        remarks: "",
+        startDateTime: "",
+        endDateTime: "",
+        cardProbability: 0,
+        cardState: false,
+      },
+      defaultItem: {
+        cardName: "",
+        remarks: "",
+        startDateTime: "",
+        endDateTime: "",
+        cardProbability: 0,
+        cardState: false,
+      },
+      search: "",
+    }),
+    computed: {
+      formTitle() {
+        return this.editedIndex === -1 ? "添加卡券" : "修改卡券"
       }
-      dateTimeObj = new Date(dateTimeObj);
-      return dateTimeObj ? `${dateTimeObj.getFullYear()}-${dateTimeObj.getMonth() + 1}-${new Date().getDate()} ${dateTimeObj.getHours()}:${dateTimeObj.getMinutes()}:${dateTimeObj.getSeconds()}` : '暂无';
-    }
-  },
-}
+    },
+    watch: {
+      dialog(val) {
+        val || this.close()
+      },
+    },
+    methods: {
+      editItem(item) {
+        this.editedIndex = this.cardList.indexOf(item);
+        this.editedItem = Object.assign({}, item);
+        this.dialog = true
+      },
+      deleteItem(item) {
+        const index = this.cardList.indexOf(item);
+        confirm(`确定要删除 ${item.cardName} ?`) && this.cardList.splice(index, 1)
+      },
+      close() {
+        this.dialog = false;
+        setTimeout(() => {
+          this.editedItem = Object.assign({}, this.defaultItem);
+          this.editedIndex = -1;
+          this.$refs.editedItem.resetFields();
+          this.valid = true;
+        }, 100)
+      },
+      save() {
+        this.$refs.editedItem.validate((valid) => {
+          console.log(this.$refs.editedItem);
+          if (valid) {
+            if (this.editedIndex > -1) {
+              Object.assign(this.cardList[this.editedIndex], this.editedItem)
+            } else {
+              this.cardList.push(JSON.parse(JSON.stringify(this.editedItem)))
+            }
+            this.close()
+          }
+        });
+      },
+      formatDate(dateTimeObj) {
+        if (!dateTimeObj) {
+          return "暂无";
+        }
+        if (!(dateTimeObj instanceof Date)) {
+          dateTimeObj = new Date(dateTimeObj);
+        }
+        return dateTimeObj ? `${dateTimeObj.getFullYear()}-${dateTimeObj.getMonth() + 1}-${new Date().getDate()} ${dateTimeObj.getHours()}:${dateTimeObj.getMinutes()}:${dateTimeObj.getSeconds()}` : "暂无";
+      }
+    },
+  }
 </script>
 
 <style scoped lang="stylus">

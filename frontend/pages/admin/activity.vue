@@ -89,11 +89,35 @@
                           multiple
                           placeholder="请选择">
                           <el-option
-                            v-for="item in options"
+                            v-for="item in cardOptions"
                             :key="item.value"
                             :label="item.label"
                             :value="item.value"/>
                         </el-select>
+                      </el-form-item>
+                    </v-flex>
+                    <v-flex
+                      xs12
+                      sm6>
+                      <el-form-item
+                        label="缩略图"
+                        prop="activityThumbnail">
+                        <el-upload
+                          :on-preview="handlePreview"
+                          :on-remove="handleRemove"
+                          :before-remove="beforeRemove"
+                          :limit="1"
+                          :file-list="fileList"
+                          class="upload-demo"
+                          action="https://jsonplaceholder.typicode.com/posts/"
+                          multiple>
+                          <el-button 
+                            size="small" 
+                            type="primary">点击上传</el-button>
+                          <div 
+                            slot="tip" 
+                            class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
+                        </el-upload>
                       </el-form-item>
                     </v-flex>
                     <v-flex
@@ -245,7 +269,7 @@
             <v-spacer/>
             <v-btn
               flat
-              @click="close">关闭
+              @click="activityProbabilityDialog=false">关闭
             </v-btn>
           </v-card-actions>
         </v-card>
@@ -255,266 +279,270 @@
 </template>
 
 <script>
-export default {
-  name: "AdminActivity",
-  layout: 'admin',
-  data: () => ({
-    valid: true,
-    breadcrumbList: [
-      {
-        text: '主页',
-        disabled: false,
-        href: '/admin'
-      },
-      {
-        text: '抽奖活动管理',
-        disabled: true,
-        href: '/admin/activity'
-      },
-    ],
-    dialog: false,
-    activityProbabilityDialog: false,
-    headers: [
-      {text: 'ID', align: 'left', sortable: true, value: 'id'},
-      {text: '活动名称', align: 'left', value: 'activityName'},
-      {text: '活动描述', align: 'left', value: 'activityDescription'},
-      {text: '活动缩略图', align: 'left', value: 'activityThumbnail'},
-      {text: '当前卡券', align: 'left', value: 'activityProbability'},
-      {text: '添加时间', align: 'left', value: 'createdAt'},
-      {text: '活动状态', align: 'left', value: 'activityState'},
-      {text: '参与人数', align: 'left', value: 'activityNum'},
-      {text: '备注', align: 'left', value: 'remarks'},
-      {text: '操作', align: 'left', value: 'id', sortable: false},
-    ],
-    activityList: [
-      {
-        id: 159,
-        activityName: '海底捞',
-        activityDescription: '活动描述活动描述活动描述',
-        activityThumbnail: "https://randomuser.me/api/portraits/men/85.jpg",
-        activityProbability: null,
-        createdAt: new Date(),
-        activityState: true,
-        activityNum: 100,
-        remarks: "备注备注备注备注备注备注"
-      },
-      {
-        id: 1,
-        activityName: '海底捞',
-        activityDescription: '活动描述活动描述活动描述',
-        activityThumbnail: "https://randomuser.me/api/portraits/men/85.jpg",
-        activityProbability: null,
-        createdAt: new Date(),
-        activityState: true,
-        activityNum: 100,
-        remarks: "备注备注备注备注备注备注"
-      },
-      {
-        id: 2,
-        activityName: '海底捞',
-        activityDescription: '活动描述活动描述活动描述',
-        activityThumbnail: "https://randomuser.me/api/portraits/men/85.jpg",
-        activityProbability: null,
-        createdAt: new Date(),
-        activityState: true,
-        activityNum: 100,
-        remarks: "备注备注备注备注备注备注"
-      },
-      {
-        id: 3,
-        activityName: '海底捞',
-        activityDescription: '活动描述活动描述活动描述',
-        activityThumbnail: "https://randomuser.me/api/portraits/men/85.jpg",
-        activityProbability: null,
-        createdAt: new Date(),
-        activityState: true,
-        activityNum: 100,
-        remarks: "备注备注备注备注备注备注"
-      },
-      {
-        id: 4,
-        activityName: '海底捞',
-        activityDescription: '活动描述活动描述活动描述',
-        activityThumbnail: "https://randomuser.me/api/portraits/men/85.jpg",
-        activityProbability: null,
-        createdAt: new Date(),
-        activityState: true,
-        activityNum: 100,
-        remarks: "备注备注备注备注备注备注"
-      },
-      {
-        id: 5,
-        activityName: '海底捞',
-        activityDescription: '活动描述活动描述活动描述',
-        activityThumbnail: "https://randomuser.me/api/portraits/men/85.jpg",
-        activityProbability: null,
-        createdAt: new Date(),
-        activityState: true,
-        activityNum: 100,
-        remarks: "备注备注备注备注备注备注"
-      },
-      {
-        id: 6,
-        activityName: '海底捞',
-        activityDescription: '活动描述活动描述活动描述',
-        activityThumbnail: "https://randomuser.me/api/portraits/men/85.jpg",
-        activityProbability: null,
-        createdAt: new Date(),
-        activityState: true,
-        activityNum: 100,
-        remarks: "备注备注备注备注备注备注"
-      },
-    ],
-    rules: {
-      activityName: [
-        {required: true, message: '请输入活动名称', trigger: 'blur'},
-        {min: 3, max: 20, message: '长度在 3 到 20 个字符', trigger: 'change'},
-        {pattern: /^(\w|[\u4e00-\u9fa5])+$/, message: '请不要包含特殊字符', trigger: 'change'}
+  export default {
+    name: "AdminActivity",
+    layout: 'admin',
+    data: () => ({
+      valid: true,
+      breadcrumbList: [
+        {
+          text: '主页',
+          disabled: false,
+          href: '/admin'
+        },
+        {
+          text: '抽奖活动管理',
+          disabled: true,
+          href: '/admin/activity'
+        },
       ],
-      activityAddress: [
-        {required: true, message: '请输入活动地址', trigger: 'blur'},
-        {type: 'string', pattern: /^(\w|[\u4e00-\u9fa5])+$/, message: '请不要包含特殊字符', trigger: 'change'}
+      dialog: false,
+      activityProbabilityDialog: false,
+      headers: [
+        {text: 'ID', align: 'left', sortable: true, value: 'id'},
+        {text: '活动名称', align: 'left', value: 'activityName'},
+        {text: '活动描述', align: 'left', value: 'activityDescription'},
+        {text: '活动缩略图', align: 'left', value: 'activityThumbnail'},
+        {text: '当前卡券', align: 'left', value: 'activityProbability'},
+        {text: '添加时间', align: 'left', value: 'createdAt'},
+        {text: '活动状态', align: 'left', value: 'activityState'},
+        {text: '参与人数', align: 'left', value: 'activityNum'},
+        {text: '备注', align: 'left', value: 'remarks'},
+        {text: '操作', align: 'left', value: 'id', sortable: false},
       ],
-      remarks: [
-        {type: 'string', pattern: /^(\w|[\u4e00-\u9fa5])+$/, message: '请不要包含特殊字符', trigger: 'change'}
+      activityList: [
+        {
+          id: 159,
+          activityName: '海底捞',
+          activityDescription: '活动描述活动描述活动描述',
+          activityThumbnail: "https://randomuser.me/api/portraits/men/85.jpg",
+          activityProbability: null,
+          createdAt: new Date(),
+          selectedCardList: [],
+          activityState: true,
+          activityNum: 100,
+          remarks: "备注备注备注备注备注备注"
+        },
+        {
+          id: 1,
+          activityName: '海底捞',
+          activityDescription: '活动描述活动描述活动描述',
+          activityThumbnail: "https://randomuser.me/api/portraits/men/85.jpg",
+          activityProbability: null,
+          createdAt: new Date(),
+          activityState: true,
+          activityNum: 100,
+          remarks: "备注备注备注备注备注备注"
+        },
+        {
+          id: 2,
+          activityName: '海底捞',
+          activityDescription: '活动描述活动描述活动描述',
+          activityThumbnail: "https://randomuser.me/api/portraits/men/85.jpg",
+          activityProbability: null,
+          createdAt: new Date(),
+          activityState: true,
+          activityNum: 100,
+          remarks: "备注备注备注备注备注备注"
+        },
+        {
+          id: 3,
+          activityName: '海底捞',
+          activityDescription: '活动描述活动描述活动描述',
+          activityThumbnail: "https://randomuser.me/api/portraits/men/85.jpg",
+          activityProbability: null,
+          createdAt: new Date(),
+          activityState: true,
+          activityNum: 100,
+          remarks: "备注备注备注备注备注备注"
+        },
+        {
+          id: 4,
+          activityName: '海底捞',
+          activityDescription: '活动描述活动描述活动描述',
+          activityThumbnail: "https://randomuser.me/api/portraits/men/85.jpg",
+          activityProbability: null,
+          createdAt: new Date(),
+          activityState: true,
+          activityNum: 100,
+          remarks: "备注备注备注备注备注备注"
+        },
+        {
+          id: 5,
+          activityName: '海底捞',
+          activityDescription: '活动描述活动描述活动描述',
+          activityThumbnail: "https://randomuser.me/api/portraits/men/85.jpg",
+          activityProbability: null,
+          createdAt: new Date(),
+          activityState: true,
+          activityNum: 100,
+          remarks: "备注备注备注备注备注备注"
+        },
+        {
+          id: 6,
+          activityName: '海底捞',
+          activityDescription: '活动描述活动描述活动描述',
+          activityThumbnail: "https://randomuser.me/api/portraits/men/85.jpg",
+          activityProbability: null,
+          createdAt: new Date(),
+          activityState: true,
+          activityNum: 100,
+          remarks: "备注备注备注备注备注备注"
+        },
       ],
-      startDateTime: [
-        {type: 'date', required: true, message: '请选择日期', trigger: 'blur'},
+      rules: {
+        activityName: [
+          {required: true, message: '请输入活动名称', trigger: 'blur'},
+          {min: 3, max: 20, message: '长度在 3 到 20 个字符', trigger: 'change'},
+          {pattern: /^(\w|[\u4e00-\u9fa5])+$/, message: '请不要包含特殊字符', trigger: 'change'}
+        ],
+        activityAddress: [
+          {required: true, message: '请输入活动地址', trigger: 'blur'},
+          {type: 'string', pattern: /^(\w|[\u4e00-\u9fa5])+$/, message: '请不要包含特殊字符', trigger: 'change'}
+        ],
+        remarks: [
+          {type: 'string', pattern: /^(\w|[\u4e00-\u9fa5])+$/, message: '请不要包含特殊字符', trigger: 'change'}
+        ],
+        startDateTime: [
+          {type: 'date', required: true, message: '请选择日期', trigger: 'blur'},
+        ],
+        activityProbability: [
+          {required: true, message: '请输入卡券中奖概率', trigger: 'blur'},
+          {type: 'number', message: '卡券中奖概率必须为数字值'}
+        ]
+      },
+      cardList: [
+        {
+          id: 1,
+          cardName: '卡券1',
+          cardDescription: '卡券详情1卡券详情1卡券详情1卡券详情1卡券详情1',
+          startDateTime: null,
+          endDateTime: new Date(new Date().getTime() + 1000000000),
+          src: 'https://cdn.vuetifyjs.com/images/employeeList/house.jpg',
+        },
+        {
+          id: 2,
+          cardName: '卡券1',
+          cardDescription: '卡券详情1卡券详情1卡券详情1卡券详情1卡券详情1',
+          startDateTime: null,
+          endDateTime: new Date(new Date().getTime() + 1000000000),
+          src: 'https://cdn.vuetifyjs.com/images/employeeList/house.jpg',
+        },
+        {
+          id: 3,
+          cardName: '卡券1',
+          cardDescription: '卡券详情1卡券详情1卡券详情1卡券详情1卡券详情1',
+          startDateTime: null,
+          endDateTime: new Date(new Date().getTime() + 1000000000),
+          src: 'https://cdn.vuetifyjs.com/images/employeeList/house.jpg',
+        },
+        {
+          id: 4,
+          cardName: '卡券1',
+          cardDescription: '卡券详情1卡券详情1卡券详情1卡券详情1卡券详情1',
+          startDateTime: null,
+          endDateTime: new Date(new Date().getTime() + 1000000000),
+          src: 'https://cdn.vuetifyjs.com/images/employeeList/house.jpg',
+        },
+        {
+          id: 5,
+          cardName: '卡券1',
+          cardDescription: '卡券详情1卡券详情1卡券详情1卡券详情1卡券详情1',
+          startDateTime: null,
+          endDateTime: new Date(new Date().getTime() + 1000000000),
+          src: 'https://cdn.vuetifyjs.com/images/employeeList/house.jpg',
+        },
       ],
-      activityProbability: [
-        {required: true, message: '请输入卡券中奖概率', trigger: 'blur'},
-        {type: 'number', message: '卡券中奖概率必须为数字值'}
-      ]
-    },
-    cardList: [
-      {
-        id: 1,
-        cardName: '卡券1',
-        cardDescription: '卡券详情1卡券详情1卡券详情1卡券详情1卡券详情1',
-        startDateTime: null,
-        endDateTime: new Date(new Date().getTime() + 1000000000),
-        src: 'https://cdn.vuetifyjs.com/images/employeeList/house.jpg',
+      editedIndex: -1,
+      editedItem: {
+        activityName: '',
+        activityAddress: '',
+        startDateTime: '',
+        activityState: false,
+        selectedCardOptions: [],
+        activityThumbnail: null,
+        remarks: '',
       },
-      {
-        id: 2,
-        cardName: '卡券1',
-        cardDescription: '卡券详情1卡券详情1卡券详情1卡券详情1卡券详情1',
-        startDateTime: null,
-        endDateTime: new Date(new Date().getTime() + 1000000000),
-        src: 'https://cdn.vuetifyjs.com/images/employeeList/house.jpg',
+      defaultItem: {
+        activityName: '',
+        activityAddress: '',
+        startDateTime: '',
+        startTime: '',
+        activityState: false,
+        selectedCardOptions: [],
+        activityThumbnail: null,
+        remarks: ''
       },
-      {
-        id: 3,
-        cardName: '卡券1',
-        cardDescription: '卡券详情1卡券详情1卡券详情1卡券详情1卡券详情1',
-        startDateTime: null,
-        endDateTime: new Date(new Date().getTime() + 1000000000),
-        src: 'https://cdn.vuetifyjs.com/images/employeeList/house.jpg',
-      },
-      {
-        id: 4,
-        cardName: '卡券1',
-        cardDescription: '卡券详情1卡券详情1卡券详情1卡券详情1卡券详情1',
-        startDateTime: null,
-        endDateTime: new Date(new Date().getTime() + 1000000000),
-        src: 'https://cdn.vuetifyjs.com/images/employeeList/house.jpg',
-      },
-      {
-        id: 5,
-        cardName: '卡券1',
-        cardDescription: '卡券详情1卡券详情1卡券详情1卡券详情1卡券详情1',
-        startDateTime: null,
-        endDateTime: new Date(new Date().getTime() + 1000000000),
-        src: 'https://cdn.vuetifyjs.com/images/employeeList/house.jpg',
-      },
-    ],
-    editedIndex: -1,
-    editedItem: {
-      activityName: '',
-      activityAddress: '',
-      startDateTime: '',
-      activityState: false,
-      remarks: '',
-    },
-    defaultItem: {
-      activityName: '',
-      activityAddress: '',
-      startDateTime: '',
-      startTime: '',
-      activityState: false,
-      remarks: ''
-    },
-    search: '',
-
-    options: [{
-      value: '选项1',
-      label: '黄金糕'
-    }, {
-      value: '选项2',
-      label: '双皮奶'
-    }, {
-      value: '选项3',
-      label: '蚵仔煎'
-    }, {
-      value: '选项4',
-      label: '龙须面'
-    }, {
-      value: '选项5',
-      label: '北京烤鸭'
-    }],
-    value5: [],
-    value11: []
-  }),
-  computed: {
-    formTitle() {
-      return this.editedIndex === -1 ? '添加活动' : '修改活动'
-    }
-  },
-  watch: {
-    dialog(val) {
-      val || this.close()
-    },
-  },
-  methods: {
-    editItem(item) {
-      this.editedIndex = this.activityList.indexOf(item);
-      this.editedItem = Object.assign({}, item);
-      this.dialog = true
-    },
-    deleteItem(item) {
-      const index = this.activityList.indexOf(item);
-      confirm(`确定要删除 ${item.activityName} ?`) && this.activityList.splice(index, 1)
-    },
-    close() {
-      this.dialog = false;
-      setTimeout(() => {
-        this.editedItem = Object.assign({}, this.defaultItem);
-        this.editedIndex = -1;
-        this.$refs.editedItem.resetFields();
-        this.valid = true;
-      }, 100)
-    },
-    save() {
-      this.$refs.editedItem.validate((valid) => {
-        if (valid) {
-          if (this.editedIndex > -1) {
-            Object.assign(this.activityList[this.editedIndex], this.editedItem)
-          } else {
-            this.activityList.push(JSON.parse(JSON.stringify(this.editedItem)))
-          }
-          this.close()
-        }
-      });
-    },
-    formatDate(dateTimeObj) {
-      if (!dateTimeObj) {
-        return '暂无';
+      search: '',
+      
+      cardOptions: [{
+        value: '1',
+        label: '卡券1'
+      }, {
+        value: '2',
+        label: '卡券2'
+      }, {
+        value: '3',
+        label: '卡券2'
+      }, {
+        value: '4',
+        label: '卡券4'
+      }, {
+        value: '5',
+        label: '卡券5'
+      }],
+      value5: [],
+    }),
+    computed: {
+      formTitle() {
+        return this.editedIndex === -1 ? '添加活动' : '修改活动'
       }
-      dateTimeObj = new Date(dateTimeObj);
-      return dateTimeObj ? `${dateTimeObj.getFullYear()}-${dateTimeObj.getMonth() + 1}-${new Date().getDate()} ${dateTimeObj.getHours()}:${dateTimeObj.getMinutes()}:${dateTimeObj.getSeconds()}` : '暂无';
-    }
-  },
-}
+    },
+    watch: {
+      dialog(val) {
+        val || this.close()
+      },
+    },
+    methods: {
+      editItem(item) {
+        this.editedIndex = this.activityList.indexOf(item);
+        this.editedItem = Object.assign({}, item);
+        this.dialog = true
+      },
+      deleteItem(item) {
+        const index = this.activityList.indexOf(item);
+        confirm(`确定要删除 ${item.activityName} ?`) && this.activityList.splice(index, 1)
+      },
+      close() {
+        this.dialog = false;
+        setTimeout(() => {
+          this.editedItem = Object.assign({}, this.defaultItem);
+          this.editedIndex = -1;
+          this.$refs.editedItem.resetFields();
+          this.valid = true;
+        }, 100)
+      },
+      save() {
+        this.$refs.editedItem.validate((valid) => {
+          if (valid) {
+            if (this.editedIndex > -1) {
+              Object.assign(this.activityList[this.editedIndex], this.editedItem)
+            } else {
+              this.activityList.push(JSON.parse(JSON.stringify(this.editedItem)))
+            }
+            this.close()
+          }
+        });
+      },
+      formatDate(dateTimeObj) {
+        if (!dateTimeObj) {
+          return '暂无';
+        }
+        dateTimeObj = new Date(dateTimeObj);
+        return dateTimeObj ? `${dateTimeObj.getFullYear()}-${dateTimeObj.getMonth() + 1}-${new Date().getDate()} ${dateTimeObj.getHours()}:${dateTimeObj.getMinutes()}:${dateTimeObj.getSeconds()}` : '暂无';
+      }
+    },
+  }
 </script>
 
 <style scoped lang="stylus">
