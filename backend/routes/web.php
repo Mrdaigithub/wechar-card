@@ -13,15 +13,17 @@
 
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function() {
-	return view('welcome');
-});
+Route::get('/',
+  function () {
+    return view('welcome');
+  });
 
-Route::get("/test", "WeChatController@test");
-
-Route::prefix('/wechat')->group(function() {
-	Route::any('/', 'WeChatController@serve');
-	Route::get('/token', 'WeChatController@getAccessToken');
-	Route::get('/jssdk/config', 'WeChatController@getJsSdkConfig');
-	Route::get('/oauth2/authorization/user', 'WeChatController@oauth2_authorization_user');
+Route::prefix('/wechat')->group(function () {
+  Route::any('/', 'WeChatController@serve');
+  Route::get("/authorize/user", "WeChatController@authorize_user");
+  Route::get("/grant/user", "WeChatController@grant_user");
+  Route::get('/token', 'WeChatController@getAccessToken');
+  Route::get('/jssdk/config', 'WeChatController@getJsSdkConfig');
+  Route::get('/oauth2/authorization/user',
+    'WeChatController@oauth2_authorization_user');
 });
