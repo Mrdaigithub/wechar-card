@@ -236,9 +236,6 @@ export default {
         : require('../../assets/images/sorry.png');
     },
   },
-  mounted() {
-    console.log(1);
-  },
   created() {
     this.init_prize_list();
   },

@@ -53,7 +53,10 @@ module.exports = {
   ** Axios module configuration
   */
   axios: {
-    // See https://github.com/nuxt-community/axios-module#options
+    baseURL: "https://wzyylm.com/api/v1",
+    https: true,
+    retry: {retries: 3},
+    debug: false
   },
 
   /*
@@ -75,4 +78,4 @@ module.exports = {
       }
     }
   }
-}
+};

@@ -40,8 +40,15 @@
     data: () => ({
       bottomNav: '',
     }),
-    mounted() {
+    async mounted() {
+      await this.$axios.$get("/user");
       this.bottomNav = this.$route.path.split("/")[this.$route.path.split("/").length - 1];
+      if (this.$route.query.openid) {
+        sessionStorage.openid = this.$route.query.openid;
+      } else if (!this.$route.query.openid && sessionStorage.openid) {
+      } else {
+      
+      }
     },
     methods: {
       changePage(url) {
