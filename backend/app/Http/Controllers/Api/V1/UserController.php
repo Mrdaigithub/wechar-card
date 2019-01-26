@@ -7,7 +7,7 @@ use App\Model\User;
 use Illuminate\Http\Request;
 
 class UserController extends ApiController {
-  
+
   /**
    * 获取用户列表
    *
@@ -16,7 +16,7 @@ class UserController extends ApiController {
   public function list() {
     return $this->success(User::all());
   }
-  
+
   /**
    * Store a newly created resource in storage.
    *
@@ -27,22 +27,22 @@ class UserController extends ApiController {
   public function save(Request $request) {
     //
   }
-  
+
   /**
    * 通过 id 查找用户
    *
-   * @param  int $id
+   * @param $id
    *
-   * @return \Illuminate\Http\Response
+   * @return \Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response|mixed
    */
   public function get_user_by_id($id) {
     $user = User::find($id);
     if (!$user) {
       return $this->notFound("未找到此用户");
     }
-    return $user;
+    return $this->success($user);
   }
-  
+
   /**
    * 通过 openid 查找用户
    *
@@ -55,21 +55,21 @@ class UserController extends ApiController {
     if ($users->count() <= 0) {
       return $this->unauthorized("无效的openid");
     }
-    return $users->first();
+    return $this->success($users->first());
   }
-  
+
   /**
    * 更新用户信息
    *
    * @param  \Illuminate\Http\Request $request
-   * @param  int $id
+   * @param  int                      $id
    *
    * @return void
    */
   public function update(Request $request, $id) {
     //
   }
-  
+
   /**
    * 删除指定id用户
    *

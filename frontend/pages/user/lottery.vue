@@ -44,7 +44,7 @@
       <div class="main-bg"/>
       <div class="bg-p"/>
       <div class="content">
-        <div class="lottery_ticket">本月剩余抽奖次数： {{ lottery_ticket }}</div>
+        <div class="lottery_ticket">本月剩余抽奖次数： {{ lotteryNum }}</div>
       </div>
       <div class="tip">
         <div class="tip-title">活动规则</div>
@@ -139,13 +139,13 @@
 </template>
 
 <script>
+import {mapState} from 'vuex';
 import rules from '~/utils/rules';
 
 export default {
   name: 'Lottery',
   layout: 'user',
   data: () => ({
-    lottery_ticket: 0, //抽奖次数
     prize_list: [
       {
         count: 10, // 奖品数量
@@ -226,6 +226,13 @@ export default {
     valid: true,
   }),
   computed: {
+    ...mapState({
+      lotteryNum: state => state.oneself.oneself ? state.oneself.oneself['lottery_num'] : 0, // 剩余抽奖次数
+      lotteryNeedsToFillInTheInformation: state => state.systemConfig.systemConfig ?
+        /^true$/i.test(state.systemConfig.systemConfig.filter(
+          item => item['config_name'] === 'lotteryNeedsToFillInTheInformation')[0]['config_value'])
+        : true,// 抽奖填写信息配置
+    }),
     toast_title() {
       return this.hasPrize
         ? `恭喜您，获得${this.prize_list[this.index].name}<br>请进入个人中心兑换奖励` : '未中奖';
@@ -289,7 +296,11 @@ export default {
         return false;
       }
       this.close_toast();
-      this.formDialog = true;
+      if (this.lotteryNeedsToFillInTheInformation) {
+        this.formDialog = true;
+      } else {
+        this.qrCodeDialog = true;
+      }
     },
     submit() {
       if (this.$refs.form.validate()) {

@@ -14,15 +14,20 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::namespace("Api\V1")
-     ->prefix("v1")
-     ->group(function() {
-       Route::prefix("user")->group(function() {
-         Route::get("/", "UserController@list");
-         Route::post("/", "UserController@save");
-         Route::get("/{id}", "UserController@get_user_by_id");
-         Route::get("/openid/{openid}", "UserController@get_user_by_openid");
-         Route::put("/{id}", "UserController@update");
-         Route::delete("/{id}", "UserController@remove");
-       });
-     });
+Route::namespace("Api\V1")->prefix("v1")->group(function () {
+  Route::prefix("user")->group(function () {
+    Route::get("/", "UserController@list");
+    Route::post("/", "UserController@save");
+    Route::get("/{id}", "UserController@get_user_by_id");
+    Route::get("/openid/{openid}", "UserController@get_user_by_openid");
+    Route::put("/{id}", "UserController@update");
+    Route::delete("/{id}", "UserController@remove");
+  });
+  Route::prefix("system/config")->group(function () {
+    Route::get("/", "SystemConfigController@list");
+  });
+  Route::prefix("card")->group(function () {
+    Route::get("/", "CardController@list");
+    Route::get("/shop/{id}", "CardController@getCardByShopId");
+  });
+});

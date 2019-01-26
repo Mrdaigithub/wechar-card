@@ -14,7 +14,7 @@ class CreateCardTable extends Migration
     public function up()
     {
         Schema::create('card', function (Blueprint $table) {
-            $table->increments('id')->unique();
+            $table->bigIncrements('id')->unique();
             $table->string('card_name');
             $table->timestamp('end_time')->nullable()->comment("失效时间");
             $table->boolean('state')->default(false)->comment("状态 0.停用 1.启用");
@@ -27,8 +27,8 @@ class CreateCardTable extends Migration
         });
 
         Schema::create("user_card", function (Blueprint $table) {
-            $table->integer("user_id");
-            $table->increments("card_id");
+            $table->bigInteger("user_id");
+            $table->bigInteger("card_id");
         });
     }
 

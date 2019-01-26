@@ -53,10 +53,11 @@ module.exports = {
   ** Axios module configuration
   */
   axios: {
-    baseURL: "https://wzyylm.com/api/v1",
-    https: true,
+    // baseURL: "https://wzyylm.com/api/v1",
+    baseURL: "http://localhost/api/v1",
+    // https: true,
     retry: {retries: 3},
-    debug: false
+    debug: true
   },
 
   /*

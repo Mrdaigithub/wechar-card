@@ -15,5 +15,6 @@ class DatabaseSeeder extends Seeder {
 		$this->call(ActivityTableSeeder::class);
 		$this->call(SystemConfigTableSeeder::class);
 		$this->call(ShopActivityTableSeeder::class);
+		$this->call(CardActivityTableSeeder::class);
 	}
 }

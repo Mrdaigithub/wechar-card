@@ -72,5 +72,65 @@ class CardTableSeeder extends Seeder
             "created_at" => date('Y-m-d h:m:s', time()),
             "updated_at" => date('Y-m-d h:m:s', time()),
         ]);
+      DB::table("card")->insert([
+        "card_name" => "card_6",
+        "end_time" => date('Y-m-d h:m:s', time() + 3600 * 24 * 20),
+        "state" => false,
+        "probability" => "0.05",
+        "all_num" => 30,
+        "usable_num" => 20,
+        "used_num" => 10,
+        "remarks" => "remarks_6",
+        "created_at" => date('Y-m-d h:m:s', time()),
+        "updated_at" => date('Y-m-d h:m:s', time()),
+      ]);
+      DB::table("card")->insert([
+        "card_name" => "card_7",
+        "end_time" => date('Y-m-d h:m:s', time() + 3600 * 24 * 20),
+        "state" => false,
+        "probability" => "0.05",
+        "all_num" => 30,
+        "usable_num" => 20,
+        "used_num" => 10,
+        "remarks" => "remarks_7",
+        "created_at" => date('Y-m-d h:m:s', time()),
+        "updated_at" => date('Y-m-d h:m:s', time()),
+      ]);
+      DB::table("card")->insert([
+        "card_name" => "card_8",
+        "end_time" => date('Y-m-d h:m:s', time() + 3600 * 24 * 20),
+        "state" => false,
+        "probability" => "0.05",
+        "all_num" => 30,
+        "usable_num" => 20,
+        "used_num" => 10,
+        "remarks" => "remarks_8",
+        "created_at" => date('Y-m-d h:m:s', time()),
+        "updated_at" => date('Y-m-d h:m:s', time()),
+      ]);
+      DB::table("card")->insert([
+        "card_name" => "card_9",
+        "end_time" => date('Y-m-d h:m:s', time() + 3600 * 24 * 20),
+        "state" => false,
+        "probability" => "0.05",
+        "all_num" => 30,
+        "usable_num" => 20,
+        "used_num" => 10,
+        "remarks" => "remarks_9",
+        "created_at" => date('Y-m-d h:m:s', time()),
+        "updated_at" => date('Y-m-d h:m:s', time()),
+      ]);
+      DB::table("card")->insert([
+        "card_name" => "card_10",
+        "end_time" => date('Y-m-d h:m:s', time() + 3600 * 24 * 20),
+        "state" => false,
+        "probability" => "0.05",
+        "all_num" => 30,
+        "usable_num" => 20,
+        "used_num" => 10,
+        "remarks" => "remarks_10",
+        "created_at" => date('Y-m-d h:m:s', time()),
+        "updated_at" => date('Y-m-d h:m:s', time()),
+      ]);
     }
 }

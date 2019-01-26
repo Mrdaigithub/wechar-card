@@ -1,11 +1,16 @@
 export const state = () => ({
-  oneself: {},
+  oneself: null,
 });
 
 export const mutations = {
-  init(state, user) {
+  add(state, user) {
     state.oneself = user;
   },
 };
 
-export const actions = {};
+export const actions = {
+  async add({commit}, openid) {
+    const {data} = await this.$axios.$get(`/user/openid/${openid}`);
+    commit('add', data);
+  },
+};

@@ -14,7 +14,7 @@ class CreateUserTable extends Migration
     public function up()
     {
         Schema::create("user", function (Blueprint $table) {
-            $table->increments("id")->unique();
+            $table->bigIncrements("id")->unique();
             $table->string("username");
             $table->string("real_name")->nullable();
             $table->string("head_img_url")->default("http://thirdwx.qlogo.cn/mmopen/g3MonUZtNHkdmzicIlibx6iaFqAc56vxLSUfpb6n5WKSYVY0ChQKkiaJSgQ1dZuTOgvLLrhJbERQQ4eMsv84eavHiaiceqxibJxCfHe/0");

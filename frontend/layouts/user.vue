@@ -36,26 +36,30 @@
 </template>
 
 <script>
-  export default {
-    data: () => ({
-      bottomNav: '',
-    }),
-    async mounted() {
-      await this.$axios.$get("/user");
-      this.bottomNav = this.$route.path.split("/")[this.$route.path.split("/").length - 1];
-      if (this.$route.query.openid) {
-        sessionStorage.openid = this.$route.query.openid;
-      } else if (!this.$route.query.openid && sessionStorage.openid) {
-      } else {
-      
-      }
+import {mapActions} from 'vuex';
+
+export default {
+  data: () => ({
+    bottomNav: '',
+  }),
+  created() {
+    this.addOneself(this.$route.query.openid);
+    this.addSystemConfig();
+    this.addCard(this.$route.query.shopid);
+    // this.$router.replace(`${this.$route.path}?shopid=${this.$route.query.shopid}`); // 清除url上的openid
+    this.bottomNav = this.$route.path.split('/')[this.$route.path.split('/').length - 1];
+  },
+  methods: {
+    changePage(url) {
+      this.$router.push(url);
     },
-    methods: {
-      changePage(url) {
-        this.$router.push(url)
-      }
-    }
-  }
+    ...mapActions({
+      addOneself: 'oneself/add',
+      addSystemConfig: 'systemConfig/add',
+      addCard: 'card/add',
+    }),
+  },
+};
 </script>
 <style scoped lang="stylus">
   .bottom_nav {
