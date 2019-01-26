@@ -16,7 +16,7 @@ use EasyWeChat\Kernel\Messages\News;
 use EasyWeChat\Kernel\Messages\NewsItem;
 
 class TextMessageHandler implements EventHandlerInterface {
-
+  
   /**
    * @param mixed $payload
    *
@@ -26,18 +26,18 @@ class TextMessageHandler implements EventHandlerInterface {
     if (!array_key_exists("Content", $payload)) {
       return "local";
     }
-
+    
     $content = $payload["Content"];
-
+    
     $activities = Activity::where("reply_keyword", $content);
     if ($activities->count() > 0
         && $activities->first()->shops()->count() > 0) {
       $activity = $activities->first();
       $shop_id  = $activities->first()->shops()->first()->id;
-
+      
       $url = env("DOMAIN") . "/wechat/authorize/user?url="
              . urlencode(env("DOMAIN") . "/wechat/grant/user?shopid=$shop_id");
-
+      
       return new News([
         new NewsItem([
           'title'       => $activity->activity_name,
@@ -47,7 +47,7 @@ class TextMessageHandler implements EventHandlerInterface {
         ]),
       ]);
     }
-
+    
     return "未找到此卡券";
   }
 }
