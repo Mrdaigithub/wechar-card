@@ -140,6 +140,7 @@
   import {mapState} from 'vuex';
   import rules from '~/utils/rules';
   import randomSort from '~/utils/randomSort';
+  import rangeRandom from '~/utils/rangeRandom';
   
   export default {
     name: 'Lottery',
@@ -155,15 +156,6 @@
       rotate_transition_pointer: 'transform 12s ease-in-out', //初始化指针过度属性控制
       click_flag: true, //是否可以旋转抽奖
       index: 0,
-      winningLogData: [
-        '152******454抽中了111111',
-        '152******454抽中了222222',
-        '152******454抽中了333333',
-        '152******454抽中了444444',
-        '152******454抽中了555555',
-        '152******454抽中了666666',
-        '152******454抽中了777777',
-      ],
       swiperOption: {
         loop: true,
         slidesPerView: 3,
@@ -200,7 +192,10 @@
             }
           }
           return randomSort(cardList);
-        },
+        }, // 显示的奖品列表带未中奖
+        cardList1: state => state.card.cardList ?
+          state.card.cardList.map(item => ({id: item['id'], name: item['card_name'], isPrize: 1}))
+          : [], // 显示的奖品列表带未中奖
         activityName: state => state.activity.activity ? state.activity.activity['activity_name'] : '', // 剩余抽奖次数
         activityDescription: state => state.activity.activity ? state.activity.activity['activity_description'] : '', // 剩余抽奖次数
       }),
@@ -212,6 +207,34 @@
         return this.hasPrize
           ? require('../../assets/images/congratulation.png')
           : require('../../assets/images/sorry.png');
+      },
+      winningLogData() {
+        return [
+          `152******${rangeRandom(0, 8)}${rangeRandom(0, 8)}${rangeRandom(0, 8)}
+          抽中了
+          ${JSON.stringify(this.cardList1[rangeRandom(0, 7)]['name'])}`,
+          `152******${rangeRandom(0, 8)}${rangeRandom(0, 8)}${rangeRandom(0, 8)}
+          抽中了
+          ${JSON.stringify(this.cardList1[rangeRandom(0, 7)]['name'])}`,
+          `152******${rangeRandom(0, 8)}${rangeRandom(0, 8)}${rangeRandom(0, 8)}
+          抽中了
+          ${JSON.stringify(this.cardList1[rangeRandom(0, 7)]['name'])}`,
+          `152******${rangeRandom(0, 8)}${rangeRandom(0, 8)}${rangeRandom(0, 8)}
+          抽中了
+          ${JSON.stringify(this.cardList1[rangeRandom(0, 7)]['name'])}`,
+          `152******${rangeRandom(0, 8)}${rangeRandom(0, 8)}${rangeRandom(0, 8)}
+          抽中了
+          ${JSON.stringify(this.cardList1[rangeRandom(0, 7)]['name'])}`,
+          `152******${rangeRandom(0, 8)}${rangeRandom(0, 8)}${rangeRandom(0, 8)}
+          抽中了
+          ${JSON.stringify(this.cardList1[rangeRandom(0, 7)]['name'])}`,
+          `152******${rangeRandom(0, 8)}${rangeRandom(0, 8)}${rangeRandom(0, 8)}
+          抽中了
+          ${JSON.stringify(this.cardList1[rangeRandom(0, 7)]['name'])}`,
+          `152******${rangeRandom(0, 8)}${rangeRandom(0, 8)}${rangeRandom(0, 8)}
+          抽中了
+          ${JSON.stringify(this.cardList1[rangeRandom(0, 7)]['name'])}`,
+        ];
       },
     },
     created() {
