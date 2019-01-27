@@ -31,4 +31,8 @@ Route::namespace("Api\V1")->prefix("v1")->group(function() {
     Route::get("/shop/{id}", "CardController@getCardByShopId");
     Route::get("/lottery/shop/{id}", "CardController@getLotteryCardIdByShopId");
   });
+  Route::prefix("activity")->group(function() {
+    Route::get("/", "ActivityController@list");
+    Route::get("/shop/{id}", "ActivityController@getActivityByShopId");
+  });
 });

@@ -1,7 +1,7 @@
 <template xmlns:v-swiper="http://www.w3.org/1999/xhtml">
   <div>
     <div class="lucky-wheel">
-      <h1 class="lucky-title text-xs-center">幸运大转盘</h1>
+      <h1 class="lucky-title text-xs-center">{{ activityName }}</h1>
       <div class="wheel-main">
         <div class="wheel-pointer-box">
           <div
@@ -48,9 +48,7 @@
       </div>
       <div class="tip">
         <div class="tip-title">活动规则</div>
-        <div class="tip-content">
-          <p> 用户每个月最多阅换2次抽奖，15天计算一次，15天后作废</p>
-        </div>
+        <div class="tip-content"><p>{{ activityDescription }}</p></div>
       </div>
     </div>
     <div
@@ -203,6 +201,8 @@
           }
           return randomSort(cardList);
         },
+        activityName: state => state.activity.activity ? state.activity.activity['activity_name'] : '', // 剩余抽奖次数
+        activityDescription: state => state.activity.activity ? state.activity.activity['activity_description'] : '', // 剩余抽奖次数
       }),
       toast_title() {
         return this.hasPrize
