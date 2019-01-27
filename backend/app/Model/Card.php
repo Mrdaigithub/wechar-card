@@ -8,5 +8,5 @@ class Card extends Model {
 
   protected $table  = "card";
 
-  protected $hidden = ["probability", "all_num", "usable_num", "used_num"];
+  protected $hidden = ["all_num", "usable_num", "used_num"];
 }
