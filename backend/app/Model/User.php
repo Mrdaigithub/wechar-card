@@ -9,6 +9,13 @@ class User extends Authenticatable implements JWTSubject {
 
   protected $table = "user";
 
+  public function signInLogs() {
+    return $this->belongsToMany("App\Model\SignIn",
+      "user_sign_in",
+      "user_id",
+      "sign_in_id");
+  }
+
   /**
    * Get the identifier that will be stored in the subject claim of the JWT.
    *

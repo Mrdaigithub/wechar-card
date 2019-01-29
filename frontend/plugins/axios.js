@@ -6,13 +6,12 @@ export default function({$axios, store}) {
       config.headers.common['Authorization'] = `Bearer ${store.state.token.token}`;
     }
   });
-  $axios.onResponseError(config => {
-    console.log(
-      config.response.data.message ? config.response.data.message : '未知错误');
+  $axios.onRequestError(error => {
     Message.error(
-      config.response.data.message ? config.response.data.message : '未知错误');
-    // if (store.state.token.token) {
-    //   config.headers.common['Authorization'] = `Bearer ${store.state.token.token}`;
-    // }
+      error.response.data.message ? error.response.data.message : '客户端请求错误');
+  });
+  $axios.onResponseError(error => {
+    Message.error(
+      error.response.data.message ? error.response.data.message : '未知错误');
   });
 }

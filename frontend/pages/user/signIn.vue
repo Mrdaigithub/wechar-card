@@ -59,18 +59,40 @@
 </template>
 
 <script>
-  export default {
-    name: "SignIn",
-    layout: "user",
-    data: () => ({
-      dates: ['2018-09-15', '2018-09-20'],
-      msgDialog: false,
-      lotteryAdd: true,
+import {mapState, mapMutations, mapActions} from 'vuex';
+
+export default {
+  name: 'SignIn',
+  layout: 'user',
+  data: () => ({
+    msgDialog: false,
+    lotteryAdd: true,
+  }),
+  computed: {
+    ...mapState({
+      dates: state => state.signIn.signInLogList ? state.signIn.signInLogList : [],
     }),
-    methods: {
-      signIn() {
-        this.msgDialog = true
-      }
-    }
-  }
+  },
+  mounted() {
+    this.asyncAddSignInLog(0);
+  },
+  methods: {
+    ...mapMutations({
+      addSignInLog: 'signIn/add',
+    }),
+    ...mapActions({
+      asyncAddSignInLog: 'signIn/add',
+    }),
+    async signIn() {
+      const {data} = await this.$axios.$put(`/signin/user/0`);
+      this.msgDialog = true;
+      this.addSignInLog(data);
+    },
+  },
+};
 </script>
+
+<style lang="stylus" scoped>
+  .v-btn--floating .v-btn__content
+    color: #fff !important
+</style>

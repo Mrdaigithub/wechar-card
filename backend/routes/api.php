@@ -1,6 +1,5 @@
 <?php
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -38,5 +37,9 @@ Route::namespace("Api\V1")->prefix("v1")->group(function () {
   Route::prefix("activity")->group(function () {
     Route::get("/", "ActivityController@list");
     Route::get("/shop/{id}", "ActivityController@getActivityByShopId");
+  });
+  Route::prefix("signin")->group(function () {
+    Route::get("/user/{id}", "SignInController@getSignInLogByUserId");
+    Route::put("/user/{id}", "SignInController@UpdateTodaySignInLogByUserId");
   });
 });

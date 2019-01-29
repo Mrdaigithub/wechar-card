@@ -106,8 +106,7 @@ class CardController extends ApiController {
       }
     }
 
-    // Todo 用户抽奖次数减1
-    $this->oneself["lottery_num"] = $this->oneself["lottery_num"] - 1;
+    $this->oneself["lottery_num"] -= 1;
     $this->oneself->save();
     return $this->success($res);
   }

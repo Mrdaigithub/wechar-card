@@ -42,7 +42,7 @@ class UserController extends ApiController {
     }
     $user = User::find($id);
     if (!$user) {
-      return $this->notFound("未找到此用户");
+      return $this->notFound(NULL, "未找到此用户");
     }
     return $this->success($user);
   }

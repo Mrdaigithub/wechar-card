@@ -11,7 +11,7 @@
         color="red"
         flat
         value="lottery"
-        @click="changePage('/user/lottery')">
+        @click="changePage(`/user/lottery?shopid=${$route.query.shopid}&openid=${$route.query.openid}`)">
         <span>抽奖界面</span>
         <v-icon>card_giftcard</v-icon>
       </v-btn>
@@ -19,7 +19,7 @@
         color="red"
         flat
         value="signIn"
-        @click="changePage('/user/signIn')">
+        @click="changePage(`/user/signIn?shopid=${$route.query.shopid}&openid=${$route.query.openid}`)">
         <span>签到中心</span>
         <v-icon>create</v-icon>
       </v-btn>
@@ -27,7 +27,7 @@
         color="red"
         flat
         value="person"
-        @click="changePage('/user/person')">
+        @click="changePage(`/user/person?shopid=${$route.query.shopid}&openid=${$route.query.openid}`)">
         <span>个人中心</span>
         <v-icon>person</v-icon>
       </v-btn>
