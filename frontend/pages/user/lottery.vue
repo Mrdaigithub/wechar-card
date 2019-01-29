@@ -138,7 +138,7 @@
 </template>
 
 <script>
-import {mapState} from 'vuex';
+import {mapState, mapActions} from 'vuex';
 import rules from '~/utils/rules';
 import randomSort from '~/utils/randomSort';
 import rangeRandom from '~/utils/rangeRandom';
@@ -228,9 +228,11 @@ export default {
     this.initPrizeList();
   },
   methods: {
+    ...mapActions({
+      addOneself: 'oneself/add',
+    }),
     //此方法为处理奖品数据
-    initPrizeList(list) {
-    },
+    initPrizeList(list) {},
     rotateHandle() {
       this.rotating();
     },
@@ -265,6 +267,7 @@ export default {
           this.start_rotating_degree % 360;
         this.start_rotating_degree = rotate_angle;
         this.rotate_angle = 'rotate(' + rotate_angle + 'deg)';
+        this.addOneself();
         // // //转动指针
         // this.rotate_angle_pointer = "rotate("+this.start_rotating_degree_pointer + 360*rand_circle+"deg)";
         // this.start_rotating_degree_pointer =360*rand_circle;

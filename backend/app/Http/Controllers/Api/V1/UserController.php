@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\Api\ApiController;
 use App\Model\User;
 use Illuminate\Http\Request;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class UserController extends ApiController {
 
@@ -36,26 +37,14 @@ class UserController extends ApiController {
    * @return \Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response|mixed
    */
   public function get_user_by_id($id) {
+    if ($id == 0) {
+      return $this->success(JWTAuth::parseToken()->authenticate());
+    }
     $user = User::find($id);
     if (!$user) {
       return $this->notFound("未找到此用户");
     }
     return $this->success($user);
-  }
-
-  /**
-   * 通过 openid 查找用户
-   *
-   * @param $openid
-   *
-   * @return \Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response
-   */
-  public function get_user_by_openid($openid) {
-    $users = User::where("openid", $openid);
-    if ($users->count() <= 0) {
-      return $this->unauthorized("无效的openid");
-    }
-    return $this->success($users->first());
   }
 
   /**

@@ -1,4 +1,4 @@
-const pkg = require('./package')
+const pkg = require('./package');
 
 module.exports = {
   mode: 'universal',
@@ -11,12 +11,15 @@ module.exports = {
     meta: [
       {charset: 'utf-8'},
       {name: 'viewport', content: 'width=device-width, initial-scale=1'},
-      {hid: 'description', name: 'description', content: pkg.description}
+      {hid: 'description', name: 'description', content: pkg.description},
     ],
     link: [
       {rel: 'icon', type: 'image/x-icon', href: '/favicon.ico'},
-      {rel: 'stylesheet', href: 'https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Material+Icons'}
-    ]
+      {
+        rel: 'stylesheet',
+        href: 'https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Material+Icons',
+      },
+    ],
   },
 
   /*
@@ -30,7 +33,7 @@ module.exports = {
   css: [
     '~/assets/style/app.styl',
     'swiper/dist/css/swiper.css',
-    'element-ui/lib/theme-chalk/index.css'
+    'element-ui/lib/theme-chalk/index.css',
   ],
 
   /*
@@ -39,6 +42,7 @@ module.exports = {
   plugins: [
     '@/plugins/vuetify',
     '@/plugins/element',
+    '@/plugins/axios',
     {src: '@/plugins/swiper', ssr: false},
   ],
 
@@ -47,17 +51,17 @@ module.exports = {
   */
   modules: [
     // Doc: https://github.com/nuxt-community/axios-module#usage
-    '@nuxtjs/axios'
+    '@nuxtjs/axios',
   ],
   /*
   ** Axios module configuration
   */
   axios: {
     // baseURL: "https://wzyylm.com/api/v1",
-    baseURL: "http://localhost/api/v1",
+    baseURL: 'http://localhost/api/v1',
     // https: true,
     retry: {retries: 3},
-    debug: true
+    debug: true,
   },
 
   /*
@@ -74,9 +78,9 @@ module.exports = {
           enforce: 'pre',
           test: /\.(js|vue)$/,
           loader: 'eslint-loader',
-          exclude: /(node_modules)/
-        })
+          exclude: /(node_modules)/,
+        });
       }
-    }
-  }
+    },
+  },
 };

@@ -36,32 +36,39 @@
 </template>
 
 <script>
-  import {mapActions} from 'vuex';
-  
-  export default {
-    data: () => ({
-      bottomNav: '',
+import {mapMutations, mapActions} from 'vuex';
+
+export default {
+  data: () => ({
+    bottomNav: '',
+  }),
+  async created() {
+    const openid = this.$route.query.openid;
+    // Todo 清除url上的openid
+    // this.$router.replace(`${this.$route.path}?shopid=${this.$route.query.shopid}`); // 清除url上的openid
+    const {data} = await this.$axios.$get(`/auth/client/${openid}`);
+    this.addToken(data);
+    this.addOneself();
+    this.addSystemConfig();
+    this.addCard(this.$route.query.shopid);
+    this.addActivity(this.$route.query.shopid);
+    this.bottomNav = this.$route.path.split('/')[this.$route.path.split('/').length - 1];
+  },
+  methods: {
+    changePage(url) {
+      this.$router.push(url);
+    },
+    ...mapMutations({
+      addToken: 'token/add',
     }),
-    created() {
-      this.addOneself(this.$route.query.openid);
-      this.addSystemConfig();
-      this.addCard(this.$route.query.shopid);
-      this.addActivity(this.$route.query.shopid);
-      // this.$router.replace(`${this.$route.path}?shopid=${this.$route.query.shopid}`); // 清除url上的openid
-      this.bottomNav = this.$route.path.split('/')[this.$route.path.split('/').length - 1];
-    },
-    methods: {
-      changePage(url) {
-        this.$router.push(url);
-      },
-      ...mapActions({
-        addOneself: 'oneself/add',
-        addSystemConfig: 'systemConfig/add',
-        addCard: 'card/add',
-        addActivity: 'activity/add',
-      }),
-    },
-  };
+    ...mapActions({
+      addOneself: 'oneself/add',
+      addSystemConfig: 'systemConfig/add',
+      addCard: 'card/add',
+      addActivity: 'activity/add',
+    }),
+  },
+};
 </script>
 <style scoped lang="stylus">
   .bottom_nav {

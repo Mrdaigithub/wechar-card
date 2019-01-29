@@ -9,8 +9,8 @@ export const mutations = {
 };
 
 export const actions = {
-  async add({commit}, openid) {
-    const {data} = await this.$axios.$get(`/user/openid/${openid}`);
+  async add({commit}) {
+    const {data} = await this.$axios.$get(`/user/0`);
     commit('add', data);
   },
 };
