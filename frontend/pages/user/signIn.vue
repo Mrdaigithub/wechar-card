@@ -29,7 +29,7 @@
         xs12
         text-xs-center>
         <v-date-picker
-          v-model="dates"
+          v-model="signInLogList"
           full-width
           locale="zh-cn"
           color="red"
@@ -38,61 +38,45 @@
           multiple/>
       </v-flex>
     </v-layout>
-    <v-dialog
-      v-model="msgDialog"
-      max-width="300px">
-      <v-card>
-        <v-card-title>
-          <span>签到成功{{ lotteryAdd?', 抽奖次数+1':null }}</span>
-          <v-spacer/>
-        </v-card-title>
-        <v-card-actions>
-          <v-btn
-            flat
-            class="red--text"
-            @click="msgDialog=false">我知道了
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
   </div>
 </template>
 
 <script>
-import {mapState, mapMutations, mapActions} from 'vuex';
-
-export default {
-  name: 'SignIn',
-  layout: 'user',
-  data: () => ({
-    msgDialog: false,
-    lotteryAdd: true,
-  }),
-  computed: {
-    ...mapState({
-      dates: state => state.signIn.signInLogList ? state.signIn.signInLogList : [],
-    }),
-  },
-  mounted() {
-    this.asyncAddSignInLog(0);
-  },
-  methods: {
-    ...mapMutations({
-      addSignInLog: 'signIn/add',
-    }),
-    ...mapActions({
-      asyncAddSignInLog: 'signIn/add',
-    }),
-    async signIn() {
-      const {data} = await this.$axios.$put(`/signin/user/0`);
-      this.msgDialog = true;
-      this.addSignInLog(data);
+  import {mapState, mapMutations, mapActions} from 'vuex';
+  import {Message} from 'element-ui';
+  
+  export default {
+    name: 'SignIn',
+    layout: 'user',
+    data: () => ({}),
+    computed: {
+      ...mapState({
+        signInLogList: state => state.signIn.signInLogList ? state.signIn.signInLogList : [],
+        oneself: state => state.oneself.oneself ? state.oneself.oneself : {},
+      }),
     },
-  },
-};
+    mounted() {
+      this.asyncAddSignInLog(0);
+    },
+    methods: {
+      ...mapMutations({
+        addSignInLog: 'signIn/add',
+        addOneself: 'oneself/add',
+      }),
+      ...mapActions({
+        asyncAddSignInLog: 'signIn/add',
+      }),
+      async signIn() {
+        const {data, message} = await this.$axios.$put(`/signin/user/0`);
+        Message.success(message);
+        this.addSignInLog(data);
+        const oneself = JSON.parse(JSON.stringify(this.oneself));
+        oneself['lottery_num']++;
+        this.addOneself(oneself);
+      },
+    },
+  };
 </script>
 
 <style lang="stylus" scoped>
-  .v-btn--floating .v-btn__content
-    color: #fff !important
 </style>
