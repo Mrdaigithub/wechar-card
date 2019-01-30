@@ -27,7 +27,6 @@
     },
     methods: {
       countdown() {
-        console.log(this.endTime);
         const end = Date.parse(new Date(this.endTime));
         const now = Date.parse(new Date());
         const msec = end - now;

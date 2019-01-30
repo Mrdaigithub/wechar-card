@@ -40,8 +40,9 @@ export const actions = {
     const {data} = await this.$axios.$get(`/signin/user/${userId}`);
     commit('addSignInLogList', data);
   },
-  async addCardList({commit}, cardList) {
-    const {data} = await this.$axios.$get(`/signin/user/${userId}`);
-    commit('addSignInLogList', data);
+  async addCardList({commit}, shopId) {
+    const {data} = await this.$axios.$get(`/card/user/shop/${shopId}`);
+    console.log(data);
+    commit('addCardList', data);
   },
 };

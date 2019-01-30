@@ -53,6 +53,17 @@ class CardController extends ApiController {
   }
   
   /**
+   * 获取与用户在当前商铺中过的卡券
+   *
+   * @param $id
+   *
+   * @return \Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response|mixed
+   */
+  public function getUserCardByShopId($id) {
+    return $this->success($this->oneself->cardList()->get());
+  }
+  
+  /**
    * 获取用户当前商铺中奖的奖品id
    *
    * @param $id

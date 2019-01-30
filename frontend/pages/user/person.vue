@@ -51,7 +51,7 @@
                 :end-time="item.endTime"/>
               {{ !item.state ? item.endTime : null }}
               <v-spacer/>
-              {{ item.state ? "有效" : "已失效" }}
+              {{ item.state ? '有效' : '已失效' }}
             </v-card-actions>
           </v-card>
         </v-flex>
@@ -118,14 +118,15 @@
 </template>
 
 <script>
+  import {mapState, mapActions} from 'vuex';
   import rules from '~/utils/rules';
-  import CountDownTimer from '~/components/CountDownTimer'
-
+  import CountDownTimer from '~/components/CountDownTimer';
+  
   export default {
-    name: "Person",
-    layout: "user",
+    name: 'Person',
+    layout: 'user',
     components: {
-      CountDownTimer
+      CountDownTimer,
     },
     data: () => ({
       items: [
@@ -219,10 +220,16 @@
       valid: true,
       viewState: true, // 当前查看为有效券或失效券
     }),
+    mounted() {
+      this.addOneself(this.$route.query.shopid);
+    },
     methods: {
+      ...mapActions({
+        addOneself: 'oneself/addCardList',
+      }),
       openFormDialog(item) {
         if (!item.state) return false;
-        this.formDialog = true
+        this.formDialog = true;
       },
       submit() {
         if (this.$refs.form.validate()) {
@@ -237,6 +244,6 @@
         this.qrCodeDialog = false;
         this.closeFormDialog();
       },
-    }
-  }
+    },
+  };
 </script>
