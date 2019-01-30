@@ -42,7 +42,6 @@ export const actions = {
   },
   async addCardList({commit}, shopId) {
     const {data} = await this.$axios.$get(`/card/user/shop/${shopId}`);
-    console.log(data);
     commit('addCardList', data);
   },
 };

@@ -19,8 +19,8 @@
         row
         wrap>
         <v-flex
-          v-for="(item, index) in items"
-          v-if="item.state === viewState"
+          v-for="(item, index) in oneselfCardList"
+          v-if="!!item.state === viewState"
           :key="index"
           xs12>
           <v-card
@@ -30,14 +30,14 @@
               <v-flex xs7>
                 <v-card-title primary-title>
                   <div>
-                    <div class="headline">{{ item.title }}</div>
-                    <div>{{ item.description }}</div>
+                    <div class="headline">{{ item.card_name }}</div>
+                    <div>{{ item.remarks }}</div>
                   </div>
                 </v-card-title>
               </v-flex>
               <v-flex xs5>
                 <v-img
-                  src="https://cdn.vuetifyjs.com/images/cards/halcyon.png"
+                  :src="item.card_thumbnail"
                   height="125px"
                   contain
                 />
@@ -45,10 +45,10 @@
             </v-layout>
             <v-divider light/>
             <v-card-actions class="pa-3">
-              {{ !!item.startTime && item.state ? `${item.startTime} -- ${item.endTime}` : null }}
+              {{ !!item.state && item['end_time_0'] ? `${item['end_time_0']}到期` : null }}
               <CountDownTimer
-                v-if="!item.startTime && item.state"
-                :end-time="item.endTime"/>
+                v-if="item.state && item['end_time_1']"
+                :end-time="new Date(new Date(item['created_at']).getTime() + item['end_time_0'] * 60).toString()"/>
               {{ !item.state ? item.endTime : null }}
               <v-spacer/>
               {{ item.state ? '有效' : '已失效' }}
@@ -131,84 +131,84 @@
     data: () => ({
       items: [
         {
-          avatar: 'https://cdn.vuetifyjs.com/images/employeeList/foster.jpg',
-          title: '海底涝5元免单卷',
+          card_thumbnail: 'https://cdn.vuetifyjs.com/images/employeeList/foster.jpg',
+          card_name: '海底涝5元免单卷',
           description: '海底涝5元免单卷介绍海底涝5元免单卷介绍',
           state: true,
           startTime: '2018-12-21',
           endTime: '2018-12-30',
         },
         {
-          avatar: 'https://cdn.vuetifyjs.com/images/employeeList/foster.jpg',
-          title: '海底涝500元免单卷',
+          card_thumbnail: 'https://cdn.vuetifyjs.com/images/employeeList/foster.jpg',
+          card_name: '海底涝500元免单卷',
           description: '海底涝5元免单卷介绍海底涝5元免单卷介绍',
           state: true,
           endTime: '2018-12-25',
         },
         {
-          avatar: 'https://cdn.vuetifyjs.com/images/employeeList/foster.jpg',
-          title: '海底涝5元免单卷',
+          card_thumbnail: 'https://cdn.vuetifyjs.com/images/employeeList/foster.jpg',
+          card_name: '海底涝5元免单卷',
           description: '海底涝5元免单卷介绍海底涝5元免单卷介绍',
           state: true,
           startTime: '2018-12-21',
           endTime: '2018-12-30',
         },
         {
-          avatar: 'https://cdn.vuetifyjs.com/images/employeeList/foster.jpg',
-          title: '海底涝5元免单卷',
+          card_thumbnail: 'https://cdn.vuetifyjs.com/images/employeeList/foster.jpg',
+          card_name: '海底涝5元免单卷',
           description: '海底涝5元免单卷介绍海底涝5元免单卷介绍',
           state: false,
           startTime: '2018-12-21',
           endTime: '2018-12-30',
         },
         {
-          avatar: 'https://cdn.vuetifyjs.com/images/employeeList/foster.jpg',
-          title: '海底涝5元免单卷',
+          card_thumbnail: 'https://cdn.vuetifyjs.com/images/employeeList/foster.jpg',
+          card_name: '海底涝5元免单卷',
           description: '海底涝5元免单卷介绍海底涝5元免单卷介绍',
           state: true,
           startTime: '2018-12-21',
           endTime: '2018-12-30',
         },
         {
-          avatar: 'https://cdn.vuetifyjs.com/images/employeeList/foster.jpg',
-          title: '海底涝5元免单卷',
+          card_thumbnail: 'https://cdn.vuetifyjs.com/images/employeeList/foster.jpg',
+          card_name: '海底涝5元免单卷',
           description: '海底涝5元免单卷介绍海底涝5元免单卷介绍',
           state: false,
           startTime: '2018-12-21',
           endTime: '2018-12-30',
         },
         {
-          avatar: 'https://cdn.vuetifyjs.com/images/employeeList/foster.jpg',
-          title: '海底涝5元免单卷',
+          card_thumbnail: 'https://cdn.vuetifyjs.com/images/employeeList/foster.jpg',
+          card_name: '海底涝5元免单卷',
           description: '海底涝5元免单卷介绍海底涝5元免单卷介绍',
           state: true,
           endTime: '2018-12-30',
         },
         {
-          avatar: 'https://cdn.vuetifyjs.com/images/employeeList/foster.jpg',
-          title: '海底涝5元免单卷',
+          card_thumbnail: 'https://cdn.vuetifyjs.com/images/employeeList/foster.jpg',
+          card_name: '海底涝5元免单卷',
           description: '海底涝5元免单卷介绍海底涝5元免单卷介绍',
           state: false,
           startTime: '2018-12-21',
           endTime: '2018-12-30',
         },
         {
-          avatar: 'https://cdn.vuetifyjs.com/images/employeeList/foster.jpg',
-          title: '海底涝5元免单卷',
+          card_thumbnail: 'https://cdn.vuetifyjs.com/images/employeeList/foster.jpg',
+          card_name: '海底涝5元免单卷',
           description: '海底涝5元免单卷介绍海底涝5元免单卷介绍',
           state: true,
           endTime: '2018-12-30',
         },
         {
-          avatar: 'https://cdn.vuetifyjs.com/images/employeeList/foster.jpg',
-          title: '海底涝5元免单卷',
+          card_thumbnail: 'https://cdn.vuetifyjs.com/images/employeeList/foster.jpg',
+          card_name: '海底涝5元免单卷',
           description: '海底涝5元免单卷介绍海底涝5元免单卷介绍',
           state: true,
           endTime: '2018-12-30',
         },
         {
-          avatar: 'https://cdn.vuetifyjs.com/images/employeeList/foster.jpg',
-          title: '海底涝5元免单卷',
+          card_thumbnail: 'https://cdn.vuetifyjs.com/images/employeeList/foster.jpg',
+          card_name: '海底涝5元免单卷',
           description: '海底涝5元免单卷介绍海底涝5元免单卷介绍',
           state: false,
           endTime: '2018-12-30',
@@ -220,6 +220,11 @@
       valid: true,
       viewState: true, // 当前查看为有效券或失效券
     }),
+    computed: {
+      ...mapState({
+        oneselfCardList: state => state.oneself.cardList ? state.oneself.cardList : [], // 剩余抽奖次数
+      }),
+    },
     mounted() {
       this.addOneself(this.$route.query.shopid);
     },
