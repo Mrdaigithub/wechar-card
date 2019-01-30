@@ -51,7 +51,7 @@
     data: () => ({}),
     computed: {
       ...mapState({
-        signInLogList: state => state.signIn.signInLogList ? state.signIn.signInLogList : [],
+        signInLogList: state => state.oneself.signInLogList ? state.oneself.signInLogList : [],
         oneself: state => state.oneself.oneself ? state.oneself.oneself : {},
       }),
     },
@@ -60,11 +60,11 @@
     },
     methods: {
       ...mapMutations({
-        addSignInLog: 'signIn/add',
-        addOneself: 'oneself/add',
+        addSignInLog: 'oneself/addSignInLogList',
+        addOneself: 'oneself/addOneself',
       }),
       ...mapActions({
-        asyncAddSignInLog: 'signIn/add',
+        asyncAddSignInLog: 'oneself/addSignInLogList',
       }),
       async signIn() {
         const {data, message} = await this.$axios.$put(`/signin/user/0`);

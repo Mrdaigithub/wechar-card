@@ -213,7 +213,7 @@
         {text: "中奖率", align: "left", value: "cardProbability"},
         {text: "操作", align: "left", value: "cardName", sortable: false},
       ],
-      cardList: [
+      cardModelList: [
         {
           id: 159,
           cardName: "卡券名称",
@@ -319,13 +319,13 @@
     },
     methods: {
       editItem(item) {
-        this.editedIndex = this.cardList.indexOf(item);
+        this.editedIndex = this.cardModelList.indexOf(item);
         this.editedItem = Object.assign({}, item);
         this.dialog = true
       },
       deleteItem(item) {
-        const index = this.cardList.indexOf(item);
-        confirm(`确定要删除 ${item.cardName} ?`) && this.cardList.splice(index, 1)
+        const index = this.cardModelList.indexOf(item);
+        confirm(`确定要删除 ${item.cardName} ?`) && this.cardModelList.splice(index, 1)
       },
       close() {
         this.dialog = false;
@@ -341,9 +341,9 @@
           console.log(this.$refs.editedItem);
           if (valid) {
             if (this.editedIndex > -1) {
-              Object.assign(this.cardList[this.editedIndex], this.editedItem)
+              Object.assign(this.cardModelList[this.editedIndex], this.editedItem)
             } else {
-              this.cardList.push(JSON.parse(JSON.stringify(this.editedItem)))
+              this.cardModelList.push(JSON.parse(JSON.stringify(this.editedItem)))
             }
             this.close()
           }

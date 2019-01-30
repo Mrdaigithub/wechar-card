@@ -19,7 +19,6 @@ class CardController extends ApiController {
     $this->oneself = JWTAuth::parseToken()->authenticate();
   }
   
-  
   /**
    * 获取卡券列表
    *

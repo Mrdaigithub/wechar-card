@@ -3,7 +3,7 @@ export const state = () => ({
 });
 
 export const mutations = {
-  add(state, user) {
+  addCardModelList(state, user) {
     state.userList.push(user)
   },
   remove(state, id) {

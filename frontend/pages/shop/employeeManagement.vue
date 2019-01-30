@@ -232,7 +232,7 @@
           remarks: '备注备注备注备注备注备注备注'
         },
       ],
-      cardList: [
+      cardModelList: [
         {
           name: '1元优惠券',
           src: 'https://cdn.vuetifyjs.com/images/employeeList/house.jpg',

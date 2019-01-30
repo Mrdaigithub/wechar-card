@@ -411,7 +411,7 @@
           {type: 'number', message: '卡券中奖概率必须为数字值'}
         ]
       },
-      cardList: [
+      cardModelList: [
         {
           id: 1,
           cardName: '卡券1',

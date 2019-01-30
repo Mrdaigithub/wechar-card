@@ -2,8 +2,8 @@ import {Message} from 'element-ui';
 
 export default function({$axios, store}) {
   $axios.onRequest(config => {
-    if (store.state.token.token) {
-      config.headers.common['Authorization'] = `Bearer ${store.state.token.token}`;
+    if (store.state.oneself.token) {
+      config.headers.common['Authorization'] = `Bearer ${store.state.oneself.token}`;
     }
   });
   $axios.onRequestError(error => {

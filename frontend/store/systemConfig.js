@@ -3,14 +3,14 @@ export const state = () => ({
 });
 
 export const mutations = {
-  add(state, systemConfig) {
+  addSystemConfig(state, systemConfig) {
     state.systemConfig = systemConfig;
   },
 };
 
 export const actions = {
-  async add({commit}) {
+  async addSystemConfig({commit}) {
     const {data} = await this.$axios.$get(`/system/config`);
-    commit('add', data);
+    commit('addSystemConfig', data);
   },
 };

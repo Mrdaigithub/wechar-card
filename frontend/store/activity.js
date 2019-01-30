@@ -3,14 +3,14 @@ export const state = () => ({
 });
 
 export const mutations = {
-  add(state, activity) {
+  addActivity(state, activity) {
     state.activity = activity;
   },
 };
 
 export const actions = {
-  async add({commit}, shopId) {
+  async addActivity({commit}, shopId) {
     const {data} = await this.$axios.$get(`/activity/shop/${shopId}`);
-    commit('add', data);
+    commit('addActivity', data);
   },
 };

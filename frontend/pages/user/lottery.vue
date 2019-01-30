@@ -14,7 +14,7 @@
           class="wheel-bg">
           <div class="prize-list">
             <div
-              v-for="(item,index) in cardList"
+              v-for="(item,index) in cardModelList"
               :key="index"
               class="prize-item">
               <div class="prize-pic">
@@ -183,9 +183,9 @@ export default {
         /^true$/i.test(state.systemConfig.systemConfig.filter(
           item => item['config_name'] === 'lotteryNeedsToFillInTheInformation')[0]['config_value'])
         : true,// 抽奖填写信息配置
-      cardList: state => {
-        const cardList = state.card.cardList ?
-          state.card.cardList.map(item => ({id: item['id'], name: item['card_name'], isPrize: 1})) : [];
+      cardModelList: state => {
+        const cardList = state.card.cardModelList ?
+          state.card.cardModelList.map(item => ({id: item['id'], name: item['card_name'], isPrize: 1})) : [];
         if (cardList.length > 8) {
           cardList.splice(8, cardList.length - 8);
         } else {
@@ -195,15 +195,15 @@ export default {
         }
         return randomSort(cardList);
       }, // 显示的奖品列表带未中奖
-      cardList1: state => state.card.cardList ?
-        state.card.cardList.map(item => ({id: item['id'], name: item['card_name'], isPrize: 1}))
+      cardList1: state => state.card.cardModelList ?
+        state.card.cardModelList.map(item => ({id: item['id'], name: item['card_name'], isPrize: 1}))
         : [], // 显示的奖品列表带未中奖
       activityName: state => state.activity.activity ? state.activity.activity['activity_name'] : '', // 剩余抽奖次数
       activityDescription: state => state.activity.activity ? state.activity.activity['activity_description'] : '', // 剩余抽奖次数
     }),
     toastTitle() {
       return this.hasPrize
-        ? `恭喜您，获得${this.cardList[this.index].name}<br>请进入个人中心兑换奖励` : '未中奖';
+        ? `恭喜您，获得${this.cardModelList[this.index].name}<br>请进入个人中心兑换奖励` : '未中奖';
     },
     toastPicture() {
       return this.hasPrize
@@ -229,7 +229,7 @@ export default {
   },
   methods: {
     ...mapActions({
-      addOneself: 'oneself/add',
+      addOneself: 'oneself/addOneself',
     }),
     //此方法为处理奖品数据
     initPrizeList(list) {},
@@ -240,13 +240,13 @@ export default {
       if (!this.click_flag) return;
       const {data} = await this.$axios.$get(`/card/lottery/shop/${this.$route.query.shopid}`);
       if (data) {
-        this.cardList.forEach((item, index) => {
+        this.cardModelList.forEach((item, index) => {
           if (item['id'] === data) {
             this.index = index;
           }
         });
       } else {
-        this.cardList.forEach((item, index) => {
+        this.cardModelList.forEach((item, index) => {
           if (item['isPrize'] === 0) {
             this.index = index;
           }
@@ -282,7 +282,7 @@ export default {
     },
     gameOver() {
       this.toast_control = true;
-      this.hasPrize = this.cardList[this.index].isPrize;
+      this.hasPrize = this.cardModelList[this.index].isPrize;
     },
     closeToast() {
       this.toast_control = false;
