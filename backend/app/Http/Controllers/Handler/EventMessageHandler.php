@@ -9,10 +9,11 @@
 namespace App\Http\Controllers\Handler;
 
 
+use App\Http\Controllers\Api\ApiController;
 use App\Model\User;
 use EasyWeChat\Kernel\Contracts\EventHandlerInterface;
 
-class EventMessageHandler implements EventHandlerInterface {
+class EventMessageHandler extends ApiController implements EventHandlerInterface {
 	/**
 	 * @param mixed $payload
 	 *
@@ -31,7 +32,7 @@ class EventMessageHandler implements EventHandlerInterface {
 				$user->username     = $wechat_user["nickname"];
 				$user->head_img_url = $wechat_user["headimgurl"];
 				$user->lottery_num  = 1;
-				$user->save();
+				$this->save_model($user);
 
 				return "欢迎首次关注";
 			}

@@ -15,19 +15,24 @@ class CreateCardTable extends Migration {
     Schema::create('card', function(Blueprint $table) {
       $table->bigIncrements('id')->unique();
       $table->string('card_name');
-      $table->timestamp('end_time')->nullable()->comment("失效时间");
+      $table->string("card_thumbnail")
+            ->default("https://randomuser.me/api/portraits/men/85.jpg")
+            ->comment("卡券的缩略图");
+      $table->timestamp('end_time_0')->nullable()->comment("指定时间的失效时间");
+      $table->unsignedInteger('end_time_1')->nullable()
+            ->comment("倒计时的失效时间(分钟)");
+      $table->double('probability')
+            ->nullable()->default(0.0)->comment("概率 0-1");
       $table->boolean('state')->default(FALSE)->comment("状态 0.停用 1.启用");
-      $table->double('probability')->default(0.0)->comment("概率 0-1");
-      $table->integer('all_num')->default(0)->comment("总计数量");
-      $table->integer('usable_num')->default(0)->comment("可用数量");
-      $table->integer('used_num')->default(0)->comment("参与人数，使用过的数量");
+      $table->boolean('type')->default(FALSE)->comment("卡券类型 0.样板卡券 1.使用的卡券");
+      $table->unsignedBigInteger('parentid')->nullable()->comment("继承的样板卡券ID");
       $table->string('remarks')->nullable()->comment("备注");
       $table->timestamps();
     });
     
-    Schema::create("user_card", function(Blueprint $table) {
-      $table->bigInteger("user_id");
+    Schema::create("card_user", function(Blueprint $table) {
       $table->bigInteger("card_id");
+      $table->bigInteger("user_id");
     });
   }
   
@@ -38,6 +43,6 @@ class CreateCardTable extends Migration {
    */
   public function down() {
     Schema::dropIfExists('card');
-    Schema::dropIfExists('user_card');
+    Schema::dropIfExists('card_user');
   }
 }

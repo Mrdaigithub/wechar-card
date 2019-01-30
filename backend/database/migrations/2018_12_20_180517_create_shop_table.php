@@ -5,7 +5,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
 class CreateShopTable extends Migration {
-
+  
   /**
    * Run the migrations.
    *
@@ -13,7 +13,7 @@ class CreateShopTable extends Migration {
    */
   public function up() {
     Schema::create('shop',
-      function (Blueprint $table) {
+      function(Blueprint $table) {
         $table->bigIncrements('id')->unique();
         $table->string('shop_name')->comment("商家名");
         $table->string('shop_location')->comment("商家地址");
@@ -26,14 +26,20 @@ class CreateShopTable extends Migration {
         $table->string('remarks')->nullable()->comment("备注");
         $table->timestamps();
       });
-
-    Schema::create("user_shop",
-      function (Blueprint $table) {
-        $table->bigInteger("user_id");
+    
+    Schema::create("shop_activity",
+      function(Blueprint $table) {
         $table->bigInteger("shop_id")->unique();
+        $table->bigInteger("activity_id")->unique();
+      });
+    
+    Schema::create("shop_user",
+      function(Blueprint $table) {
+        $table->bigInteger("shop_id")->unique();
+        $table->bigInteger("user_id");
       });
   }
-
+  
   /**
    * Reverse the migrations.
    *
@@ -41,6 +47,7 @@ class CreateShopTable extends Migration {
    */
   public function down() {
     Schema::dropIfExists('shop');
-    Schema::dropIfExists('user_shop');
+    Schema::dropIfExists('shop_activity');
+    Schema::dropIfExists('shop_user');
   }
 }

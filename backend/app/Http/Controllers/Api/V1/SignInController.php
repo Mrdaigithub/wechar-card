@@ -109,14 +109,14 @@ class SignInController extends ApiController {
     
     // 更新签到记录
     $signInLog->month_sign_in_log = implode(",", $signInLogArray);
-    $signInLog->save();
+    $this->save_model($signInLog);
     
     if ($count < 7) {
       return $this->success(explode(",", $signInLog->month_sign_in_log), "签到成功,请再接再厉");
     }
     elseif ($count == 7) {
       $user->lottery_num++;
-      $user->save();
+      $this->save_model($user);
       return $this->success(explode(",", $signInLog->month_sign_in_log), "签到成功,抽奖次数+1");
     }
     else {

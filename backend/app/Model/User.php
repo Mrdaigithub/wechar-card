@@ -11,7 +11,7 @@ class User extends Authenticatable implements JWTSubject {
 
   public function signInLogs() {
     return $this->belongsToMany("App\Model\SignIn",
-      "user_sign_in",
+      "sign_in_user",
       "user_id",
       "sign_in_id");
   }

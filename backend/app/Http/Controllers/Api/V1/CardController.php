@@ -9,17 +9,17 @@ use App\Model\Shop;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
 class CardController extends ApiController {
-
+  
   private $oneself;
-
+  
   /**
    * CardController constructor.
    */
   public function __construct() {
     $this->oneself = JWTAuth::parseToken()->authenticate();
   }
-
-
+  
+  
   /**
    * 获取卡券列表
    *
@@ -28,7 +28,7 @@ class CardController extends ApiController {
   public function list() {
     return $this->success(Card::all());
   }
-
+  
   /**
    * 获取与指定商铺关联的卡券
    *
@@ -49,10 +49,10 @@ class CardController extends ApiController {
     if ($cardArray > 8) {
       array_splice($cardArray, 8, count($cardArray));
     }
-
+    
     return $this->success($cardArray);
   }
-
+  
   /**
    * 获取用户当前商铺中奖的奖品id
    *
@@ -76,14 +76,16 @@ class CardController extends ApiController {
     if ($cardArray > 8) {
       array_splice($cardArray, 8, count($cardArray));
     }
+    
     // 去除概率为0的奖项
     $cardArray = array_filter($cardArray,
-      function ($item) {
+      function($item) {
         if ($item["probability"] <= 0) {
           return FALSE;
         }
         return TRUE;
       });
+    
     // 获取卡券的概率列表
     $cardProbabilityList = [];
     foreach ($cardArray as $item) {
@@ -93,7 +95,8 @@ class CardController extends ApiController {
           "probability" => $item["probability"],
         ]);
     }
-    // 随机数
+    
+    // 随机抽取卡券
     $res = NULL;
     for (
       $randomNum = lcg_value(), $sum = 0, $item = 0;
@@ -105,9 +108,28 @@ class CardController extends ApiController {
         break;
       }
     }
-
+    
+    // 用户抽奖次数-1
     $this->oneself["lottery_num"] -= 1;
-    $this->oneself->save();
+    $this->save_model($this->oneself);
+    
+    // 为用户创建抽到的卡券
+    if ($res) {
+      $cardModel               = Card::find($res);
+      $newCard                 = new Card();
+      $newCard->card_name      = $cardModel->card_name;
+      $newCard->card_thumbnail = $cardModel->card_thumbnail;
+      $newCard->end_time_0     = $cardModel->end_time_0;
+      $newCard->end_time_1     = $cardModel->end_time_1;
+      $newCard->probability    = $cardModel->probability;
+      $newCard->state          = $cardModel->state;
+      $newCard->type           = TRUE;
+      $newCard->parentid       = $cardModel->id;
+      $newCard->remarks        = $cardModel->remarks;
+      $this->save_model($newCard);
+      $newCard->user()->attach($this->oneself->id);
+    }
+    
     return $this->success($res);
   }
 }

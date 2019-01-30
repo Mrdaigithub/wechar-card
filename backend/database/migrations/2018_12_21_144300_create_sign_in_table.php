@@ -18,10 +18,10 @@ class CreateSignInTable extends Migration {
         $table->text("month_sign_in_log")->comment("当前月份签到记录(天)");
         $table->timestamps();
       });
-    Schema::create("user_sign_in",
+    Schema::create("sign_in_user",
       function (Blueprint $table) {
-        $table->bigInteger("sign_in_id");
-        $table->bigInteger("user_id");
+        $table->unsignedBigInteger("sign_in_id")->unique();
+        $table->unsignedBigInteger("user_id")->unique();
       });
   }
 
@@ -32,6 +32,6 @@ class CreateSignInTable extends Migration {
    */
   public function down() {
     Schema::dropIfExists("sign_in");
-    Schema::dropIfExists("user_sign_in");
+    Schema::dropIfExists("sign_in_user");
   }
 }

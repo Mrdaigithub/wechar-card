@@ -11,7 +11,7 @@ class UserSignInTableSeeder extends Seeder {
    * @return void
    */
   public function run() {
-    DB::table("user_sign_in")->insert([
+    DB::table("sign_in_user")->insert([
       "sign_in_id" => 1,
       "user_id"    => 4,
     ]);

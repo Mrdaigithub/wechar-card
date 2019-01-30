@@ -23,7 +23,7 @@ class CreateWinningLogTable extends Migration
             $table->timestamps();
         });
 
-        Schema::create("user_winning_log", function (Blueprint $table) {
+        Schema::create("winning_log_user", function (Blueprint $table) {
             $table->bigInteger("user_id");
             $table->bigInteger("winning_log_id")->unique();
         });
@@ -37,6 +37,6 @@ class CreateWinningLogTable extends Migration
     public function down()
     {
         Schema::dropIfExists('winning_log');
-        Schema::dropIfExists('user_winning_log');
+        Schema::dropIfExists('winning_log_user');
     }
 }
