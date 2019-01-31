@@ -20,7 +20,7 @@ class CreateCardTable extends Migration {
             ->comment("卡券的缩略图");
       $table->timestamp('end_time_0')->nullable()->comment("指定时间的失效时间");
       $table->unsignedInteger('end_time_1')->nullable()
-            ->comment("倒计时的失效时间(分钟)");
+            ->comment("倒计时的失效时间(秒)");
       $table->double('probability')
             ->nullable()->default(0.0)->comment("概率 0-1");
       $table->boolean('state')->default(FALSE)->comment("状态 0.停用 1.启用");

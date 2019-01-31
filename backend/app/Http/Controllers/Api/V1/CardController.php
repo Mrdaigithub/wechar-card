@@ -60,7 +60,25 @@ class CardController extends ApiController {
    * @return \Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response|mixed
    */
   public function getUserCardByShopId($id) {
-    return $this->success($this->oneself->cardList()->get());
+    $cardList = array_map(function($item) {
+      // 时间1过期卡券失效
+      if (!!$item["end_time_0"]) {
+        $item["state"] = strtotime($item["end_time_0"]) > strtotime(date('Y-m-d h:m:s', time())) ? 1 : 0;
+      }
+      // 时间2过期卡券失效
+      elseif (!!$item["end_time_1"]) {
+        $item["state"] = strtotime(date('Y-m-d H:i:s', strtotime("+" . $item["end_time_1"] . " seconds",
+          date(strtotime($item["created_at"]))))) > strtotime(date('Y-m-d h:m:s', time())) ?
+          1 : 0;
+      }
+      // 如果卡券模板被禁用下级卡券全部失效(优先级最高,要放最下面)
+      if (!Card::find($item["parentid"])["state"]) {
+        $item["state"] = 0;
+      }
+      return $item;
+    }, $this->oneself->cardList()->get()->toArray());
+    
+    return $this->success($cardList);
   }
   
   /**

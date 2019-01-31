@@ -48,7 +48,8 @@
               {{ !!item.state && item['end_time_0'] ? `${item['end_time_0']}到期` : null }}
               <CountDownTimer
                 v-if="item.state && item['end_time_1']"
-                :end-time="new Date(new Date(item['created_at']).getTime() + item['end_time_0'] * 60).toString()"/>
+                :id="item.id"
+                :end-time="getCountDownTimerString(new Date(new Date(item['created_at']).getTime() + item['end_time_1'] * 1000))"/>
               {{ !item.state ? item.endTime : null }}
               <v-spacer/>
               {{ item.state ? '有效' : '已失效' }}
@@ -129,91 +130,6 @@
       CountDownTimer,
     },
     data: () => ({
-      items: [
-        {
-          card_thumbnail: 'https://cdn.vuetifyjs.com/images/employeeList/foster.jpg',
-          card_name: '海底涝5元免单卷',
-          description: '海底涝5元免单卷介绍海底涝5元免单卷介绍',
-          state: true,
-          startTime: '2018-12-21',
-          endTime: '2018-12-30',
-        },
-        {
-          card_thumbnail: 'https://cdn.vuetifyjs.com/images/employeeList/foster.jpg',
-          card_name: '海底涝500元免单卷',
-          description: '海底涝5元免单卷介绍海底涝5元免单卷介绍',
-          state: true,
-          endTime: '2018-12-25',
-        },
-        {
-          card_thumbnail: 'https://cdn.vuetifyjs.com/images/employeeList/foster.jpg',
-          card_name: '海底涝5元免单卷',
-          description: '海底涝5元免单卷介绍海底涝5元免单卷介绍',
-          state: true,
-          startTime: '2018-12-21',
-          endTime: '2018-12-30',
-        },
-        {
-          card_thumbnail: 'https://cdn.vuetifyjs.com/images/employeeList/foster.jpg',
-          card_name: '海底涝5元免单卷',
-          description: '海底涝5元免单卷介绍海底涝5元免单卷介绍',
-          state: false,
-          startTime: '2018-12-21',
-          endTime: '2018-12-30',
-        },
-        {
-          card_thumbnail: 'https://cdn.vuetifyjs.com/images/employeeList/foster.jpg',
-          card_name: '海底涝5元免单卷',
-          description: '海底涝5元免单卷介绍海底涝5元免单卷介绍',
-          state: true,
-          startTime: '2018-12-21',
-          endTime: '2018-12-30',
-        },
-        {
-          card_thumbnail: 'https://cdn.vuetifyjs.com/images/employeeList/foster.jpg',
-          card_name: '海底涝5元免单卷',
-          description: '海底涝5元免单卷介绍海底涝5元免单卷介绍',
-          state: false,
-          startTime: '2018-12-21',
-          endTime: '2018-12-30',
-        },
-        {
-          card_thumbnail: 'https://cdn.vuetifyjs.com/images/employeeList/foster.jpg',
-          card_name: '海底涝5元免单卷',
-          description: '海底涝5元免单卷介绍海底涝5元免单卷介绍',
-          state: true,
-          endTime: '2018-12-30',
-        },
-        {
-          card_thumbnail: 'https://cdn.vuetifyjs.com/images/employeeList/foster.jpg',
-          card_name: '海底涝5元免单卷',
-          description: '海底涝5元免单卷介绍海底涝5元免单卷介绍',
-          state: false,
-          startTime: '2018-12-21',
-          endTime: '2018-12-30',
-        },
-        {
-          card_thumbnail: 'https://cdn.vuetifyjs.com/images/employeeList/foster.jpg',
-          card_name: '海底涝5元免单卷',
-          description: '海底涝5元免单卷介绍海底涝5元免单卷介绍',
-          state: true,
-          endTime: '2018-12-30',
-        },
-        {
-          card_thumbnail: 'https://cdn.vuetifyjs.com/images/employeeList/foster.jpg',
-          card_name: '海底涝5元免单卷',
-          description: '海底涝5元免单卷介绍海底涝5元免单卷介绍',
-          state: true,
-          endTime: '2018-12-30',
-        },
-        {
-          card_thumbnail: 'https://cdn.vuetifyjs.com/images/employeeList/foster.jpg',
-          card_name: '海底涝5元免单卷',
-          description: '海底涝5元免单卷介绍海底涝5元免单卷介绍',
-          state: false,
-          endTime: '2018-12-30',
-        },
-      ],
       formDialog: false,
       qrCodeDialog: false,
       rules: rules,
@@ -248,6 +164,10 @@
       closeQrCodeDialog() {
         this.qrCodeDialog = false;
         this.closeFormDialog();
+      },
+      getCountDownTimerString(date) {
+        return `${date.getFullYear()}-${date.getMonth() +
+        1}-${date.getDate()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
       },
     },
   };

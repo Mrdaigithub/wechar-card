@@ -65,14 +65,13 @@
       }),
       ...mapActions({
         asyncAddSignInLog: 'oneself/addSignInLogList',
+        asyncAddOneself: 'oneself/addOneself',
       }),
       async signIn() {
         const {data, message} = await this.$axios.$put(`/signin/user/0`);
         Message.success(message);
         this.addSignInLog(data);
-        const oneself = JSON.parse(JSON.stringify(this.oneself));
-        oneself['lottery_num']++;
-        this.addOneself(oneself);
+        this.asyncAddOneself();
       },
     },
   };

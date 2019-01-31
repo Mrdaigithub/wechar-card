@@ -35,7 +35,7 @@ class CardTableSeeder extends Seeder {
     ]);
     DB::table("card")->insert([
       "card_name"   => "card_3",
-      "end_time_1"  => 3600 * 24 * 30,
+      "end_time_1"  => 3600 * 2,
       "probability" => "0.1",
       "state"       => TRUE,
       "type"        => FALSE,
