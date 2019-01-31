@@ -22,6 +22,21 @@ class AuthController extends ApiController {
     }
     return $this->success(JWTAuth::fromUser($users->first()));
   }
+  
+  /**
+   * 客户通过username, password获取token
+   *
+   * @param $openid
+   *
+   * @return \Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response|mixed
+   */
+  public function getTokenByPassword($openid) {
+    $users = User::where("openid", $openid);
+    if ($users->count() <= 0) {
+      return $this->badRequest(NULL, "认证错误");
+    }
+    return $this->success(JWTAuth::fromUser($users->first()));
+  }
 
   /**
    * 废止当前token
