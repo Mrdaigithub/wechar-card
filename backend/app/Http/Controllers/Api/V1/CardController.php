@@ -29,7 +29,7 @@ class CardController extends ApiController {
   }
   
   /**
-   * 获取与指定商铺关联的卡券
+   * 获取与指定商铺关联的卡券模板
    *
    * @param $id
    *
@@ -40,11 +40,28 @@ class CardController extends ApiController {
     if ($activities->count() <= 0) {
       return $this->badRequest(NULL, "单前商铺未参加任何活动");
     }
-    $card = $activities->first()->cards();
-    if ($card->count() <= 0) {
+    $cardModelList = $activities->first()->cards();
+    
+    // 去除被禁用,类型不为卡券模板,已过期的卡券模板
+    $cardModelList = array_filter($cardModelList->get()
+                                                ->toArray(), function($item) {
+      if (($item["state"] == 1) &&
+          ($item["type"] == 0) &&
+          ($item["end_time_0"]) &&
+          (strtotime($item["end_time_0"]) > strtotime(date('Y-m-d h:m:s', time())))) {
+        return TRUE;
+      }
+      elseif (($item["state"] == 1) &&
+              ($item["type"] == 0) &&
+              ($item["end_time_1"])) {
+        return TRUE;
+      }
+      return FALSE;
+    });
+    if (count($cardModelList) <= 0) {
       return $this->badRequest(NULL, "单前活动未选取任何卡券奖品");
     }
-    $cardArray = $card->get()->toArray();
+    $cardArray = $cardModelList;
     if ($cardArray > 8) {
       array_splice($cardArray, 8, count($cardArray));
     }
@@ -93,14 +110,32 @@ class CardController extends ApiController {
     if ($activities->count() <= 0) {
       return $this->badRequest(NULL, "单前商铺未参加任何活动");
     }
-    $card = $activities->first()->cards();
-    if ($card->count() <= 0) {
+    $cardModelList = $activities->first()->cards();
+  
+    // 去除被禁用,类型不为卡券模板,已过期的卡券模板
+    $cardModelList = array_filter($cardModelList->get()
+                                                ->toArray(), function($item) {
+      if (($item["state"] == 1) &&
+          ($item["type"] == 0) &&
+          ($item["end_time_0"]) &&
+          (strtotime($item["end_time_0"]) > strtotime(date('Y-m-d h:m:s', time())))) {
+        return TRUE;
+      }
+      elseif (($item["state"] == 1) &&
+              ($item["type"] == 0) &&
+              ($item["end_time_1"])) {
+        return TRUE;
+      }
+      return FALSE;
+    });
+    
+    if (count($cardModelList) <= 0) {
       return $this->badRequest(NULL, "单前活动未选取任何卡券奖品");
     }
     if ($this->oneself["lottery_num"] <= 0) {
       return $this->badRequest(NULL, "没有抽奖次数");
     }
-    $cardArray = $card->get()->toArray();
+    $cardArray = $cardModelList;
     if ($cardArray > 8) {
       array_splice($cardArray, 8, count($cardArray));
     }
