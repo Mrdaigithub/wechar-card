@@ -20,6 +20,7 @@ Route::get('/',
 
 Route::prefix('/wechat')->group(function() {
   Route::any('/', 'WeChatController@serve');
+  Route::any('/test', 'WeChatController@test');
   Route::get("/authorize/user", "WeChatController@authorize_user");
   Route::get("/grant/user", "WeChatController@grant_user");
   Route::get('/token', 'WeChatController@getAccessToken');

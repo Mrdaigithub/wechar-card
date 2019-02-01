@@ -16,33 +16,40 @@ use EasyWeChat\Kernel\Messages\Message;
 use GuzzleHttp\Client;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class WeChatController extends Controller {
-  
+
   public function test() {
+    return base64_encode(QrCode::encoding('UTF-8')
+                               ->format("png")
+                               ->size(300)
+                               ->generate('https://mrdaisite.club/wechat?token=asdiouj12iuiojioqwejiqwoe9023490u90du09u23908eru89u489cn4u893n4v8923n6b45723ybn5723bny578b237845b&shopid=123123&nsukey=5DbPrMgs9scNaJIElWV%2BIgSdxiXu2BbeQkgfszV1NbZTzDkFQQwmfavkWMVz%2F29j3ItLVSQ8Sv6Ql6l5fH3iDkgIG3OmFT3OR0m2mdtf%2FMCFJFLjttv2tLAyisovO8Z%2BbMynJsOA1SP2weTtxuo9lgsCBJHuIQUG3bFVMW7o%2FmileFyuZjCwt7RFa1v9Hpmu'));
+    //    return QrCode::encoding('UTF-8')
+    //                 ->size(300)
+    //                 ->generate('1');
   }
-  
+
   public function authorize_user(Request $request) {
     if (!$request->exists("url")) {
       return "参数错误";
     }
     $url = $request->get("url");
-    
+
     $app      = app('wechat.official_account');
     $response = $app->oauth->scopes(['snsapi_base'])->redirect($url);
     return $response;
   }
-  
+
   public function grant_user() {
     $app  = app('wechat.official_account');
     $user = $app->oauth->user();
-    return view("redirectUser",
-      [
-        "openid" => $user->getId(),
-        "url"    => env("FRONT_DOMAIN") . "/user/lottery",
-      ]);
+    return view("redirectUser", [
+      "openid" => $user->getId(),
+      "url"    => env("FRONT_DOMAIN") . "/user/lottery",
+    ]);
   }
-  
+
   /**
    * 处理微信的请求消息
    *
@@ -50,13 +57,13 @@ class WeChatController extends Controller {
    */
   public function serve() {
     $app = app('wechat.official_account');
-    
+
     $app->server->push(TextMessageHandler::class, Message::TEXT); // 文本消息
     $app->server->push(EventMessageHandler::class, Message::EVENT); // 事件消息
-    
+
     return $app->server->serve();
   }
-  
+
   /**
    * 获取Access token
    *
@@ -64,10 +71,10 @@ class WeChatController extends Controller {
    */
   public function getAccessToken() {
     $app = app('wechat.official_account');
-    
+
     return $app->access_token->getToken();
   }
-  
+
   /**
    * 获取js sdk 配置
    *
@@ -75,10 +82,10 @@ class WeChatController extends Controller {
    */
   public function getJsSdkConfig() {
     $app = app('wechat.official_account');
-    
+
     return $app->jssdk->buildConfig(['getLocation'], TRUE);
   }
-  
+
   /**
    * 地理位置逆编码
    *
@@ -92,10 +99,12 @@ class WeChatController extends Controller {
       return "缺少参数";
     }
     $client = new Client();
-    $res    = $client->get("http://api.map.baidu.com/geocoder/v2/?location=$location&output=json&pois=1&ak=" . env("AK"));
+    $res
+            = $client->get("http://api.map.baidu.com/geocoder/v2/?location=$location&output=json&pois=1&ak="
+                           . env("AK"));
     return $res;
   }
-  
+
   public function getCityByShopId($id) {
     return Shop::find($id)["shop_location"];
   }
