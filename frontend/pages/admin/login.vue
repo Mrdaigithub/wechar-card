@@ -45,25 +45,30 @@
 </template>
 
 <script>
-  import rules from '~/utils/rules';
-  
-  export default {
-    name: 'AdminLogin',
-    layout: 'empty',
-    data: () => ({
-      rules: rules,
-      gradient: 'to top, #F44336 ,#fff',
-      valid: true,
-      hidePassword: true,
-    }),
-    methods: {
-      submit() {
-        if (this.$refs.loginForm.validate()) {
-          console.log(1);
-        }
-      },
+import rules from '~/utils/rules';
+
+export default {
+  name: 'AdminLogin',
+  layout: 'empty',
+  data: () => ({
+    rules: rules,
+    gradient: 'to top, #F44336 ,#fff',
+    valid: true,
+    hidePassword: true,
+  }),
+  mounted() {
+    window.Echo.channel('news').listen('News', (e) => {
+      console.log(e.message);
+    });
+  },
+  methods: {
+    submit() {
+      if (this.$refs.loginForm.validate()) {
+        console.log(1);
+      }
     },
-  };
+  },
+};
 </script>
 
 <style scoped>

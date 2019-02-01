@@ -43,6 +43,7 @@ module.exports = {
     '@/plugins/vuetify',
     '@/plugins/element',
     '@/plugins/axios',
+    {src: '@/plugins/laravelEcho', ssr: false},
     {src: '@/plugins/swiper', ssr: false},
   ],
 
@@ -57,7 +58,7 @@ module.exports = {
   ** Axios module configuration
   */
   axios: {
-    baseURL: "https://wzyylm.com/api/v1",
+    baseURL: 'https://wzyylm.com/api/v1',
     // baseURL: 'http://localhost/api/v1',
     https: true,
     retry: {retries: 3},
