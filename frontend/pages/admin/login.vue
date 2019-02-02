@@ -38,7 +38,7 @@
       this.loginQrCodeBase64 = data;
       
       window.Echo.channel('publicChannel').listen('MessageEvent', async (e) => {
-        if (e.message && JSON.parse(e.message).signal === 'allowLogin') {
+        if (e.message && JSON.parse(e.message).signal === 'allowLogin' && JSON.parse(e.message).openid) {
           const {data} = await this.$axios.$get(`/auth/client/${JSON.parse(e.message).openid}`);
           this.addToken(data);
           this.addOneself();
@@ -54,11 +54,6 @@
         addOneself: 'oneself/addOneself',
         addSystemConfig: 'systemConfig/addSystemConfig',
       }),
-      submit() {
-        if (this.$refs.loginForm.validate()) {
-          console.log(1);
-        }
-      },
     },
   };
 </script>

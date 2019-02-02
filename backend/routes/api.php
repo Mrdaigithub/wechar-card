@@ -31,6 +31,7 @@ Route::namespace("Api\V1")->prefix("v1")->group(function() {
   });
   Route::prefix("system/config")->group(function() {
     Route::get("/", "SystemConfigController@list");
+    Route::put("/{id}", "SystemConfigController@updateSystemConfig");
   });
   Route::prefix("card")->group(function() {
     Route::get("/", "CardController@list");

@@ -7,25 +7,28 @@
       <v-card-text>
         <v-container grid-list-md>
           <el-form
+            v-if="!!systemConfigList"
             label-width="200px"
             label-position="right">
             <v-layout wrap>
               <v-flex
+                v-if="systemConfigList.filter(item=>item['config_name']==='lotteryNeedsToFillInTheInformation').length > 0"
                 xs12
                 sm6>
-                <el-form-item :label="configList.needWriteInfo.configName">
-                  <el-switch v-model="configList.needWriteInfo.configValue"/>
+                <el-form-item :label="systemConfigList.filter(item=>item['config_name']==='lotteryNeedsToFillInTheInformation')[0]['config_description']">
+                  <el-switch v-model="lotteryNeedsToFillInTheInformationValue"/>
                 </el-form-item>
               </v-flex>
               <v-flex
+                v-if="systemConfigList.filter(item=>item['config_name']==='howManyDaysHaveYouWonTheLotteryIn15Days').length > 0"
                 xs12
                 sm6>
-                <el-form-item :label="configList.signInDay.configName">
+                <el-form-item :label="systemConfigList.filter(item=>item['config_name']==='howManyDaysHaveYouWonTheLotteryIn15Days')[0]['config_description']">
                   <el-input-number
-                    v-model="configList.signInDay.configValue"
+                    v-model="howManyDaysHaveYouWonTheLotteryIn15DaysValue"
                     :min="0"
                     :max="15"
-                    :label="configList.signInDay.configName"/>
+                    :label="systemConfigList.filter(item=>item['config_name']==='howManyDaysHaveYouWonTheLotteryIn15Days')[0]['config_description']"/>
                 </el-form-item>
               </v-flex>
             </v-layout>
@@ -46,8 +49,10 @@
 </template>
 
 <script>
+  import {mapState, mapActions} from 'vuex';
+  
   export default {
-    name: "AdminSystemConfig",
+    name: 'AdminSystemConfig',
     layout: 'admin',
     data: () => ({
       valid: true,
@@ -55,34 +60,43 @@
         {
           text: '主页',
           disabled: false,
-          href: '/admin'
+          href: '/admin',
         },
         {
           text: '系统设置',
           disabled: true,
-          href: '/admin/system/config'
+          href: '/admin/system/config',
         },
       ],
-      configList: {
-        needWriteInfo: {
-          id: 1,
-          configName: "抽奖信息填写",
-          configValue: true
-        },
-        signInDay: {
-          id: 2,
-          configName: "15天签到多少天获得抽奖数",
-          configValue: 7
-        }
-      }
+      lotteryNeedsToFillInTheInformationValue: false,
+      howManyDaysHaveYouWonTheLotteryIn15DaysValue: 0,
     }),
-    computed: {},
-    watch: {},
-    methods: {
-      save() {
+    computed: {
+      ...mapState({
+        systemConfigList: state => state.systemConfig.systemConfig ? state.systemConfig.systemConfig : null,
+      }),
+    },
+    watch: {
+      systemConfigList(systemConfigList) {
+        if (!systemConfigList) {
+          return;
+        }
+        this.lotteryNeedsToFillInTheInformationValue = /true/i.test(systemConfigList.filter(item=>item['config_name']==='lotteryNeedsToFillInTheInformation')[0]['config_value']);
+        this.howManyDaysHaveYouWonTheLotteryIn15DaysValue = parseInt(systemConfigList.filter(item=>item['config_name']==='howManyDaysHaveYouWonTheLotteryIn15Days')[0]['config_value']);
       },
     },
-  }
+    mounted() {
+      this.addSystemConfig();
+    },
+    methods: {
+      ...mapActions({
+        addSystemConfig: 'systemConfig/addSystemConfig',
+      }),
+      save() {
+        console.log('save');
+      },
+    },
+  };
 </script>
 
 <style scoped lang="stylus">

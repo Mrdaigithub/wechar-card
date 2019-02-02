@@ -98,22 +98,42 @@
 </template>
 
 <script>
+  import {mapState, mapMutations, mapActions} from 'vuex';
+  
   export default {
     data: () => ({
       drawer: false,
     }),
-    mounted() {
+    computed: {
+      ...mapState({
+        oneself: state => state.oneself.oneself ? state.oneself.oneself : null,
+      }),
+    },
+    async mounted() {
+      // Todo in dev
+      const openid = 'oWqQa6K2egw4ijKVOAC-tffxhxKg';
+      if (!this.oneself) {
+        const {data} = await this.$axios.$get(`/auth/client/${openid}`);
+        this.addToken(data);
+        this.addOneself();
+      }
     },
     methods: {
+      ...mapMutations({
+        addToken: 'oneself/addToken',
+      }),
+      ...mapActions({
+        addOneself: 'oneself/addOneself',
+      }),
       clickDrawerHandler(url) {
         this.changePage(url);
         this.drawer = false;
       },
       changePage(url) {
-        this.$router.push(url)
-      }
-    }
-  }
+        this.$router.push(url);
+      },
+    },
+  };
 </script>
 
 <style scoped lang="stylus">
