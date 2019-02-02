@@ -32,7 +32,7 @@ module.exports = {
   */
   css: [
     '~/assets/style/app.styl',
-    'swiper/dist/css/swiper.css',
+    // 'swiper/dist/css/swiper.css',
     'element-ui/lib/theme-chalk/index.css',
   ],
 
@@ -44,7 +44,7 @@ module.exports = {
     '@/plugins/element',
     '@/plugins/axios',
     {src: '@/plugins/laravelEcho', ssr: false},
-    {src: '@/plugins/swiper', ssr: false},
+    // {src: '@/plugins/swiper', ssr: false},
   ],
 
   /*
@@ -58,8 +58,9 @@ module.exports = {
   ** Axios module configuration
   */
   axios: {
-    baseURL: 'https://wzyylm.com/api/v1',
+    // baseURL: 'https://wzyylm.com/api/v1',
     // baseURL: 'http://localhost/api/v1',
+    baseURL: 'https://mrdaisite.club/api/v1',
     https: true,
     retry: {retries: 3},
     debug: true,

@@ -8,10 +8,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\MessageEvent;
+use App\Events\News;
 use App\Http\Controllers\Handler\EventMessageHandler;
 use App\Http\Controllers\Handler\TextMessageHandler;
 use App\Model\Activity;
 use App\Model\Shop;
+use App\Model\User;
 use EasyWeChat\Kernel\Messages\Message;
 use GuzzleHttp\Client;
 use Illuminate\Http\Request;
@@ -19,37 +22,69 @@ use Illuminate\Http\Response;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class WeChatController extends Controller {
-
+  
   public function test() {
-    return base64_encode(QrCode::encoding('UTF-8')
-                               ->format("png")
-                               ->size(300)
-                               ->generate('https://mrdaisite.club/wechat?token=asdiouj12iuiojioqwejiqwoe9023490u90du09u23908eru89u489cn4u893n4v8923n6b45723ybn5723bny578b237845b&shopid=123123&nsukey=5DbPrMgs9scNaJIElWV%2BIgSdxiXu2BbeQkgfszV1NbZTzDkFQQwmfavkWMVz%2F29j3ItLVSQ8Sv6Ql6l5fH3iDkgIG3OmFT3OR0m2mdtf%2FMCFJFLjttv2tLAyisovO8Z%2BbMynJsOA1SP2weTtxuo9lgsCBJHuIQUG3bFVMW7o%2FmileFyuZjCwt7RFa1v9Hpmu'));
-    //    return QrCode::encoding('UTF-8')
-    //                 ->size(300)
-    //                 ->generate('1');
+    $openid = "oWqQa6K2egw4ijKVOAC-tffxhxKg";
+    return json_encode();
   }
-
-  public function authorize_user(Request $request) {
+  
+  /**
+   * 微信授权获取用户信息,跳转指定页面
+   *
+   * @param \Illuminate\Http\Request $request
+   *
+   * @return string
+   */
+  public function wechatAuthorize(Request $request) {
     if (!$request->exists("url")) {
       return "参数错误";
     }
     $url = $request->get("url");
-
+    
     $app      = app('wechat.official_account');
     $response = $app->oauth->scopes(['snsapi_base'])->redirect($url);
     return $response;
   }
-
-  public function grant_user() {
+  
+  /**
+   * 普通用户认证跳转到地理位置验证界面通过则跳转到抽奖界面
+   *
+   * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+   */
+  public function grantLotteryUser() {
     $app  = app('wechat.official_account');
     $user = $app->oauth->user();
-    return view("redirectUser", [
+    return view("redirectUserLottery", [
       "openid" => $user->getId(),
       "url"    => env("FRONT_DOMAIN") . "/user/lottery",
     ]);
   }
-
+  
+  /**
+   * 管理员用户认证通过想web客户端发送允许登录的消息
+   *
+   * @return string
+   */
+  public function grantLoginAdmin() {
+    $app        = app('wechat.official_account');
+    $wechatUser = $app->oauth->user();
+    
+    $userList = User::where("openid", $wechatUser->getId())->get();
+    if ($userList->isEmpty()) {
+      return "用户不存在";
+    }
+    elseif ($userList->first()->identity !== 3) {
+      return "无权限";
+    }
+    
+    // 通过验证发送消息
+    broadcast(new MessageEvent(json_encode([
+      "signal" => "allowLogin",
+      "openid" => $wechatUser->getId(),
+    ])));
+    return "登录成功";
+  }
+  
   /**
    * 处理微信的请求消息
    *
@@ -57,13 +92,13 @@ class WeChatController extends Controller {
    */
   public function serve() {
     $app = app('wechat.official_account');
-
+    
     $app->server->push(TextMessageHandler::class, Message::TEXT); // 文本消息
     $app->server->push(EventMessageHandler::class, Message::EVENT); // 事件消息
-
+    
     return $app->server->serve();
   }
-
+  
   /**
    * 获取Access token
    *
@@ -71,10 +106,10 @@ class WeChatController extends Controller {
    */
   public function getAccessToken() {
     $app = app('wechat.official_account');
-
+    
     return $app->access_token->getToken();
   }
-
+  
   /**
    * 获取js sdk 配置
    *
@@ -82,10 +117,10 @@ class WeChatController extends Controller {
    */
   public function getJsSdkConfig() {
     $app = app('wechat.official_account');
-
+    
     return $app->jssdk->buildConfig(['getLocation'], TRUE);
   }
-
+  
   /**
    * 地理位置逆编码
    *
@@ -104,7 +139,7 @@ class WeChatController extends Controller {
                            . env("AK"));
     return $res;
   }
-
+  
   public function getCityByShopId($id) {
     return Shop::find($id)["shop_location"];
   }

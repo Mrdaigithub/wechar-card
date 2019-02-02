@@ -17,8 +17,8 @@ class SignInTableSeeder extends Seeder {
     };
     DB::table("sign_in")->insert([
       "month_sign_in_log" => trim($log, ","),
-      "created_at"        => date('Y-m-d h:m:s', time()),
-      "updated_at"        => date('Y-m-d h:m:s', time()),
+      "created_at"        => date('Y-m-d h:i:s', time()),
+      "updated_at"        => date('Y-m-d h:i:s', time()),
     ]);
   }
 }

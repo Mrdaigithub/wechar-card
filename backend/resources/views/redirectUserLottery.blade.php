@@ -11,6 +11,10 @@
 <div id="url" style="display: none">{{$url}}</div>
 <script src="https://res.wx.qq.com/open/js/jweixin-1.4.0.js"></script>
 <script>
+    /**
+     * 校验用户的地理位置通过并跳转至抽奖页面
+     */
+
     wx.config(<?php
       $app = app('wechat.official_account');
       echo $app->jssdk->buildConfig(array("getLocation"), FALSE)

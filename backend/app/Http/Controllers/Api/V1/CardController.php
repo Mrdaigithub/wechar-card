@@ -48,7 +48,7 @@ class CardController extends ApiController {
       if (($item["state"] == 1) &&
           ($item["type"] == 0) &&
           ($item["end_time_0"]) &&
-          (strtotime($item["end_time_0"]) > strtotime(date('Y-m-d h:m:s', time())))) {
+          (strtotime($item["end_time_0"]) > strtotime(date('Y-m-d h:i:s', time())))) {
         return TRUE;
       }
       elseif (($item["state"] == 1) &&
@@ -80,12 +80,12 @@ class CardController extends ApiController {
     $cardList = array_map(function($item) {
       // 时间1过期卡券失效
       if (!!$item["end_time_0"]) {
-        $item["state"] = strtotime($item["end_time_0"]) > strtotime(date('Y-m-d h:m:s', time())) ? 1 : 0;
+        $item["state"] = strtotime($item["end_time_0"]) > strtotime(date('Y-m-d h:i:s', time())) ? 1 : 0;
       }
       // 时间2过期卡券失效
       elseif (!!$item["end_time_1"]) {
         $item["state"] = strtotime(date('Y-m-d H:i:s', strtotime("+" . $item["end_time_1"] . " seconds",
-          date(strtotime($item["created_at"]))))) > strtotime(date('Y-m-d h:m:s', time())) ?
+          date(strtotime($item["created_at"]))))) > strtotime(date('Y-m-d h:i:s', time())) ?
           1 : 0;
       }
       // 如果卡券模板被禁用下级卡券全部失效(优先级最高,要放最下面)
@@ -118,7 +118,7 @@ class CardController extends ApiController {
       if (($item["state"] == 1) &&
           ($item["type"] == 0) &&
           ($item["end_time_0"]) &&
-          (strtotime($item["end_time_0"]) > strtotime(date('Y-m-d h:m:s', time())))) {
+          (strtotime($item["end_time_0"]) > strtotime(date('Y-m-d h:i:s', time())))) {
         return TRUE;
       }
       elseif (($item["state"] == 1) &&

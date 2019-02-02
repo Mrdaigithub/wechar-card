@@ -18,7 +18,7 @@ class CreateShopTable extends Migration {
         $table->string('shop_name')->comment("商家名");
         $table->string('shop_location')->comment("商家地址");
         $table->timestamp('started_at')
-              ->default(date('Y-m-d h:m:s', time()))
+              ->default(date('Y-m-d h:i:s', time()))
               ->comment("合作时间");
         $table->boolean('state')
               ->default(FALSE)
