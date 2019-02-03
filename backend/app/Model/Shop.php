@@ -8,7 +8,7 @@ class Shop extends Model {
 
   protected $table = "shop";
 
-  public function activities() {
+  public function activity() {
     return $this->belongsToMany("App\Model\Activity",
       "shop_activity",
       "shop_id",

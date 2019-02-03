@@ -40,8 +40,8 @@
                       sm6>
                       <el-form-item
                         label="商家名称"
-                        prop="shopName">
-                        <el-input v-model="editedItem.shopName"/>
+                        prop="shop_name">
+                        <el-input v-model="editedItem.shop_name"/>
                       </el-form-item>
                     </v-flex>
                     <v-flex
@@ -49,10 +49,17 @@
                       sm6>
                       <el-form-item
                         label="商家地址"
-                        prop="shopAddress">
-                        <el-input
-                          v-model="editedItem.shopAddress"
-                          placeholder="城市名 (温州)"/>
+                        prop="shop_location">
+                        <el-select
+                          v-model="editedItem.shop_location"
+                          class="w100"
+                          filterable>
+                          <el-option
+                            v-for="item in cityList"
+                            :key="item"
+                            :label="item"
+                            :value="item"/>
+                        </el-select>
                       </el-form-item>
                     </v-flex>
                     <v-flex
@@ -70,9 +77,9 @@
                       sm6>
                       <el-form-item
                         label="合作日期"
-                        prop="startDateTime">
+                        prop="started_at">
                         <el-date-picker
-                          v-model="editedItem.startDateTime"
+                          v-model="editedItem.started_at"
                           class="w100"
                           type="datetime"
                           placeholder="选择日期时间"/>
@@ -81,18 +88,17 @@
                     <v-flex
                       xs12
                       sm6>
-                      <el-form-item
-                        label="参加的活动"
-                        prop="startDateTime">
+                      <el-form-item label="参加的活动">
                         <el-select
-                          v-model="editedItem.activity"
+                          v-model="editedItem.activity_id"
                           class="w100"
                           filterable>
                           <el-option
-                            v-for="item in activityOptions"
-                            :key="item.value"
-                            :label="item.label"
-                            :value="item.value"/>
+                            v-for="item in activityList"
+                            :key="item.id"
+                            :label="item.activity_name"
+                            :value="item.id"
+                            :disabled="item.state !== 1 || !!item.shop_id"/>
                         </el-select>
                       </el-form-item>
                     </v-flex>
@@ -100,7 +106,7 @@
                       xs12
                       sm6>
                       <el-form-item label="商家状态">
-                        <el-switch v-model="editedItem.shopState"/>
+                        <el-switch v-model="editedItem.state"/>
                       </el-form-item>
                     </v-flex>
                   </v-layout>
@@ -142,13 +148,13 @@
           slot="items"
           slot-scope="props">
           <td>{{ props.item.id }}</td>
-          <td class="text-xs-left">{{ props.item.shopName ? props.item.shopName : '暂无' }}</td>
-          <td class="text-xs-left">{{ props.item.shopAddress ? props.item.shopAddress : '暂无' }}</td>
-          <td class="text-xs-left">{{ formatDate(props.item.startDateTime) }}</td>
-          <td class="text-xs-left">{{ props.item.shopState ? '合作中' : '合作结束' }}</td>
+          <td class="text-xs-left">{{ props.item.shop_name ? props.item.shop_name : '暂无' }}</td>
+          <td class="text-xs-left">{{ props.item.shop_location ? props.item.shop_location : '暂无' }}</td>
+          <td class="text-xs-left">{{ props.item.started_at }}</td>
+          <td class="text-xs-left">{{ props.item.state ? '合作中' : '合作结束' }}</td>
           <td class="text-xs-left">
-            {{ activityOptions.filter(e=>props.item.activity ===e.value).length >=1 ?
-            activityOptions.filter(e=>props.item.activity ===e.value)[0].label : "暂无" }}
+            {{ activityList.filter(e=>props.item.activity_id === e.id).length >=1 ?
+            activityList.filter(e=>props.item.activity_id === e.id)[0].activity_name : '暂无' }}
           </td>
           <td class="text-xs-left">{{ props.item.remarks ? props.item.remarks : '暂无' }}</td>
           <td class="justify-center layout px-0">
@@ -186,187 +192,144 @@
 </template>
 
 <script>
-  export default {
-    name: "AdminShop",
-    layout: 'admin',
-    data: () => ({
-      valid: true,
-      breadcrumbList: [
-        {
-          text: '主页',
-          disabled: false,
-          href: '/admin'
-        },
-        {
-          text: '商家管理',
-          disabled: true,
-          href: '/admin/shop'
-        },
-      ],
-      dialog: false,
-      headers: [
-        {text: 'ID', align: 'left', sortable: true, value: 'id'},
-        {text: '商家名称', align: 'left', value: 'shopName'},
-        {text: '商家地址', align: 'left', value: 'shopAddress'},
-        {text: '合作时间', align: 'left', value: 'startDateTimeTime'},
-        {text: '商家状态', align: 'left', value: 'shopState'},
-        {text: '参与活动', align: 'left', value: 'activity'},
-        {text: '备注', align: 'left', value: 'remarks'},
-        {text: '操作', align: 'left', value: 'shopName', sortable: false},
-      ],
-      shopList: [
-        {
-          id: 159,
-          shopName: '海底捞',
-          shopAddress: '地址地址',
-          startDateTime: new Date(),
-          activity: 1,
-          shopState: true,
-          remarks: "备注备注备注备注备注备注"
-        },
-        {
-          id: 1,
-          shopName: '海底捞',
-          shopAddress: '地址地址',
-          startDateTime: new Date(),
-          activity: 2,
-          shopState: true,
-          remarks: "备注备注备注备注备注备注"
-        },
-        {
-          id: 2,
-          shopName: '海底捞',
-          shopAddress: '地址地址',
-          startDateTime: new Date(),
-          activity: 3,
-          shopState: true,
-          remarks: "备注备注备注备注备注备注"
-        },
-        {
-          id: 3,
-          shopName: '海底捞',
-          shopAddress: '地址地址',
-          startDateTime: new Date(),
-          activity: 2,
-          shopState: true,
-          remarks: "备注备注备注备注备注备注"
-        },
-        {
-          id: 4,
-          shopName: '海底捞',
-          shopAddress: '地址地址',
-          startDateTime: new Date(),
-          activity: 1,
-          shopState: true,
-          remarks: "备注备注备注备注备注备注"
-        },
-        {
-          id: 5,
-          shopName: '海底捞',
-          shopAddress: '地址地址',
-          startDateTime: new Date(),
-          activity: 4,
-          shopState: true,
-          remarks: "备注备注备注备注备注备注"
-        },
-      ],
-      activityOptions: [
-        {value: 1, label: '活动1'},
-        {value: 2, label: '活动2'},
-        {value: 3, label: '活动3'},
-        {value: 4, label: '活动4'},
-      ],
-      rules: {
-        shopName: [
-          {required: true, message: '请输入商家名称', trigger: 'blur'},
-          {min: 3, max: 20, message: '长度在 3 到 20 个字符', trigger: 'change'},
-          {pattern: /^(\w|[\u4e00-\u9fa5])+$/, message: '请不要包含特殊字符', trigger: 'change'}
-        ],
-        shopAddress: [
-          {required: true, message: '请输入商家地址', trigger: 'blur'},
-          {type: 'string', pattern: /^(\w|[\u4e00-\u9fa5])+$/, message: '请不要包含特殊字符', trigger: 'change'}
-        ],
-        remarks: [
-          {type: 'string', pattern: /^(\w|[\u4e00-\u9fa5])+$/, message: '请不要包含特殊字符', trigger: 'change'}
-        ],
-        startDateTime: [
-          {type: 'date', required: true, message: '请选择日期', trigger: 'blur'},
-        ],
-        activity: [
-          {required: true, message: '请选择参加的活动', trigger: 'change'},
-        ]
+import {mapState, mapActions} from 'vuex';
+import qs from 'qs';
+import cityList from '@/utils/cityList';
+
+export default {
+  name: 'AdminShop',
+  layout: 'admin',
+  data: () => ({
+    cityList: cityList,
+    valid: true,
+    breadcrumbList: [
+      {
+        text: '主页',
+        disabled: false,
+        href: '/admin',
       },
-      editedIndex: -1,
-      editedItem: {
-        shopName: '',
-        shopAddress: '',
-        startDateTime: '',
-        activity: '',
-        shopState: false,
-        remarks: '',
+      {
+        text: '商家管理',
+        disabled: true,
+        href: '/admin/shop',
       },
-      defaultItem: {
-        shopName: '',
-        shopAddress: '',
-        startDateTime: '',
-        startTime: '',
-        activity: '',
-        shopState: false,
-        remarks: ''
-      },
-      search: '',
+    ],
+    dialog: false,
+    headers: [
+      {text: 'ID', align: 'left', sortable: true, value: 'id'},
+      {text: '商家名称', align: 'left', value: 'shop_name'},
+      {text: '商家地址', align: 'left', value: 'shop_location'},
+      {text: '开始合作时间', align: 'left', value: 'started_atTime'},
+      {text: '商家状态', align: 'left', value: 'state'},
+      {text: '参与活动', align: 'left', value: 'activity_id'},
+      {text: '备注', align: 'left', value: 'remarks'},
+      {text: '操作', align: 'left', value: 'shop_name', sortable: false},
+    ],
+    rules: {
+      shop_name: [
+        {required: true, message: '请输入商家名称', trigger: 'blur'},
+        {min: 3, max: 20, message: '长度在 3 到 20 个字符', trigger: 'change'},
+        {pattern: /^(\w|[\u4e00-\u9fa5])+$/, message: '请不要包含特殊字符', trigger: 'change'},
+      ],
+      shop_location: [
+        {required: true, message: '请选择商家所在地址', trigger: 'change'},
+      ],
+      remarks: [
+        {type: 'string', pattern: /^(\w|[\u4e00-\u9fa5])+$/, message: '请不要包含特殊字符', trigger: 'change'},
+      ],
+    },
+    editedIndex: -1,
+    editedItem: {
+      shop_name: '',
+      shop_location: '',
+      started_at: '',
+      activity: '',
+      state: false,
+      remarks: '',
+    },
+    defaultItem: {
+      shop_name: '',
+      shop_location: '',
+      started_at: '',
+      startTime: '',
+      activity: '',
+      state: false,
+      remarks: '',
+    },
+    search: '',
+  }),
+  computed: {
+    ...mapState({
+      shopList: state => state.shop.shopList ? state.shop.shopList : [],
+      activityList: state => state.activity.activityList ? state.activity.activityList : [],
     }),
-    computed: {
-      formTitle() {
-        return this.editedIndex === -1 ? '添加商家' : '修改商家'
+    formTitle() {
+      return this.editedIndex === -1 ? '添加商家' : '修改商家';
+    },
+  },
+  watch: {
+    dialog(val) {
+      val || this.close();
+    },
+  },
+  mounted() {
+    this.addShopList();
+    this.addActivityList();
+  },
+  methods: {
+    ...mapActions({
+      addShopList: 'shop/addShopList',
+      addActivityList: 'activity/addActivityList',
+    }),
+    editItem(item) {
+      const _item = JSON.parse(JSON.stringify(item));
+      _item.state = _item.state === 1;
+      this.editedIndex = this.shopList.indexOf(item);
+      this.editedItem = Object.assign({}, _item);
+      this.dialog = true;
+    },
+    async deleteItem(item) {
+      if (confirm(`确定要删除 ${item.shop_name} ?`)) {
+        await this.$axios.$delete(`/shop/${item.id}`);
+        this.addShopList();
       }
     },
-    watch: {
-      dialog(val) {
-        val || this.close()
-      },
+    close() {
+      this.dialog = false;
+      setTimeout(() => {
+        this.editedItem = Object.assign({}, this.defaultItem);
+        this.editedIndex = -1;
+        this.$refs.editedItem.resetFields();
+        this.valid = true;
+      }, 100);
     },
-    methods: {
-      editItem(item) {
-        this.editedIndex = this.shopList.indexOf(item);
-        this.editedItem = Object.assign({}, item);
-        this.dialog = true
-      },
-      deleteItem(item) {
-        const index = this.shopList.indexOf(item);
-        confirm(`确定要删除 ${item.shopName} ?`) && this.shopList.splice(index, 1)
-      },
-      close() {
-        this.dialog = false;
-        setTimeout(() => {
-          this.editedItem = Object.assign({}, this.defaultItem);
-          this.editedIndex = -1;
-          this.$refs.editedItem.resetFields();
-          this.valid = true;
-        }, 100)
-      },
-      save() {
-        this.$refs.editedItem.validate((valid) => {
-          if (valid) {
-            if (this.editedIndex > -1) {
-              Object.assign(this.shopList[this.editedIndex], this.editedItem)
-            } else {
-              this.shopList.push(JSON.parse(JSON.stringify(this.editedItem)))
-            }
-            this.close()
+    save() {
+      this.$refs.editedItem.validate(async (valid) => {
+        if (valid) {
+          const _editedItem = {};
+          _editedItem.shop_name = this.editedItem.shop_name;
+          _editedItem.shop_location = this.editedItem.shop_location;
+          _editedItem.remarks = this.editedItem.remarks;
+          _editedItem.started_at = this.editedItem.started_at;
+          _editedItem.state = this.editedItem.state ? 1 : 0;
+          if (!!this.editedItem.activity_id) {
+            _editedItem.activity_id = this.editedItem.activity_id;
           }
-        });
-      },
-      formatDate(dateTimeObj) {
-        if (!dateTimeObj) {
-          return '暂无';
+
+          if (this.editedIndex > -1) {
+            // 编辑
+            await this.$axios.$put(`/shop/${this.editedItem.id}`, qs.stringify(_editedItem));
+          } else {
+            // 新建
+            await this.$axios.$post(`/shop`, qs.stringify(_editedItem));
+          }
+          this.close();
+          this.addShopList();
         }
-        dateTimeObj = new Date(dateTimeObj);
-        console.log(dateTimeObj);
-        return dateTimeObj ? `${dateTimeObj.getFullYear()}-${dateTimeObj.getMonth() + 1}-${new Date().getDate()} ${dateTimeObj.getHours()}:${dateTimeObj.getMinutes()}:${dateTimeObj.getSeconds()}` : '暂无';
-      }
+      });
     },
-  }
+  },
+};
 </script>
 
 <style scoped lang="stylus">

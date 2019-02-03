@@ -1,16 +1,16 @@
 export const state = () => ({
-  activity: null,
+  activityList: null,
 });
 
 export const mutations = {
-  addActivity(state, activity) {
-    state.activity = activity;
+  addActivityList(state, activityList) {
+    state.activityList = activityList;
   },
 };
 
 export const actions = {
-  async addActivity({commit}, shopId) {
-    const {data} = await this.$axios.$get(`/activity/shop/${shopId}`);
-    commit('addActivity', data);
+  async addActivityList({commit}) {
+    const {data} = await this.$axios.$get(`/activity`);
+    commit('addActivityList', data);
   },
 };

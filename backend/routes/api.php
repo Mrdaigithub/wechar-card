@@ -43,6 +43,12 @@ Route::namespace("Api\V1")->prefix("v1")->group(function () {
     Route::put("/{id}", "CardController@updateCardModel");
     Route::delete("/{id}", "CardController@removeCardModel");
   });
+  Route::prefix("shop")->group(function () {
+    Route::get("/", "ShopController@list");
+    Route::post("/", "ShopController@store");
+    Route::put("/{id}", "ShopController@update");
+    Route::delete("/{id}", "ShopController@remove");
+  });
   Route::prefix("activity")->group(function () {
     Route::get("/", "ActivityController@list");
     Route::get("/shop/{id}", "ActivityController@getActivityByShopId");
