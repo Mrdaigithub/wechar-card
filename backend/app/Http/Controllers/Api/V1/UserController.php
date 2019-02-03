@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Api\ApiController;
+use App\Http\Requests\UpdatePlainUserRequest;
 use App\Model\User;
 use Illuminate\Http\Request;
 use Tymon\JWTAuth\Facades\JWTAuth;
@@ -10,7 +11,7 @@ use Tymon\JWTAuth\Facades\JWTAuth;
 class UserController extends ApiController {
 
   /**
-   * 获取用户列表
+   * 获取所有用户列表
    *
    * @return \Illuminate\Database\Eloquent\Collection|static[]
    */
@@ -19,11 +20,18 @@ class UserController extends ApiController {
   }
 
   /**
+   * 获取普通用户列表
+   *
+   * @return \Illuminate\Database\Eloquent\Collection|static[]
+   */
+  public function listPlainUser() {
+    return $this->success(User::where("identity", 0)->get());
+  }
+
+  /**
    * Store a newly created resource in storage.
    *
-   * @param  \Illuminate\Http\Request $request
-   *
-   * @return \Illuminate\Http\Response
+   * @param \Illuminate\Http\Request $request
    */
   public function save(Request $request) {
     //
@@ -50,13 +58,37 @@ class UserController extends ApiController {
   /**
    * 更新用户信息
    *
-   * @param  \Illuminate\Http\Request $request
-   * @param  int                      $id
+   * @param \App\Http\Requests\UpdatePlainUserRequest $request
+   * @param                                           $id
    *
-   * @return void
+   * @return \Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response
    */
-  public function update(Request $request, $id) {
-    //
+  public function updatePlainUser(UpdatePlainUserRequest $request, $id) {
+    $user = User::find($id);
+
+    if (!$user) {
+      return $this->notFound();
+    }
+    if ($user->identity != 0) {
+      return $this->badRequest(NULL, "用户身份不符合");
+    }
+
+    if ($request->has("real_name")) {
+      $user->real_name = $request->get("real_name");
+    }
+    if ($request->has("phone")) {
+      $user->phone = $request->get("phone");
+    }
+    if ($request->has("lottery_num")) {
+      $user->lottery_num = $request->get("lottery_num");
+    }
+    if ($request->has("remarks")) {
+      $user->remarks = $request->get("remarks");
+    }
+
+    $this->save_model($user);
+
+    return User::find($user->id);
   }
 
   /**

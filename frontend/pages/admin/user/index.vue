@@ -34,9 +34,9 @@
                       sm6>
                       <el-form-item
                         label="真实姓名"
-                        prop="realName">
+                        prop="real_name">
                         <el-input
-                          v-model="editedItem.realName"/>
+                          v-model="editedItem.real_name"/>
                       </el-form-item>
                     </v-flex>
                     <v-flex
@@ -53,18 +53,11 @@
                       xs12
                       sm6>
                       <el-form-item
-                        label="本月签到"
-                        prop="signInNum">
-                        <el-input v-model="editedItem.signInNum"/>
-                      </el-form-item>
-                    </v-flex>
-                    <v-flex
-                      xs12
-                      sm6>
-                      <el-form-item
                         label="抽奖次数"
-                        prop="lotteryNum">
-                        <el-input v-model="editedItem.lotteryNum"/>
+                        prop="lottery_num">
+                        <el-input-number
+                          v-model="editedItem.lottery_num"
+                          :min="0"/>
                       </el-form-item>
                     </v-flex>
                     <v-flex
@@ -109,7 +102,7 @@
         :headers="headers"
         :items="userList"
         :search="search"
-        :rows-per-page-items="[ 5, 10, 30]"
+        :rows-per-page-items="[5, 10, 30]"
         rows-per-page-text="每页行数"
         class="elevation-1">
         <template
@@ -117,21 +110,21 @@
           slot-scope="props">
           <td>{{ props.item.id }}</td>
           <td class="text-xs-left">{{ props.item.username }}</td>
-          <td class="text-xs-left">{{ props.item.realName ? props.item.realName : '暂无' }}</td>
+          <td class="text-xs-left">{{ props.item.real_name ? props.item.real_name : '暂无' }}</td>
           <td class="text-xs-left">{{ props.item.phone ? props.item.phone : '暂无' }}</td>
           <td class="text-xs-left">
             <v-avatar
               slot="activator"
               size="48px">
               <img
-                :src="props.item.headImgUrl"
+                :src="props.item.head_img_url"
                 alt="Avatar">
             </v-avatar>
           </td>
           <td class="text-xs-left">{{ props.item.openid }}</td>
-          <td class="text-xs-left">{{ props.item.signInNum }}</td>
-          <td class="text-xs-left">{{ props.item.lotteryNum }}</td>
-          <td class="text-xs-left">{{ formatDate(props.item.createdAt) }}</td>
+          <td class="text-xs-left">{{ props.item.sign_in_num }}</td>
+          <td class="text-xs-left">{{ props.item.lottery_num }}</td>
+          <td class="text-xs-left">{{ formatDate(props.item.created_at) }}</td>
           <td class="text-xs-left">{{ props.item.remarks }}</td>
           <td class="justify-center layout px-0">
             <v-icon
@@ -168,202 +161,139 @@
 </template>
 
 <script>
-  export default {
-    name: "AdminUser",
-    layout: 'admin',
-    data: () => ({
-      valid: true,
-      breadcrumbList: [
+import {mapState, mapActions} from 'vuex';
+import qs from 'qs';
+
+export default {
+  name: 'AdminUser',
+  layout: 'admin',
+  data: () => ({
+    valid: true,
+    breadcrumbList: [
+      {
+        text: '主页',
+        disabled: false,
+        href: '/admin',
+      },
+      {
+        text: '用户管理',
+        disabled: true,
+        href: '/admin/user',
+      },
+    ],
+    dialog: false,
+    headers: [
+      {text: 'ID', align: 'left', sortable: true, value: 'id'},
+      {text: '用户名称', align: 'left', value: 'username'},
+      {text: '真实姓名', align: 'left', value: 'real_name'},
+      {text: '电话号码', align: 'left', value: 'phone'},
+      {text: '用户头像', align: 'left', value: 'head_img_url'},
+      {text: 'open ID', align: 'left', value: 'openid'},
+      {text: '本月签到次数', align: 'left', value: 'sign_in_num'},
+      {text: '抽奖次数', align: 'left', value: 'lottery_num'},
+      {text: '创建时间', align: 'left', value: 'created_at'},
+      {text: '备注', align: 'left', value: 'remarks'},
+      {text: '操作', align: 'left', value: 'username', sortable: false},
+    ],
+    rules: {
+      real_name: [
+        {min: 1, max: 20, message: '长度在 1 到 20 个字符', trigger: 'change'},
+        {type: 'string', pattern: /^(\w|[\u4e00-\u9fa5])+$/, message: '请不要包含特殊字符', trigger: 'change'},
+      ],
+      phone: [
         {
-          text: '主页',
-          disabled: false,
-          href: '/admin'
-        },
-        {
-          text: '用户管理',
-          disabled: true,
-          href: '/admin/user'
+          pattern: /^(0|86|17951)?(13[0-9]|15[012356789]|166|17[3678]|18[0-9]|14[57])[0-9]{8}$/,
+          message: '格式不正确',
+          trigger: 'change',
         },
       ],
-      dialog: false,
-      headers: [
-        {text: 'ID', align: 'left', sortable: true, value: 'id'},
-        {text: '用户名称', align: 'left', value: 'username'},
-        {text: '真实姓名', align: 'left', value: 'realName'},
-        {text: '电话号码', align: 'left', value: 'phone'},
-        {text: '用户头像', align: 'left', value: 'headImgUrl'},
-        {text: 'open ID', align: 'left', value: 'openid'},
-        {text: '本月签到次数', align: 'left', value: 'signInNum'},
-        {text: '抽奖次数', align: 'left', value: 'lotteryNum'},
-        {text: '创建时间', align: 'left', value: 'createdAt'},
-        {text: '备注', align: 'left', value: 'remarks'},
-        {text: '操作', align: 'left', value: 'username', sortable: false},
+      remarks: [
+        {type: 'string', pattern: /^(\w|[\u4e00-\u9fa5])+$/, message: '请不要包含特殊字符', trigger: 'change'},
       ],
-      userList: [
-        {
-          id: 159,
-          username: '用户名称',
-          realName: '真实姓名',
-          phone: "18764785469",
-          headImgUrl: "https://randomuser.me/api/portraits/men/85.jpg",
-          openid: "54AS56D465W4E65A4SD654",
-          signInNum: 1,
-          lotteryNum: 100,
-          createdAt: new Date(),
-          remarks: "备注备注备注备注备注备注"
-        },
-        {
-          id: 1,
-          username: '用户名称',
-          realName: '真实姓名',
-          phone: "18764785469",
-          headImgUrl: "https://randomuser.me/api/portraits/men/85.jpg",
-          openid: "54AS56D465W4E65A4SD654",
-          signInNum: 1,
-          lotteryNum: 100,
-          createdAt: new Date(),
-          remarks: "备注备注备注备注备注备注"
-        },
-        {
-          id: 2,
-          username: '用户名称',
-          realName: '真实姓名',
-          phone: "18764785469",
-          headImgUrl: "https://randomuser.me/api/portraits/men/85.jpg",
-          openid: "54AS56D465W4E65A4SD654",
-          signInNum: 1,
-          lotteryNum: 100,
-          createdAt: new Date(),
-          remarks: "备注备注备注备注备注备注"
-        },
-        {
-          id: 3,
-          username: '用户名称',
-          realName: null,
-          phone: null,
-          headImgUrl: "https://randomuser.me/api/portraits/men/85.jpg",
-          openid: "54AS56D465W4E65A4SD654",
-          signInNum: 1,
-          lotteryNum: 100,
-          createdAt: new Date(),
-          remarks: "备注备注备注备注备注备注"
-        },
-        {
-          id: 4,
-          username: '用户名称',
-          realName: '真实姓名',
-          phone: "18764785469",
-          headImgUrl: "https://randomuser.me/api/portraits/men/85.jpg",
-          openid: "54AS56D465W4E65A4SD654",
-          signInNum: 1,
-          lotteryNum: 100,
-          createdAt: new Date(),
-          remarks: "备注备注备注备注备注备注"
-        },
-        {
-          id: 5,
-          username: '用户名称',
-          realName: null,
-          phone: null,
-          headImgUrl: "https://randomuser.me/api/portraits/men/85.jpg",
-          openid: "54AS56D465W4E65A4SD654",
-          signInNum: 1,
-          lotteryNum: 100,
-          createdAt: new Date(),
-          remarks: "备注备注备注备注备注备注"
-        },
-      ],
-      rules: {
-        realName: [
-          {min: 3, max: 20, message: '长度在 3 到 20 个字符', trigger: 'change'},
-          {type: 'string', pattern: /^(\w|[\u4e00-\u9fa5])+$/, message: '请不要包含特殊字符', trigger: 'change'}
-        ],
-        phone: [
-          {
-            pattern: /^(0|86|17951)?(13[0-9]|15[012356789]|166|17[3678]|18[0-9]|14[57])[0-9]{8}$/,
-            message: '格式不正确',
-            trigger: 'change'
-          }
-        ],
-        signInNum: [
-          {required: true, message: '请输入本月签到数', trigger: 'blur'},
-          {pattern: /^\d*$/, message: '本月签到数必须为数字值', trigger: 'change'},
-        ],
-        lotteryNum: [
-          {required: true, message: '请输入本月抽奖数', trigger: 'blur'},
-          {pattern: /^\d*$/, message: '本月抽奖数必须为数字值', trigger: 'change'},
-        ],
-        remarks: [
-          {type: 'string', pattern: /^(\w|[\u4e00-\u9fa5])+$/, message: '请不要包含特殊字符', trigger: 'change'}
-        ],
-      },
-      editedIndex: -1,
-      editedItem: {
-        realName: '',
-        phone: '',
-        signInNum: 0,
-        lotteryNum: 0,
-        remarks: ''
-      },
-      defaultItem: {
-        realName: '',
-        phone: '',
-        signInNum: 0,
-        lotteryNum: 0,
-        remarks: ''
-      },
-      search: '',
+    },
+    editedIndex: -1,
+    editedItem: {
+      real_name: '',
+      phone: '',
+      lottery_num: 0,
+      remarks: '',
+    },
+    defaultItem: {
+      real_name: '',
+      phone: '',
+      lottery_num: 0,
+      remarks: '',
+    },
+    search: '',
+  }),
+  computed: {
+    ...mapState({
+      userList: state => state.user.userList ? state.user.userList : [],
     }),
-    computed: {
-      formTitle() {
-        return this.editedIndex === -1 ? '添加用户' : '修改用户'
-      }
+    formTitle() {
+      return this.editedIndex === -1 ? '添加用户' : '修改用户';
     },
-    watch: {
-      dialog(val) {
-        val || this.close()
-      },
+  },
+  watch: {
+    dialog(val) {
+      val || this.close();
     },
-    methods: {
-      editItem(item) {
-        this.editedIndex = this.userList.indexOf(item);
-        this.editedItem = Object.assign({}, item);
-        this.dialog = true
-      },
-      deleteItem(item) {
-        const index = this.userList.indexOf(item);
-        confirm(`确定要删除 ${item.username} ?`) && this.userList.splice(index, 1)
-      },
-      close() {
-        this.dialog = false;
-        setTimeout(() => {
-          this.editedItem = Object.assign({}, this.defaultItem);
-          this.editedIndex = -1;
-          this.$refs.editedItem.resetFields();
-          this.valid = true;
-        }, 100)
-      },
-      save() {
-        this.$refs.editedItem.validate((valid) => {
-          if (valid) {
-            if (this.editedIndex > -1) {
-              Object.assign(this.userList[this.editedIndex], this.editedItem)
-            } else {
-              this.userList.push(JSON.parse(JSON.stringify(this.editedItem)))
-            }
-            this.close()
+  },
+  mounted() {
+    this.addUserList();
+  },
+  methods: {
+    ...mapActions({
+      addUserList: 'user/addUserList',
+    }),
+    editItem(item) {
+      this.editedIndex = this.userList.indexOf(item);
+      this.editedItem = Object.assign({}, item);
+      this.dialog = true;
+    },
+    deleteItem(item) {
+      const index = this.userList.indexOf(item);
+      confirm(`确定要删除 ${item.username} ?`) && this.userList.splice(index, 1);
+    },
+    close() {
+      this.dialog = false;
+      setTimeout(() => {
+        this.editedItem = Object.assign({}, this.defaultItem);
+        this.editedIndex = -1;
+        this.$refs.editedItem.resetFields();
+        this.valid = true;
+      }, 100);
+    },
+    save() {
+      this.$refs.editedItem.validate(async (valid) => {
+        if (valid) {
+          const _editedItem = {};
+          _editedItem.real_name = this.editedItem.real_name;
+          _editedItem.phone = this.editedItem.phone;
+          _editedItem.lottery_num = this.editedItem.lottery_num;
+          _editedItem.remarks = this.editedItem.remarks;
+          if (this.editedIndex > -1) {
+            // 编辑
+            await this.$axios.$put(`/user/plain_user/${this.editedItem.id}`, qs.stringify(_editedItem));
+          } else {
           }
-        });
-      },
-      formatDate(dateTimeObj) {
-        if (!dateTimeObj) {
-          return '暂无';
+          this.close();
+          this.addUserList();
         }
-        dateTimeObj = new Date(dateTimeObj);
-        return dateTimeObj ? `${dateTimeObj.getFullYear()}-${dateTimeObj.getMonth() + 1}-${new Date().getDate()} ${dateTimeObj.getHours()}:${dateTimeObj.getMinutes()}:${dateTimeObj.getSeconds()}` : '暂无';
-      }
+      });
     },
-  }
+    formatDate(dateTimeObj) {
+      if (!dateTimeObj) {
+        return '暂无';
+      }
+      dateTimeObj = new Date(dateTimeObj);
+      return dateTimeObj
+        ? `${dateTimeObj.getFullYear()}-${dateTimeObj.getMonth() +
+        1}-${new Date().getDate()} ${dateTimeObj.getHours()}:${dateTimeObj.getMinutes()}:${dateTimeObj.getSeconds()}`
+        : '暂无';
+    },
+  },
+};
 </script>
 
 <style scoped lang="stylus">

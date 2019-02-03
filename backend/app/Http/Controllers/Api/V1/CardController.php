@@ -250,7 +250,7 @@ class CardController extends ApiController {
    *
    * @return \Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response
    */
-  public function updateCardModel($id, UpdateCardModelRequest $request) {
+  public function updateCardModel(UpdateCardModelRequest $request, $id) {
     $cardModel = Card::find($id);
 
     if (!$cardModel) {

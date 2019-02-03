@@ -42,7 +42,6 @@ class UpdateCardModelRequest extends FormRequest {
       "end_time_0.date"       => "卡券定期时间格式不正确",
       "end_time_1.numeric"    => "卡券名倒计时间格式不正确",
       "probability.numeric"   => "卡券名概率格式不正确",
-      "remarks.string"        => "卡券备注数据类型不正确",
       "remarks.regex"         => "卡券备注格式不正确",
       "state.boolean"         => "卡券状态数据类型不正确",
       "type.boolean"          => "卡券类型数据类型不正确",

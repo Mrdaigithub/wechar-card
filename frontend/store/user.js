@@ -3,17 +3,14 @@ export const state = () => ({
 });
 
 export const mutations = {
-  addCardModelList(state, user) {
-    state.userList.push(user)
+  addUserList(state, user) {
+    state.userList = user;
   },
-  remove(state, id) {
-    state.list = state.list.filter(e => e.id !== id);
-  },
-  update(state, id, user) {
-    state.list = state.list.map(e => e.id === id ? user : e);
-  }
 };
 
 export const actions = {
-
+  async addUserList({commit}) {
+    const {data} = await this.$axios.$get(`/user/plain_user`);
+    commit('addUserList', data);
+  },
 };
