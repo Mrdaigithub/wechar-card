@@ -6,6 +6,8 @@ use App\Helpers\Api\ApiResponse;
 use Exception;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Tymon\JWTAuth\Exceptions\TokenExpiredException;
 
 class Handler extends ExceptionHandler {
@@ -60,6 +62,14 @@ class Handler extends ExceptionHandler {
     // 处理jwt token 失效异常
     if ($e instanceof TokenExpiredException) {
       return $this->unauthorized(NULL, "token已失效");
+    }
+    // 无效的请求方法
+    if ($e instanceof MethodNotAllowedHttpException) {
+      return $this->methodNotAllowed();
+    }
+    // 找不到资源
+    if ($e instanceof NotFoundHttpException) {
+      return $this->notFound();
     }
     return parent::render($request, $e);
   }

@@ -3,31 +3,33 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Api\ApiController;
+use App\Http\Requests\StoreCardModelRequest;
+use App\Http\Requests\UpdateCardModelRequest;
 use App\Model\Activity;
 use App\Model\Card;
 use App\Model\Shop;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
 class CardController extends ApiController {
-  
+
   private $oneself;
-  
+
   /**
    * CardController constructor.
    */
   public function __construct() {
     $this->oneself = JWTAuth::parseToken()->authenticate();
   }
-  
+
   /**
-   * 获取卡券列表
+   * 获取卡券模版列表
    *
    * @return mixed
    */
   public function list() {
-    return $this->success(Card::all());
+    return $this->success(Card::where("type", 0)->get());
   }
-  
+
   /**
    * 获取与指定商铺关联的卡券模板
    *
@@ -41,23 +43,24 @@ class CardController extends ApiController {
       return $this->badRequest(NULL, "单前商铺未参加任何活动");
     }
     $cardModelList = $activities->first()->cards();
-    
+
     // 去除被禁用,类型不为卡券模板,已过期的卡券模板
-    $cardModelList = array_filter($cardModelList->get()
-                                                ->toArray(), function($item) {
-      if (($item["state"] == 1) &&
-          ($item["type"] == 0) &&
-          ($item["end_time_0"]) &&
-          (strtotime($item["end_time_0"]) > strtotime(date('Y-m-d h:i:s', time())))) {
-        return TRUE;
-      }
-      elseif (($item["state"] == 1) &&
-              ($item["type"] == 0) &&
-              ($item["end_time_1"])) {
-        return TRUE;
-      }
-      return FALSE;
-    });
+    $cardModelList = array_filter($cardModelList->get()->toArray(),
+      function ($item) {
+        if (($item["state"] == 1)
+            && ($item["type"] == 0)
+            && ($item["end_time_0"])
+            && (strtotime($item["end_time_0"]) > strtotime(date('Y-m-d h:i:s',
+              time())))) {
+          return TRUE;
+        }
+        elseif (($item["state"] == 1)
+                && ($item["type"] == 0)
+                && ($item["end_time_1"])) {
+          return TRUE;
+        }
+        return FALSE;
+      });
     if (count($cardModelList) <= 0) {
       return $this->badRequest(NULL, "单前活动未选取任何卡券奖品");
     }
@@ -65,10 +68,10 @@ class CardController extends ApiController {
     if ($cardArray > 8) {
       array_splice($cardArray, 8, count($cardArray));
     }
-    
+
     return $this->success($cardArray);
   }
-  
+
   /**
    * 获取与用户在当前商铺中过的卡券
    *
@@ -77,16 +80,18 @@ class CardController extends ApiController {
    * @return \Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response|mixed
    */
   public function getUserCardByShopId($id) {
-    $cardList = array_map(function($item) {
+    $cardList = array_map(function ($item) {
       // 时间1过期卡券失效
       if (!!$item["end_time_0"]) {
-        $item["state"] = strtotime($item["end_time_0"]) > strtotime(date('Y-m-d h:i:s', time())) ? 1 : 0;
+        $item["state"] = strtotime($item["end_time_0"])
+                         > strtotime(date('Y-m-d h:i:s', time())) ? 1 : 0;
       }
       // 时间2过期卡券失效
       elseif (!!$item["end_time_1"]) {
-        $item["state"] = strtotime(date('Y-m-d H:i:s', strtotime("+" . $item["end_time_1"] . " seconds",
-          date(strtotime($item["created_at"]))))) > strtotime(date('Y-m-d h:i:s', time())) ?
-          1 : 0;
+        $item["state"] = strtotime(date('Y-m-d H:i:s',
+          strtotime("+" . $item["end_time_1"] . " seconds",
+            date(strtotime($item["created_at"])))))
+                         > strtotime(date('Y-m-d h:i:s', time())) ? 1 : 0;
       }
       // 如果卡券模板被禁用下级卡券全部失效(优先级最高,要放最下面)
       if (!Card::find($item["parentid"])["state"]) {
@@ -94,10 +99,10 @@ class CardController extends ApiController {
       }
       return $item;
     }, $this->oneself->cardList()->get()->toArray());
-    
+
     return $this->success($cardList);
   }
-  
+
   /**
    * 获取用户当前商铺中奖的奖品id
    *
@@ -111,24 +116,25 @@ class CardController extends ApiController {
       return $this->badRequest(NULL, "单前商铺未参加任何活动");
     }
     $cardModelList = $activities->first()->cards();
-  
+
     // 去除被禁用,类型不为卡券模板,已过期的卡券模板
-    $cardModelList = array_filter($cardModelList->get()
-                                                ->toArray(), function($item) {
-      if (($item["state"] == 1) &&
-          ($item["type"] == 0) &&
-          ($item["end_time_0"]) &&
-          (strtotime($item["end_time_0"]) > strtotime(date('Y-m-d h:i:s', time())))) {
-        return TRUE;
-      }
-      elseif (($item["state"] == 1) &&
-              ($item["type"] == 0) &&
-              ($item["end_time_1"])) {
-        return TRUE;
-      }
-      return FALSE;
-    });
-    
+    $cardModelList = array_filter($cardModelList->get()->toArray(),
+      function ($item) {
+        if (($item["state"] == 1)
+            && ($item["type"] == 0)
+            && ($item["end_time_0"])
+            && (strtotime($item["end_time_0"]) > strtotime(date('Y-m-d h:i:s',
+              time())))) {
+          return TRUE;
+        }
+        elseif (($item["state"] == 1)
+                && ($item["type"] == 0)
+                && ($item["end_time_1"])) {
+          return TRUE;
+        }
+        return FALSE;
+      });
+
     if (count($cardModelList) <= 0) {
       return $this->badRequest(NULL, "单前活动未选取任何卡券奖品");
     }
@@ -139,26 +145,24 @@ class CardController extends ApiController {
     if ($cardArray > 8) {
       array_splice($cardArray, 8, count($cardArray));
     }
-    
+
     // 去除概率为0的奖项
-    $cardArray = array_filter($cardArray,
-      function($item) {
-        if ($item["probability"] <= 0) {
-          return FALSE;
-        }
-        return TRUE;
-      });
-    
+    $cardArray = array_filter($cardArray, function ($item) {
+      if ($item["probability"] <= 0) {
+        return FALSE;
+      }
+      return TRUE;
+    });
+
     // 获取卡券的概率列表
     $cardProbabilityList = [];
     foreach ($cardArray as $item) {
-      array_push($cardProbabilityList,
-        [
-          "id"          => $item["id"],
-          "probability" => $item["probability"],
-        ]);
+      array_push($cardProbabilityList, [
+        "id"          => $item["id"],
+        "probability" => $item["probability"],
+      ]);
     }
-    
+
     // 随机抽取卡券
     $res = NULL;
     for (
@@ -171,11 +175,11 @@ class CardController extends ApiController {
         break;
       }
     }
-    
+
     // 用户抽奖次数-1
     $this->oneself["lottery_num"] -= 1;
     $this->save_model($this->oneself);
-    
+
     // 为用户创建抽到的卡券
     if ($res) {
       $cardModel               = Card::find($res);
@@ -192,7 +196,109 @@ class CardController extends ApiController {
       $this->save_model($newCard);
       $newCard->user()->attach($this->oneself->id);
     }
-    
+
     return $this->success($res);
+  }
+
+  /**
+   * 新建卡券模版
+   *
+   * @param \App\Http\Requests\StoreCardModelRequest $request
+   *
+   * @return \Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response
+   */
+  public function storeCardModel(StoreCardModelRequest $request) {
+    if (!$request->has("end_time_0") && !$request->has("end_time_1")) {
+      return $this->badRequest(NULL, "卡券结束时间参数缺失");
+    }
+
+    $cardModel = new Card();
+
+    $cardModel->card_name = $request->get("card_name");
+    if ($request->has("card_thumbnail")) {
+      $cardModel->card_thumbnail = $request->get("card_thumbnail");
+    }
+    if ($request->has("end_time_0")) {
+      $cardModel->end_time_0 = date("Y-m-d h:i:s",
+        strtotime($request->get("end_time_0")));
+    }
+    elseif ($request->has("end_time_1")) {
+      $cardModel->end_time_1 = $request->get("end_time_1");
+    }
+    if ($request->has("probability")) {
+      $cardModel->probability = $request->get("probability");
+    }
+    if ($request->has("remarks")) {
+      $cardModel->remarks = $request->get("remarks");
+    }
+    if ($request->has("state")) {
+      $cardModel->state = $request->get("state");
+    }
+    if ($request->has("type")) {
+      $cardModel->type = $request->get("type");
+    }
+
+    $this->save_model($cardModel);
+    return Card::find($cardModel->id);
+  }
+
+  /**
+   * 更新卡券模版
+   *
+   * @param                                           $id
+   * @param \App\Http\Requests\UpdateCardModelRequest $request
+   *
+   * @return \Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response
+   */
+  public function updateCardModel($id, UpdateCardModelRequest $request) {
+    $cardModel = Card::find($id);
+
+    if (!$cardModel) {
+      return $this->notFound();
+    }
+
+    if ($request->has("card_name")) {
+      $cardModel->card_name = $request->get("card_name");
+    }
+    if ($request->has("card_thumbnail")) {
+      $cardModel->card_thumbnail = $request->get("card_thumbnail");
+    }
+    if ($request->has("end_time_0")) {
+      $cardModel->end_time_0 = date("Y-m-d h:i:s",
+        strtotime($request->get("end_time_0")));
+      $cardModel->end_time_1 = NULL;
+    }
+    elseif ($request->has("end_time_1")) {
+      $cardModel->end_time_1 = $request->get("end_time_1");
+      $cardModel->end_time_0 = NULL;
+    }
+    if ($request->has("probability")) {
+      $cardModel->probability = $request->get("probability");
+    }
+    if ($request->has("remarks")) {
+      $cardModel->remarks = $request->get("remarks");
+    }
+    if ($request->has("state")) {
+      $cardModel->state = $request->get("state");
+    }
+    if ($request->has("type")) {
+      $cardModel->type = $request->get("type");
+    }
+
+    $this->save_model($cardModel);
+    return Card::find($cardModel->id);
+  }
+
+  /**
+   * 删除卡券模版
+   *
+   * @param $id
+   *
+   * @return mixed
+   */
+  public function removeCardModel($id) {
+    Card::destroy($id);
+    // Todo 删除卡券关联
+    return;
   }
 }

@@ -1649,6 +1649,11 @@ cache-loader@^2.0.1:
     normalize-path "^3.0.0"
     schema-utils "^1.0.0"
 
+calculatorjs@^1.1.2:
+  version "1.1.2"
+  resolved "http://registry.npm.taobao.org/calculatorjs/download/calculatorjs-1.1.2.tgz#5e254ce929cb21f00c07e539709c3f0ed8a24e83"
+  integrity sha1-XiVM6SnLIfAMB+U5cJw/DtiiToM=
+
 caller-callsite@^2.0.0:
   version "2.0.0"
   resolved "http://registry.npm.taobao.org/caller-callsite/download/caller-callsite-2.0.0.tgz#847e0fce0a223750a9a027c54b33731ad3154134"

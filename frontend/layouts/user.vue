@@ -64,7 +64,7 @@
       ...mapActions({
         addOneself: 'oneself/addOneself',
         addSystemConfig: 'systemConfig/addSystemConfig',
-        addCard: 'card/addCardModelList',
+        addCard: 'card/addCardModelListByShopId',
         addActivity: 'activity/addActivity',
       }),
     },

@@ -27,13 +27,12 @@ class SystemConfigController extends ApiController {
    * @return mixed
    */
   public function updateSystemConfig($id, UpdateSystemConfigRequest $request) {
-    $configValue  = $request->only("config_value")["config_value"];
     $systemConfig = SystemConfig::find($id);
     if (!$systemConfig) {
       return $this->notFound(NULL, "未找到此系统配置项");
     }
 
-    $systemConfig->config_value = $configValue;
+    $systemConfig->config_value = $request->get("config_value");
     $this->save_model($systemConfig);
     return $systemConfig;
   }

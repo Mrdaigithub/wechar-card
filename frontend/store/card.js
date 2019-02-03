@@ -9,7 +9,11 @@ export const mutations = {
 };
 
 export const actions = {
-  async addCardModelList({commit}, shopId) {
+  async addCardModelList({commit}) {
+    const {data} = await this.$axios.$get(`/card`);
+    commit('addCardModelList', data);
+  },
+  async addCardModelListByShopId({commit}, shopId) {
     const {data} = await this.$axios.$get(`/card/shop/${shopId}`);
     commit('addCardModelList', data);
   },
