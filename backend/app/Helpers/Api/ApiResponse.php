@@ -21,27 +21,7 @@ trait ApiResponse {
   private $statusCode = Response::HTTP_OK;
   
   private $header = [];
-  
-  /**
-   * ApiResponse constructor.
-   *
-   * @param string $message
-   * @param null $data
-   * @param int $code
-   * @param int $statusCode
-   */
-  public function __construct(
-    string $message = "",
-    $data = NULL,
-    int $code = Response::HTTP_OK,
-    int $statusCode = Response::HTTP_OK
-  ) {
-    $this->message    = $message;
-    $this->data       = $data;
-    $this->code       = $code;
-    $this->statusCode = $statusCode;
-  }
-  
+
   /**
    * @return string
    */

@@ -15,7 +15,8 @@
                 v-if="systemConfigList.filter(item=>item['config_name']==='lotteryNeedsToFillInTheInformation').length > 0"
                 xs12
                 sm6>
-                <el-form-item :label="systemConfigList.filter(item=>item['config_name']==='lotteryNeedsToFillInTheInformation')[0]['config_description']">
+                <el-form-item
+                  :label="systemConfigList.filter(item=>item['config_name']==='lotteryNeedsToFillInTheInformation')[0]['config_description']">
                   <el-switch v-model="lotteryNeedsToFillInTheInformationValue"/>
                 </el-form-item>
               </v-flex>
@@ -23,7 +24,8 @@
                 v-if="systemConfigList.filter(item=>item['config_name']==='howManyDaysHaveYouWonTheLotteryIn15Days').length > 0"
                 xs12
                 sm6>
-                <el-form-item :label="systemConfigList.filter(item=>item['config_name']==='howManyDaysHaveYouWonTheLotteryIn15Days')[0]['config_description']">
+                <el-form-item
+                  :label="systemConfigList.filter(item=>item['config_name']==='howManyDaysHaveYouWonTheLotteryIn15Days')[0]['config_description']">
                   <el-input-number
                     v-model="howManyDaysHaveYouWonTheLotteryIn15DaysValue"
                     :min="0"
@@ -49,54 +51,67 @@
 </template>
 
 <script>
-  import {mapState, mapActions} from 'vuex';
-  
-  export default {
-    name: 'AdminSystemConfig',
-    layout: 'admin',
-    data: () => ({
-      valid: true,
-      breadcrumbList: [
-        {
-          text: '主页',
-          disabled: false,
-          href: '/admin',
-        },
-        {
-          text: '系统设置',
-          disabled: true,
-          href: '/admin/system/config',
-        },
-      ],
-      lotteryNeedsToFillInTheInformationValue: false,
-      howManyDaysHaveYouWonTheLotteryIn15DaysValue: 0,
-    }),
-    computed: {
-      ...mapState({
-        systemConfigList: state => state.systemConfig.systemConfig ? state.systemConfig.systemConfig : null,
-      }),
-    },
-    watch: {
-      systemConfigList(systemConfigList) {
-        if (!systemConfigList) {
-          return;
-        }
-        this.lotteryNeedsToFillInTheInformationValue = /true/i.test(systemConfigList.filter(item=>item['config_name']==='lotteryNeedsToFillInTheInformation')[0]['config_value']);
-        this.howManyDaysHaveYouWonTheLotteryIn15DaysValue = parseInt(systemConfigList.filter(item=>item['config_name']==='howManyDaysHaveYouWonTheLotteryIn15Days')[0]['config_value']);
+import {mapState, mapActions} from 'vuex';
+import qs from 'qs';
+
+export default {
+  name: 'AdminSystemConfig',
+  layout: 'admin',
+  data: () => ({
+    valid: true,
+    breadcrumbList: [
+      {
+        text: '主页',
+        disabled: false,
+        href: '/admin',
       },
+      {
+        text: '系统设置',
+        disabled: true,
+        href: '/admin/system/config',
+      },
+    ],
+    lotteryNeedsToFillInTheInformationValue: false,
+    howManyDaysHaveYouWonTheLotteryIn15DaysValue: 0,
+  }),
+  computed: {
+    ...mapState({
+      systemConfigList: state => state.systemConfig.systemConfig ? state.systemConfig.systemConfig : null,
+    }),
+  },
+  watch: {
+    systemConfigList(systemConfigList) {
+      if (!systemConfigList) {
+        return;
+      }
+      this.lotteryNeedsToFillInTheInformationValue = /true/i.test(systemConfigList.filter(
+        item => item['config_name'] === 'lotteryNeedsToFillInTheInformation')[0]['config_value']);
+      this.howManyDaysHaveYouWonTheLotteryIn15DaysValue = parseInt(systemConfigList.filter(
+        item => item['config_name'] === 'howManyDaysHaveYouWonTheLotteryIn15Days')[0]['config_value']);
     },
-    mounted() {
+  },
+  mounted() {
+    this.addSystemConfig();
+  },
+  methods: {
+    ...mapActions({
+      addSystemConfig: 'systemConfig/addSystemConfig',
+    }),
+    async save() {
+      for (let item of this.systemConfigList) {
+        let _item = JSON.parse(JSON.stringify(item));
+        if (_item['config_name'] === 'lotteryNeedsToFillInTheInformation') {
+          _item['config_value'] = this.lotteryNeedsToFillInTheInformationValue.toString();
+          const {data} = await this.$axios.$put(`/system/config/${item['id']}`, qs.stringify(_item));
+        } else if (_item['config_name'] === 'howManyDaysHaveYouWonTheLotteryIn15Days') {
+          _item['config_value'] = this.howManyDaysHaveYouWonTheLotteryIn15DaysValue.toString();
+          const {data} = await this.$axios.$put(`/system/config/${item['id']}`, qs.stringify(_item));
+        }
+      }
       this.addSystemConfig();
     },
-    methods: {
-      ...mapActions({
-        addSystemConfig: 'systemConfig/addSystemConfig',
-      }),
-      save() {
-        console.log('save');
-      },
-    },
-  };
+  },
+};
 </script>
 
 <style scoped lang="stylus">

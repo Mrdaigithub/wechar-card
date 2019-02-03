@@ -9,25 +9,19 @@
 namespace App\Http\Controllers;
 
 use App\Events\MessageEvent;
-use App\Events\News;
 use App\Http\Controllers\Handler\EventMessageHandler;
 use App\Http\Controllers\Handler\TextMessageHandler;
-use App\Model\Activity;
 use App\Model\Shop;
 use App\Model\User;
 use EasyWeChat\Kernel\Messages\Message;
 use GuzzleHttp\Client;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
-use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class WeChatController extends Controller {
-  
+
   public function test() {
-    $openid = "oWqQa6K2egw4ijKVOAC-tffxhxKg";
-    return json_encode();
   }
-  
+
   /**
    * 微信授权获取用户信息,跳转指定页面
    *
@@ -40,12 +34,12 @@ class WeChatController extends Controller {
       return "参数错误";
     }
     $url = $request->get("url");
-    
+
     $app      = app('wechat.official_account');
     $response = $app->oauth->scopes(['snsapi_base'])->redirect($url);
     return $response;
   }
-  
+
   /**
    * 普通用户认证跳转到地理位置验证界面通过则跳转到抽奖界面
    *
@@ -59,7 +53,7 @@ class WeChatController extends Controller {
       "url"    => env("FRONT_DOMAIN") . "/user/lottery",
     ]);
   }
-  
+
   /**
    * 管理员用户认证通过想web客户端发送允许登录的消息
    *
@@ -68,7 +62,7 @@ class WeChatController extends Controller {
   public function grantLoginAdmin() {
     $app        = app('wechat.official_account');
     $wechatUser = $app->oauth->user();
-    
+
     $userList = User::where("openid", $wechatUser->getId())->get();
     if ($userList->isEmpty()) {
       return "用户不存在";
@@ -76,7 +70,7 @@ class WeChatController extends Controller {
     elseif ($userList->first()->identity !== 3) {
       return "无权限";
     }
-    
+
     // 通过验证发送消息
     broadcast(new MessageEvent(json_encode([
       "signal" => "allowLogin",
@@ -84,7 +78,7 @@ class WeChatController extends Controller {
     ])));
     return "登录成功";
   }
-  
+
   /**
    * 处理微信的请求消息
    *
@@ -92,13 +86,13 @@ class WeChatController extends Controller {
    */
   public function serve() {
     $app = app('wechat.official_account');
-    
+
     $app->server->push(TextMessageHandler::class, Message::TEXT); // 文本消息
     $app->server->push(EventMessageHandler::class, Message::EVENT); // 事件消息
-    
+
     return $app->server->serve();
   }
-  
+
   /**
    * 获取Access token
    *
@@ -106,10 +100,10 @@ class WeChatController extends Controller {
    */
   public function getAccessToken() {
     $app = app('wechat.official_account');
-    
+
     return $app->access_token->getToken();
   }
-  
+
   /**
    * 获取js sdk 配置
    *
@@ -117,10 +111,10 @@ class WeChatController extends Controller {
    */
   public function getJsSdkConfig() {
     $app = app('wechat.official_account');
-    
+
     return $app->jssdk->buildConfig(['getLocation'], TRUE);
   }
-  
+
   /**
    * 地理位置逆编码
    *
@@ -139,7 +133,7 @@ class WeChatController extends Controller {
                            . env("AK"));
     return $res;
   }
-  
+
   public function getCityByShopId($id) {
     return Shop::find($id)["shop_location"];
   }

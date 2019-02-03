@@ -9,7 +9,7 @@
         md6
         sm8
         xs12>
-        <h2>登录</h2>
+        <h2>管理员登录</h2>
         <img
           v-if="loginQrCodeBase64"
           :src="`data:image/png;base64,${loginQrCodeBase64}`"
@@ -20,42 +20,42 @@
 </template>
 
 <script>
-  import {mapMutations, mapActions} from 'vuex';
-  import rules from '~/utils/rules';
-  
-  export default {
-    name: 'AdminLogin',
-    layout: 'empty',
-    data: () => ({
-      rules: rules,
-      gradient: 'to top, #F44336 ,#fff',
-      valid: true,
-      hidePassword: true,
-      loginQrCodeBase64: '',
+import {mapMutations, mapActions} from 'vuex';
+import rules from '~/utils/rules';
+
+export default {
+  name: 'AdminLogin',
+  layout: 'empty',
+  data: () => ({
+    rules: rules,
+    gradient: 'to top, #F44336 ,#fff',
+    valid: true,
+    hidePassword: true,
+    loginQrCodeBase64: '',
+  }),
+  async mounted() {
+    const {data} = await this.$axios.$get(`/qrcode/admin/login`);
+    this.loginQrCodeBase64 = data;
+
+    window.Echo.channel('publicChannel').listen('MessageEvent', async (e) => {
+      if (e.message && JSON.parse(e.message).signal === 'allowLogin' && JSON.parse(e.message).openid) {
+        const {data} = await this.$axios.$get(`/auth/client/${JSON.parse(e.message).openid}`);
+        this.addToken(data);
+        this.addOneself();
+        this.$router.replace('/admin');
+      }
+    });
+  },
+  methods: {
+    ...mapMutations({
+      addToken: 'oneself/addToken',
     }),
-    async mounted() {
-      const {data} = await this.$axios.$get(`/qrcode/admin/login`);
-      this.loginQrCodeBase64 = data;
-      
-      window.Echo.channel('publicChannel').listen('MessageEvent', async (e) => {
-        if (e.message && JSON.parse(e.message).signal === 'allowLogin' && JSON.parse(e.message).openid) {
-          const {data} = await this.$axios.$get(`/auth/client/${JSON.parse(e.message).openid}`);
-          this.addToken(data);
-          this.addOneself();
-          this.$router.replace('/admin');
-        }
-      });
-    },
-    methods: {
-      ...mapMutations({
-        addToken: 'oneself/addToken',
-      }),
-      ...mapActions({
-        addOneself: 'oneself/addOneself',
-        addSystemConfig: 'systemConfig/addSystemConfig',
-      }),
-    },
-  };
+    ...mapActions({
+      addOneself: 'oneself/addOneself',
+      addSystemConfig: 'systemConfig/addSystemConfig',
+    }),
+  },
+};
 </script>
 
 <style scoped>

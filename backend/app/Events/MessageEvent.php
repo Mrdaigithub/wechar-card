@@ -12,7 +12,7 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 
 class MessageEvent implements ShouldBroadcast {
   
-  private $message;
+  public $message;
   
   use Dispatchable, InteractsWithSockets, SerializesModels;
   

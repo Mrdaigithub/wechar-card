@@ -41,10 +41,8 @@ class SignInController extends ApiController {
     // 获取签到记录
     $signInLogs     = $user->signInLogs()->first()["month_sign_in_log"];
     $signInLogArray = $signInLogs ? explode(",", $signInLogs) : [];
-    // 如果是上个月的记录则清除
-    if (count($signInLogArray)
-        && date("m", strtotime($signInLogArray[count($signInLogArray) - 1]))
-           !== date("m", time())) {
+    // 如果是上个月的记录则清除 // Todo fix bug
+    if (count($signInLogArray) && date("m", strtotime($signInLogArray[count($signInLogArray) - 1])) !== date("m", time())) {
       $signInLogArray = [];
     }
     

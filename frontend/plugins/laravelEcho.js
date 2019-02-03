@@ -6,6 +6,6 @@ export default ({app, store, redirect}) => {
 
   window.Echo = new Echo({
     broadcaster: 'socket.io',
-    host: 'wechat.com:6001',
+    host: 'localhost:6001',
   });
 }
