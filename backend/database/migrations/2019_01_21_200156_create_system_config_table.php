@@ -15,7 +15,7 @@ class CreateSystemConfigTable extends Migration {
     Schema::create('system_config',
       function (Blueprint $table) {
         $table->bigIncrements('id')->unique();
-        $table->string("config_name");
+        $table->string("config_name")->unique();
         $table->string("config_description");
         $table->string("config_value");
         $table->timestamps();

@@ -20,7 +20,6 @@ class CreateUserTable extends Migration {
             ->default("http://thirdwx.qlogo.cn/mmopen/g3MonUZtNHkdmzicIlibx6iaFqAc56vxLSUfpb6n5WKSYVY0ChQKkiaJSgQ1dZuTOgvLLrhJbERQQ4eMsv84eavHiaiceqxibJxCfHe/0");
       $table->string("phone")->nullable();
       $table->string("openid")->unique();
-      $table->integer("sign_in_num")->default(0)->comment("签到次数  (普通客户独有)");
       $table->integer("lottery_num")->default(0)->comment("抽奖次数  (普通客户独有)");
       $table->integer("identity")
             ->default(0)

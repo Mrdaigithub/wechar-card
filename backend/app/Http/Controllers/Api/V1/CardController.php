@@ -38,7 +38,7 @@ class CardController extends ApiController {
    * @return \Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response|mixed
    */
   public function getCardByShopId($id) {
-    $activities = Shop::find($id)->activities();
+    $activities = Shop::find($id)->activity();
     if ($activities->count() <= 0) {
       return $this->badRequest(NULL, "单前商铺未参加任何活动");
     }
@@ -111,7 +111,7 @@ class CardController extends ApiController {
    * @return \Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response|mixed
    */
   public function getLotteryCardIdByShopId($id) {
-    $activities = Shop::find($id)->activities();
+    $activities = Shop::find($id)->activity();
     if ($activities->count() <= 0) {
       return $this->badRequest(NULL, "单前商铺未参加任何活动");
     }

@@ -21,7 +21,7 @@ class SystemConfigTableSeeder extends Seeder {
     DB::table("system_config")->insert([
       "config_name"        => "howManyDaysHaveYouWonTheLotteryIn15Days",
       "config_description" => "15天签到多少天获得抽奖数",
-      "config_value"       => "true",
+      "config_value"       => "7",
       "created_at"         => date('Y-m-d h:i:s', time()),
       "updated_at"         => date('Y-m-d h:i:s', time()),
     ]);

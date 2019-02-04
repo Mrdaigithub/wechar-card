@@ -51,7 +51,7 @@
       this.addOneself();
       this.addSystemConfig();
       this.addCard(this.$route.query.shopid);
-      this.addActivity(this.$route.query.shopid);
+      this.addShopActivity(this.$route.query.shopid);
       this.bottomNav = this.$route.path.split('/')[this.$route.path.split('/').length - 1];
     },
     methods: {
@@ -65,7 +65,7 @@
         addOneself: 'oneself/addOneself',
         addSystemConfig: 'systemConfig/addSystemConfig',
         addCard: 'card/addCardModelListByShopId',
-        addActivity: 'activity/addActivity',
+        addShopActivity: 'shop/addShopActivity',
       }),
     },
   };

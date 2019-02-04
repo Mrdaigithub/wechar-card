@@ -198,8 +198,8 @@ export default {
       cardList1: state => state.card.cardModelList ?
         state.card.cardModelList.map(item => ({id: item['id'], name: item['card_name'], isPrize: 1}))
         : [], // 显示的奖品列表带未中奖
-      activityName: state => state.activity.activity ? state.activity.activity['activity_name'] : '', // 剩余抽奖次数
-      activityDescription: state => state.activity.activity ? state.activity.activity['activity_description'] : '', // 剩余抽奖次数
+      activityName: state => state.shop.activity ? state.shop.activity['activity_name'] : '', // 剩余抽奖次数
+      activityDescription: state => state.shop.activity ? state.shop.activity['activity_description'] : '', // 剩余抽奖次数
     }),
     toastTitle() {
       return this.hasPrize
