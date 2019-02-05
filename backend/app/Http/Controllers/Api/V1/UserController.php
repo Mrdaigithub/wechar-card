@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Api\ApiController;
 use App\Http\Requests\UpdatePlainUserRequest;
+use App\Http\Requests\UpdateShopEmployeeRequest;
+use App\Model\Shop;
 use App\Model\User;
 use Illuminate\Http\Request;
 use Tymon\JWTAuth\Facades\JWTAuth;
@@ -42,12 +44,26 @@ class UserController extends ApiController {
     }
 
     /**
-     * Store a newly created resource in storage.
+     * 获取所有商铺用户列表(老板、员工)
      *
-     * @param \Illuminate\Http\Request $request
+     * @return mixed
      */
-    public function save(Request $request) {
-        //
+    public function listShopEmployee() {
+        $plainUserList = User::where("identity", 1)
+            ->orWhere("identity", 2)
+            ->get()
+            ->map(function ($item) {
+                $shop = $item->shop();
+                if ($shop->get()->isEmpty()) {
+                    $item->shop_id = NULL;
+                } else {
+                    $item->shop_id = $shop->first()->id;
+                }
+
+                return $item;
+            });
+
+        return $this->success($plainUserList);
     }
 
     /**
@@ -57,7 +73,7 @@ class UserController extends ApiController {
      *
      * @return \Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response|mixed
      */
-    public function get_user_by_id($id) {
+    public function getUserById($id) {
         if ($id == 0) {
             return $this->success(JWTAuth::parseToken()->authenticate());
         }
@@ -70,7 +86,16 @@ class UserController extends ApiController {
     }
 
     /**
-     * 更新用户信息
+     * Store a newly created resource in storage.
+     *
+     * @param \Illuminate\Http\Request $request
+     */
+    public function save(Request $request) {
+        //
+    }
+
+    /**
+     * 更新普通用户信息
      *
      * @param \App\Http\Requests\UpdatePlainUserRequest $request
      * @param                                           $id
@@ -106,13 +131,61 @@ class UserController extends ApiController {
     }
 
     /**
-     * 删除指定id用户
+     * 更新商铺老板雇员信息
+     *
+     * @param \App\Http\Requests\UpdateShopEmployeeRequest $request
+     * @param                                              $id
+     *
+     * @return \Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response
+     */
+    public function updateShopEmployee(UpdateShopEmployeeRequest $request, $id) {
+        $user = User::find($id);
+
+        if ( ! $user) {
+            return $this->notFound();
+        }
+        if ($user->identity != 1 && $user->identity != 2) {
+            return $this->badRequest(NULL, "用户身份不符合");
+        }
+        if ($request->has("shop_id") && ! ! Shop::find($request->get("shop_id"))) {
+            $this->notFound();
+        }
+
+        if ($request->has("real_name")) {
+            $user->real_name = $request->get("real_name");
+        }
+        if ($request->has("phone")) {
+            $user->phone = $request->get("phone");
+        }
+        if ($request->has("identity")) {
+            $user->identity = $request->get("identity");
+        }
+        if ($request->has("state")) {
+            $user->state = $request->get("state");
+        }
+        if ($request->has("remarks")) {
+            $user->remarks = $request->get("remarks");
+        }
+
+        $this->save_model($user);
+
+        if ($request->has("shop_id")) {
+            $user->shop()->detach();
+            $user->shop()->attach($request->get("shop_id"));
+        }
+
+        return User::find($user->id);
+    }
+
+    /**
+     * 删除指定商铺老板雇员
      *
      * @param  int $id
      *
-     * @return \Illuminate\Http\Response
+     * @return void
      */
-    public function remove($id) {
-        //
+    public function removeShopEmployee($id) {
+        User::find($id)->shop()->detach();
+        User::destroy($id);
     }
 }

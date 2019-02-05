@@ -111,7 +111,7 @@
           <td class="text-xs-center">{{ props.item.writeOff ? '已核销' : '未核销' }}</td>
           <td class="text-xs-center">{{ formatDate(props.item.writeOffDate) }}</td>
           <td class="text-xs-center">{{ props.item.remarks }}</td>
-          <td class="justify-center layout px-0">
+          <td class="text-xs-center">
             <v-icon
               small
               class="mr-2"

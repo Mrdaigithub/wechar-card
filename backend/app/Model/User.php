@@ -22,6 +22,13 @@ class User extends Authenticatable implements JWTSubject {
       "user_id",
       "card_id");
   }
+
+  public function shop() {
+        return $this->belongsToMany("App\Model\Shop",
+            "shop_user",
+            "user_id",
+            "shop_id");
+    }
   
   /**
    * Get the identifier that will be stored in the subject claim of the JWT.

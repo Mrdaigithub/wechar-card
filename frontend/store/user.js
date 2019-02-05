@@ -1,10 +1,14 @@
 export const state = () => ({
-  userList: []
+  userList: [],
+  shopEmployeeList: [],
 });
 
 export const mutations = {
-  addUserList(state, user) {
-    state.userList = user;
+  addUserList(state, userList) {
+    state.userList = userList;
+  },
+  addShopEmployeeList(state, shopEmployeeList) {
+    state.shopEmployeeList = shopEmployeeList;
   },
 };
 
@@ -12,5 +16,9 @@ export const actions = {
   async addUserList({commit}) {
     const {data} = await this.$axios.$get(`/user/plain_user`);
     commit('addUserList', data);
+  },
+  async addShopEmployeeList({commit}) {
+    const {data} = await this.$axios.$get(`/user/shop`);
+    commit('addShopEmployeeList', data);
   },
 };

@@ -61,9 +61,9 @@
                       sm6>
                       <el-form-item
                         label="真实姓名"
-                        prop="realName">
+                        prop="real_name">
                         <el-input
-                          v-model="editedItem.realName"/>
+                          v-model="editedItem.real_name"/>
                       </el-form-item>
                     </v-flex>
                     <v-flex
@@ -81,16 +81,16 @@
                       sm6>
                       <el-form-item
                         label="店名"
-                        prop="shopName">
+                        prop="shop_name">
                         <el-select
-                          v-model="editedItem.shopName"
+                          v-model="editedItem.shop_id"
                           class="w100"
                           filterable>
                           <el-option
-                            v-for="item in shopNameOptions"
-                            :key="item.value"
-                            :label="item.label"
-                            :value="item.value"/>
+                            v-for="item in shopList"
+                            :key="item.id"
+                            :label="item['shop_name']"
+                            :value="item.id"/>
                         </el-select>
                       </el-form-item>
                     </v-flex>
@@ -99,12 +99,12 @@
                       sm6>
                       <el-form-item
                         label="人员岗位"
-                        prop="userIdentity">
-                        <el-select 
-                          v-model="editedItem.userIdentity" 
+                        prop="identity">
+                        <el-select
+                          v-model="editedItem.identity"
                           class="w100">
                           <el-option
-                            v-for="item in userIdentityOptions"
+                            v-for="item in identityOptions"
                             :key="item.value"
                             :label="item.label"
                             :value="item.value"/>
@@ -126,8 +126,8 @@
                       sm6>
                       <el-form-item
                         label="人员状态"
-                        prop="userState">
-                        <el-switch v-model="editedItem.userState"/>
+                        prop="state">
+                        <el-switch v-model="editedItem.state"/>
                       </el-form-item>
                     </v-flex>
                   </v-layout>
@@ -160,7 +160,7 @@
       </v-content>
       <v-data-table
         :headers="headers"
-        :items="employeeList"
+        :items="shopEmployeeList"
         :search="search"
         :rows-per-page-items="[ 5, 10, 30]"
         rows-per-page-text="每页行数"
@@ -170,24 +170,33 @@
           slot-scope="props">
           <td class="text-xs-center">{{ props.item.id }}</td>
           <td class="text-xs-center">{{ props.item.username }}</td>
-          <td class="text-xs-center">{{ props.item.realName ? props.item.realName : '暂无' }}</td>
+          <td class="text-xs-center">{{ props.item.real_name ? props.item.real_name : '暂无' }}</td>
           <td class="text-xs-center">{{ props.item.phone ? props.item.phone : '暂无' }}</td>
           <td class="text-xs-center">
             <v-avatar
               slot="activator"
               size="48px">
               <img
-                :src="props.item.headImgUrl"
+                :src="props.item.head_img_url"
                 alt="Avatar">
             </v-avatar>
           </td>
           <td class="text-xs-center">{{ props.item.openid }}</td>
-          <td class="text-xs-center">{{ shopNameOptions.filter(e=>props.item.shopName ===e.value).length >=1 ? shopNameOptions.filter(e=>props.item.shopName ===e.value)[0].label : "暂无" }}</td>
-          <td class="text-xs-center">{{ props.item.userState ? '启用' : '未启用' }}</td>
-          <td class="text-xs-center">{{ props.item.userIdentity === 1 ? '老板' : '员工' }}</td>
-          <td class="text-xs-center">{{ formatDate(props.item.createdAt) }}</td>
+          <td class="text-xs-center">
+            <v-btn
+              v-if="!!props.item.shop_id && shopList.filter(e=>props.item.shop_id ===e.id).length >=1"
+              small
+              flat
+              @click="changePage(`/admin/shop?shop=${shopList.filter(e=>props.item.shop_id ===e.id)[0]['shop_name']}`)">
+              {{ shopList.filter(e=>props.item.shop_id ===e.id)[0]['shop_name'] }}
+            </v-btn>
+            <div v-else>暂无</div>
+          </td>
+          <td class="text-xs-center">{{ props.item.state ? '启用' : '未启用' }}</td>
+          <td class="text-xs-center">{{ props.item.identity === 1 ? '老板' : '员工' }}</td>
+          <td class="text-xs-center">{{ formatDate(props.item.created_at) }}</td>
           <td class="text-xs-center">{{ props.item.remarks }}</td>
-          <td class="justify-center layout px-0">
+          <td class="text-xs-center">
             <v-icon
               small
               class="mr-2"
@@ -222,214 +231,167 @@
 </template>
 
 <script>
-  export default {
-    name: "AdminShopEmployee",
-    layout: 'admin',
-    data: () => ({
-      valid: true,
-      breadcrumbList: [
-        {
-          text: '主页',
-          disabled: false,
-          href: '/admin'
-        },
-        {
-          text: '商家人员管理',
-          disabled: true,
-          href: '/admin/shop/employee'
-        },
-      ],
-      dialog: false,
-      addDialog: false,
-      headers: [
-        {text: 'ID', align: 'center', sortable: true, value: 'id'},
-        {text: '店员名称', align: 'center', value: 'username'},
-        {text: '真实姓名', align: 'center', value: 'realName'},
-        {text: '电话号码', align: 'center', value: 'phone'},
-        {text: '店员头像', align: 'center', value: 'headImgUrl'},
-        {text: 'openid', align: 'center', value: 'openid'},
-        {text: '店名', align: 'center', value: 'shopName'},
-        {text: '人员状态', align: 'center', value: 'userState'},
-        {text: '人员岗位', align: 'center', value: 'userIdentity'},
-        {text: '创建时间', align: 'center', value: 'createdAt'},
-        {text: '备注', align: 'center', value: 'remarks'},
-        {text: '操作', align: 'center', value: 'username', sortable: false},
-      ],
-      employeeList: [
-        {
-          id: 159,
-          username: '店员名称',
-          realName: null,
-          phone: null,
-          headImgUrl: "https://randomuser.me/api/portraits/men/85.jpg",
-          openid: "54AS56D465W4E65A4SD654",
-          shopName: 1,
-          userState: true,
-          userIdentity: 1,
-          createdAt: new Date(),
-          remarks: "备注备注备注备注备注备注"
-        },
-        {
-          id: 1,
-          username: '店员名称',
-          realName: null,
-          phone: null,
-          headImgUrl: "https://randomuser.me/api/portraits/men/85.jpg",
-          openid: "54AS56D465W4E65A4SD654",
-          shopName: 2,
-          userState: true,
-          userIdentity: 1,
-          createdAt: new Date(),
-          remarks: "备注备注备注备注备注备注"
-        },
-        {
-          id: 2,
-          username: '店员名称',
-          realName: null,
-          phone: null,
-          headImgUrl: "https://randomuser.me/api/portraits/men/85.jpg",
-          openid: "54AS56D465W4E65A4SD654",
-          shopName: 3,
-          userState: true,
-          userIdentity: 1,
-          createdAt: new Date(),
-          remarks: "备注备注备注备注备注备注"
-        },
-        {
-          id: 3,
-          username: '店员名称',
-          realName: null,
-          phone: null,
-          headImgUrl: "https://randomuser.me/api/portraits/men/85.jpg",
-          openid: "54AS56D465W4E65A4SD654",
-          shopName: 4,
-          userState: true,
-          userIdentity: 1,
-          createdAt: new Date(),
-          remarks: "备注备注备注备注备注备注"
-        },
-        {
-          id: 4,
-          username: '店员名称',
-          realName: null,
-          phone: null,
-          headImgUrl: "https://randomuser.me/api/portraits/men/85.jpg",
-          openid: "54AS56D465W4E65A4SD654",
-          shopName: 3,
-          userState: true,
-          userIdentity: 1,
-          createdAt: new Date(),
-          remarks: "备注备注备注备注备注备注"
-        },
-        {
-          id: 5,
-          username: '店员名称',
-          realName: "真实姓名",
-          phone: 15235656565,
-          headImgUrl: "https://randomuser.me/api/portraits/men/85.jpg",
-          openid: "54AS56D465W4E65A4SD654",
-          shopName: 2,
-          userState: true,
-          userIdentity: 1,
-          createdAt: new Date(),
-          remarks: "备注备注备注备注备注备注"
-        },
-      ],
-      rules: {
-        realName: [
-          {min: 3, max: 20, message: '长度在 3 到 20 个字符', trigger: 'change'},
-          {type: 'string', pattern: /^(\w|[\u4e00-\u9fa5])+$/, message: '请不要包含特殊字符', trigger: 'change'}
-        ],
-        phone: [
-          {
-            pattern: /^(0|86|17951)?(13[0-9]|15[012356789]|166|17[3678]|18[0-9]|14[57])[0-9]{8}$/,
-            message: '格式不正确',
-            trigger: 'change'
-          }
-        ],
-        remarks: [
-          {type: 'string', pattern: /^(\w|[\u4e00-\u9fa5])+$/, message: '请不要包含特殊字符', trigger: 'change'}
-        ],
+import {mapState, mapActions} from 'vuex';
+import qs from 'qs';
+
+export default {
+  name: 'AdminShopEmployee',
+  layout: 'admin',
+  data: () => ({
+    valid: true,
+    breadcrumbList: [
+      {
+        text: '主页',
+        disabled: false,
+        href: '/admin',
       },
-      editedIndex: -1,
-      editedItem: {
-        realName: '',
-        phone: '',
-        shopName: null,
-        userIdentity: 1,
-        userState: true,
-        remarks: ''
+      {
+        text: '商家人员管理',
+        disabled: true,
+        href: '/admin/shop/employee',
       },
-      defaultItem: {
-        realName: '',
-        phone: '',
-        shopName: null,
-        userIdentity: 1,
-        userState: true,
-        remarks: ''
-      },
-      search: '',
-      userIdentityOptions: [
-        {value: 1, label: '老板'},
-        {value: 2, label: '店员'}
+    ],
+    dialog: false,
+    addDialog: false,
+    headers: [
+      {text: 'ID', align: 'center', sortable: true, value: 'id'},
+      {text: '店员名称', align: 'center', value: 'username'},
+      {text: '真实姓名', align: 'center', value: 'real_name'},
+      {text: '电话号码', align: 'center', value: 'phone'},
+      {text: '店员头像', align: 'center', value: 'head_img_url'},
+      {text: 'openid', align: 'center', value: 'openid'},
+      {text: '店名', align: 'center', value: 'shop_name'},
+      {text: '人员状态', align: 'center', value: 'state'},
+      {text: '人员岗位', align: 'center', value: 'identity'},
+      {text: '创建时间', align: 'center', value: 'created_at'},
+      {text: '备注', align: 'center', value: 'remarks'},
+      {text: '操作', align: 'center', value: 'action', sortable: false},
+    ],
+    rules: {
+      real_name: [
+        {min: 3, max: 20, message: '长度在 3 到 20 个字符', trigger: 'change'},
+        {type: 'string', pattern: /^(\w|[\u4e00-\u9fa5])+$/, message: '请不要包含特殊字符', trigger: 'change'},
       ],
-      shopNameOptions: [
-        {value: 1, label: 'Google'},
-        {value: 2, label: 'Microsoft'},
-        {value: 3, label: 'ByteJump'},
-        {value: 4, label: 'Alibaba'},
+      phone: [
+        {
+          pattern: /^(0|86|17951)?(13[0-9]|15[012356789]|166|17[3678]|18[0-9]|14[57])[0-9]{8}$/,
+          message: '格式不正确',
+          trigger: 'change',
+        },
       ],
+      remarks: [
+        {type: 'string', pattern: /^(\w|[\u4e00-\u9fa5])+$/, message: '请不要包含特殊字符', trigger: 'change'},
+      ],
+    },
+    editedIndex: -1,
+    editedItem: {
+      real_name: '',
+      phone: '',
+      shop_id: null,
+      identity: 1,
+      state: true,
+      remarks: '',
+    },
+    defaultItem: {
+      real_name: '',
+      phone: '',
+      shop_id: null,
+      identity: 1,
+      state: true,
+      remarks: '',
+    },
+    search: '',
+    identityOptions: [
+      {value: 1, label: '老板'},
+      {value: 2, label: '店员'},
+    ],
+  }),
+  computed: {
+    ...mapState({
+      shopEmployeeList: state => state.user.shopEmployeeList ? state.user.shopEmployeeList : [],
+      shopList: state => state.shop.shopList ? state.shop.shopList : [],
     }),
-    computed: {
-      formTitle() {
-        return this.editedIndex === -1 ? '添加店员' : '修改店员'
+    formTitle() {
+      return this.editedIndex === -1 ? '添加店员' : '修改店员';
+    },
+  },
+  watch: {
+    dialog(val) {
+      val || this.close();
+    },
+  },
+  mounted() {
+    this.addShopEmployeeList();
+    this.addShopList();
+  },
+  methods: {
+    ...mapActions({
+      addShopEmployeeList: 'user/addShopEmployeeList',
+      addShopList: 'shop/addShopList',
+    }),
+    changePage(url) {
+      this.$router.push(url);
+    },
+    editItem(item) {
+      const _item = JSON.parse(JSON.stringify(item));
+      _item.state = _item.state === 1;
+      this.editedIndex = this.shopEmployeeList.indexOf(item);
+      this.editedItem = Object.assign({}, _item);
+      this.dialog = true;
+    },
+    async deleteItem(item) {
+      if (confirm(`确定要删除 ${item.identity === 1 ? '老板' : '员工'}--${item.username} ?`)) {
+        await this.$axios.$delete(`/user/shop/${item.id}`);
+        this.addShopEmployeeList();
+        this.addShopList();
       }
     },
-    watch: {
-      dialog(val) {
-        val || this.close()
-      },
+    close() {
+      this.dialog = false;
+      setTimeout(() => {
+        this.editedItem = Object.assign({}, this.defaultItem);
+        this.editedIndex = -1;
+        this.$refs.editedItem.resetFields();
+        this.valid = true;
+      }, 100);
     },
-    methods: {
-      editItem(item) {
-        this.editedIndex = this.employeeList.indexOf(item);
-        this.editedItem = Object.assign({}, item);
-        this.dialog = true
-      },
-      deleteItem(item) {
-        const index = this.employeeList.indexOf(item);
-        confirm(`确定要删除 ${item.username} ?`) && this.employeeList.splice(index, 1)
-      },
-      close() {
-        this.dialog = false;
-        setTimeout(() => {
-          this.editedItem = Object.assign({}, this.defaultItem);
-          this.editedIndex = -1;
-          this.$refs.editedItem.resetFields();
-          this.valid = true;
-        }, 100)
-      },
-      save() {
-        this.$refs.editedItem.validate((valid) => {
-          if (valid) {
-            if (this.editedIndex > -1) {
-              Object.assign(this.employeeList[this.editedIndex], this.editedItem)
-            } else {
-              this.employeeList.push(JSON.parse(JSON.stringify(this.editedItem)))
-            }
-            this.close()
+    save() {
+      this.$refs.editedItem.validate(async (valid) => {
+        if (valid) {
+          const _editedItem = {};
+          if (!!this.editedItem.real_name) {
+            _editedItem.real_name = this.editedItem.real_name;
           }
-        });
-      },
-      formatDate(dateTimeObj) {
-        if (!dateTimeObj) {
-          return '暂无';
+          if (!!this.editedItem.phone) {
+            _editedItem.phone = this.editedItem.phone;
+          }
+          if (!!this.editedItem.identity) {
+            _editedItem.identity = this.editedItem.identity;
+          }
+          _editedItem.shop_id = this.editedItem.shop_id;
+          _editedItem.state = this.editedItem.state ? 1 : 0;
+          _editedItem.remarks = this.editedItem.remarks;
+          if (this.editedIndex > -1) {
+            await this.$axios.$put(`/user/shop/${this.editedItem.id}`, qs.stringify(_editedItem));
+          } else {
+          }
+          this.close();
+          this.addShopEmployeeList();
         }
-        dateTimeObj = new Date(dateTimeObj);
-        return dateTimeObj ? `${dateTimeObj.getFullYear()}-${dateTimeObj.getMonth() + 1}-${new Date().getDate()} ${dateTimeObj.getHours()}:${dateTimeObj.getMinutes()}:${dateTimeObj.getSeconds()}` : '暂无';
-      }
+      });
     },
-  }
+    formatDate(dateTimeObj) {
+      if (!dateTimeObj) {
+        return '暂无';
+      }
+      dateTimeObj = new Date(dateTimeObj);
+      return dateTimeObj
+        ? `${dateTimeObj.getFullYear()}-${dateTimeObj.getMonth() +
+        1}-${new Date().getDate()} ${dateTimeObj.getHours()}:${dateTimeObj.getMinutes()}:${dateTimeObj.getSeconds()}`
+        : '暂无';
+    },
+  },
+};
 </script>
 
 <style scoped lang="stylus">

@@ -168,7 +168,7 @@
             </v-btn>
             <div v-else>未参加活动</div>
           </td>
-          <td class="justify-center layout px-0">
+          <td class="text-xs-center">
             <v-icon
               small
               class="mr-2"

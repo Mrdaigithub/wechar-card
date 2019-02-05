@@ -25,10 +25,12 @@ Route::namespace("Api\V1")->prefix("v1")->group(function () {
     Route::prefix("user")->group(function () {
         Route::get("/", "UserController@list");
         Route::get("/plain_user", "UserController@listPlainUser");
-        Route::get("/{id}", "UserController@get_user_by_id");
+        Route::get("/shop", "UserController@listShopEmployee");
+        Route::get("/{id}", "UserController@getUserById");
         Route::post("/", "UserController@save");
         Route::put("/plain_user/{id}", "UserController@updatePlainUser");
-        Route::delete("/{id}", "UserController@remove");
+        Route::put("/shop/{id}", "UserController@updateShopEmployee");
+        Route::delete("/shop/{id}", "UserController@removeShopEmployee");
     });
     Route::prefix("system/config")->group(function () {
         Route::get("/", "SystemConfigController@list");

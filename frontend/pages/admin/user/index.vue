@@ -126,7 +126,7 @@
           <td class="text-xs-center">{{ props.item.lottery_num }}</td>
           <td class="text-xs-center">{{ formatDate(props.item.created_at) }}</td>
           <td class="text-xs-center">{{ props.item.remarks ? props.item.remarks : '暂无' }}</td>
-          <td class="justify-center layout px-0">
+          <td class="text-xs-center">
             <v-icon
               small
               class="mr-2"
