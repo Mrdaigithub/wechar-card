@@ -32,7 +32,7 @@
                   ref="editedItem"
                   :model="editedItem"
                   :rules="rules"
-                  label-width="80px"
+                  label-width="100px"
                   label-position="right">
                   <v-layout wrap>
                     <v-flex
@@ -40,19 +40,37 @@
                       sm6>
                       <el-form-item
                         label="活动名称"
-                        prop="activityName">
-                        <el-input v-model="editedItem.activityName"/>
+                        prop="activity_name">
+                        <el-input v-model="editedItem.activity_name"/>
                       </el-form-item>
                     </v-flex>
                     <v-flex
                       xs12
                       sm6>
                       <el-form-item
-                        label="活动地址"
-                        prop="activityAddress">
+                        label="活动详情"
+                        prop="activity_description">
+                        <el-input v-model="editedItem.activity_description"/>
+                      </el-form-item>
+                    </v-flex>
+                    <v-flex
+                      xs12
+                      sm6>
+                      <el-form-item
+                        label="活动缩略图"
+                        prop="activity_thumbnail">
                         <el-input
-                          v-model="editedItem.activityAddress"
-                          placeholder="城市名 (温州)"/>
+                          v-model="editedItem.activity_thumbnail"
+                          placeholder="图片URL"/>
+                      </el-form-item>
+                    </v-flex>
+                    <v-flex
+                      xs12
+                      sm6>
+                      <el-form-item
+                        label="回复关键词"
+                        prop="reply_keyword">
+                        <el-input v-model="editedItem.reply_keyword"/>
                       </el-form-item>
                     </v-flex>
                     <v-flex
@@ -69,62 +87,26 @@
                       xs12
                       sm6>
                       <el-form-item
-                        label="使用日期"
-                        prop="startDateTime">
-                        <el-date-picker
-                          v-model="editedItem.startDateTime"
-                          class="w100"
-                          type="datetime"
-                          placeholder="选择日期时间"/>
-                      </el-form-item>
-                    </v-flex>
-                    <v-flex
-                      xs12
-                      sm6>
-                      <el-form-item
                         label="活动卡券">
                         <el-select
-                          v-model="value5"
+                          v-model="editedItem.card_model_id_list"
+                          :multiple-limit="8"
                           class="w100"
                           multiple
-                          placeholder="请选择">
+                          filterable>
                           <el-option
-                            v-for="item in cardOptions"
-                            :key="item.value"
-                            :label="item.label"
-                            :value="item.value"/>
+                            v-for="item in cardModelList"
+                            :key="item.id"
+                            :label="item.card_name"
+                            :value="item.id"/>
                         </el-select>
                       </el-form-item>
                     </v-flex>
                     <v-flex
                       xs12
                       sm6>
-                      <el-form-item
-                        label="缩略图"
-                        prop="activityThumbnail">
-                        <el-upload
-                          :on-preview="handlePreview"
-                          :on-remove="handleRemove"
-                          :before-remove="beforeRemove"
-                          :limit="1"
-                          :file-list="fileList"
-                          class="upload-demo"
-                          action="https://jsonplaceholder.typicode.com/posts/"
-                          multiple>
-                          <el-button 
-                            size="small" 
-                            type="primary">点击上传</el-button>
-                          <div 
-                            slot="tip" 
-                            class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
-                        </el-upload>
-                      </el-form-item>
-                    </v-flex>
-                    <v-flex
-                      xs12
-                      sm6>
                       <el-form-item label="活动状态">
-                        <el-switch v-model="editedItem.activityState"/>
+                        <el-switch v-model="editedItem.state"/>
                       </el-form-item>
                     </v-flex>
                   </v-layout>
@@ -165,24 +147,38 @@
         <template
           slot="items"
           slot-scope="props">
-          <td>{{ props.item.id }}</td>
-          <td class="text-xs-left">{{ props.item.activityName }}</td>
-          <td class="text-xs-left">{{ props.item.activityDescription }}</td>
-          <td class="text-xs-left">
+          <td class="text-xs-center">{{ props.item.id }}</td>
+          <td class="text-xs-center">{{ props.item.activity_name }}</td>
+          <td class="text-xs-center">{{ props.item.activity_description }}</td>
+          <td class="text-xs-center">
             <v-img
-              :src="props.item.activityThumbnail"
-              :lazy-src="props.item.activityThumbnail"/>
+              :src="props.item.activity_thumbnail"
+              :lazy-src="props.item.activity_thumbnail"/>
           </td>
-          <td class="text-xs-left">
+          <td class="text-xs-center">{{ props.item.reply_keyword }}</td>
+          <td class="text-xs-center">{{ props.item.state ? '使用中' : '使用结束' }}</td>
+          <td class="text-xs-center">{{ props.item.customer_num }}</td>
+          <td class="text-xs-center">{{ props.item.remarks ? props.item.remarks : '暂无' }}</td>
+          <td class="text-xs-center">{{ formatDate(props.item['created_at']) }}</td>
+          <td class="text-xs-center">
             <v-btn
-              color="info"
-              @click="activityProbabilityDialog=true">查看
+              v-if="!!props.item['card_model_id_list'].length"
+              small
+              flat
+              @click="changePage(`/admin/card?activity=${props.item.activity_name}`)">查看
             </v-btn>
+            <div v-if="!props.item['card_model_id_list'].length">暂无</div>
           </td>
-          <td class="text-xs-left">{{ formatDate(props.item.createdAt) }}</td>
-          <td class="text-xs-left">{{ props.item.activityState ? '使用中' : '使用结束' }}</td>
-          <td class="text-xs-left">{{ props.item.activityNum }}</td>
-          <td class="text-xs-left">{{ props.item.remarks }}</td>
+          <td class="text-xs-center">
+            <v-btn
+              v-if="!!props.item['shop_id'] && shopList.length"
+              small
+              flat
+              @click="changePage(`/admin/shop?shop=${shopList.filter(item=>item.id===props.item['shop_id'])[0]['shop_name']}`)">
+              {{ shopList.filter(item=>item.id===props.item['shop_id'])[0]['shop_name'] }}
+            </v-btn>
+            <div v-else>未被使用</div>
+          </td>
           <td class="justify-center layout px-0">
             <v-icon
               small
@@ -213,336 +209,185 @@
           没有找到{{ search }}
         </v-alert>
       </v-data-table>
-      <v-dialog
-        v-model="activityProbabilityDialog"
-        max-width="1200px">
-        <v-card>
-          <v-card-text>
-            <v-container grid-list-md>
-              <v-layout
-                row
-                wrap>
-                <v-flex
-                  v-for="(item, index) of cardList"
-                  :key="index"
-                  xs12
-                  sm6
-                  md6
-                  lg4>
-                  <v-card color="white">
-                    <v-layout row>
-                      <v-flex xs7>
-                        <v-card-title primary-name>
-                          <div>
-                            <div class="headline">{{ item.cardName }}</div>
-                            <v-tooltip top>
-                              <span slot="activator">{{ item.cardDescription }}</span>
-                              <span>卡券详情</span>
-                            </v-tooltip>
-                          </div>
-                        </v-card-title>
-                      </v-flex>
-                      <v-flex xs5>
-                        <v-img
-                          src="https://cdn.vuetifyjs.com/images/cards/halcyon.png"
-                          height="125px"
-                          contain
-                        />
-                      </v-flex>
-                    </v-layout>
-                    <v-divider light/>
-                    <v-card-actions class="pa-3">
-                      <v-tooltip top>
-                        <div slot="activator">
-                          {{ item.startDateTime ? `${formatDate(item.startDateTime)} -
-                          ${formatDate(item.endDateTime)}` : `${formatDate(item.endDateTime)}` }}
-                        </div>
-                        <span>有效期</span>
-                      </v-tooltip>
-                    </v-card-actions>
-                  </v-card>
-                </v-flex>
-              </v-layout>
-            </v-container>
-          </v-card-text>
-          <v-card-actions>
-            <v-spacer/>
-            <v-btn
-              flat
-              @click="activityProbabilityDialog=false">关闭
-            </v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-dialog>
     </v-card>
   </div>
 </template>
 
 <script>
-  export default {
-    name: "AdminActivity",
-    layout: 'admin',
-    data: () => ({
-      valid: true,
-      breadcrumbList: [
-        {
-          text: '主页',
-          disabled: false,
-          href: '/admin'
-        },
-        {
-          text: '抽奖活动管理',
-          disabled: true,
-          href: '/admin/activity'
-        },
-      ],
-      dialog: false,
-      activityProbabilityDialog: false,
-      headers: [
-        {text: 'ID', align: 'left', sortable: true, value: 'id'},
-        {text: '活动名称', align: 'left', value: 'activityName'},
-        {text: '活动描述', align: 'left', value: 'activityDescription'},
-        {text: '活动缩略图', align: 'left', value: 'activityThumbnail'},
-        {text: '当前卡券', align: 'left', value: 'activityProbability'},
-        {text: '添加时间', align: 'left', value: 'createdAt'},
-        {text: '活动状态', align: 'left', value: 'activityState'},
-        {text: '参与人数', align: 'left', value: 'activityNum'},
-        {text: '备注', align: 'left', value: 'remarks'},
-        {text: '操作', align: 'left', value: 'id', sortable: false},
-      ],
-      activityList: [
-        {
-          id: 159,
-          activityName: '海底捞',
-          activityDescription: '活动描述活动描述活动描述',
-          activityThumbnail: "https://randomuser.me/api/portraits/men/85.jpg",
-          activityProbability: null,
-          createdAt: new Date(),
-          selectedCardList: [],
-          activityState: true,
-          activityNum: 100,
-          remarks: "备注备注备注备注备注备注"
-        },
-        {
-          id: 1,
-          activityName: '海底捞',
-          activityDescription: '活动描述活动描述活动描述',
-          activityThumbnail: "https://randomuser.me/api/portraits/men/85.jpg",
-          activityProbability: null,
-          createdAt: new Date(),
-          activityState: true,
-          activityNum: 100,
-          remarks: "备注备注备注备注备注备注"
-        },
-        {
-          id: 2,
-          activityName: '海底捞',
-          activityDescription: '活动描述活动描述活动描述',
-          activityThumbnail: "https://randomuser.me/api/portraits/men/85.jpg",
-          activityProbability: null,
-          createdAt: new Date(),
-          activityState: true,
-          activityNum: 100,
-          remarks: "备注备注备注备注备注备注"
-        },
-        {
-          id: 3,
-          activityName: '海底捞',
-          activityDescription: '活动描述活动描述活动描述',
-          activityThumbnail: "https://randomuser.me/api/portraits/men/85.jpg",
-          activityProbability: null,
-          createdAt: new Date(),
-          activityState: true,
-          activityNum: 100,
-          remarks: "备注备注备注备注备注备注"
-        },
-        {
-          id: 4,
-          activityName: '海底捞',
-          activityDescription: '活动描述活动描述活动描述',
-          activityThumbnail: "https://randomuser.me/api/portraits/men/85.jpg",
-          activityProbability: null,
-          createdAt: new Date(),
-          activityState: true,
-          activityNum: 100,
-          remarks: "备注备注备注备注备注备注"
-        },
-        {
-          id: 5,
-          activityName: '海底捞',
-          activityDescription: '活动描述活动描述活动描述',
-          activityThumbnail: "https://randomuser.me/api/portraits/men/85.jpg",
-          activityProbability: null,
-          createdAt: new Date(),
-          activityState: true,
-          activityNum: 100,
-          remarks: "备注备注备注备注备注备注"
-        },
-        {
-          id: 6,
-          activityName: '海底捞',
-          activityDescription: '活动描述活动描述活动描述',
-          activityThumbnail: "https://randomuser.me/api/portraits/men/85.jpg",
-          activityProbability: null,
-          createdAt: new Date(),
-          activityState: true,
-          activityNum: 100,
-          remarks: "备注备注备注备注备注备注"
-        },
-      ],
-      rules: {
-        activityName: [
-          {required: true, message: '请输入活动名称', trigger: 'blur'},
-          {min: 3, max: 20, message: '长度在 3 到 20 个字符', trigger: 'change'},
-          {pattern: /^(\w|[\u4e00-\u9fa5])+$/, message: '请不要包含特殊字符', trigger: 'change'}
-        ],
-        activityAddress: [
-          {required: true, message: '请输入活动地址', trigger: 'blur'},
-          {type: 'string', pattern: /^(\w|[\u4e00-\u9fa5])+$/, message: '请不要包含特殊字符', trigger: 'change'}
-        ],
-        remarks: [
-          {type: 'string', pattern: /^(\w|[\u4e00-\u9fa5])+$/, message: '请不要包含特殊字符', trigger: 'change'}
-        ],
-        startDateTime: [
-          {type: 'date', required: true, message: '请选择日期', trigger: 'blur'},
-        ],
-        activityProbability: [
-          {required: true, message: '请输入卡券中奖概率', trigger: 'blur'},
-          {type: 'number', message: '卡券中奖概率必须为数字值'}
-        ]
+import {mapState, mapActions} from 'vuex';
+import qs from 'qs';
+
+// Todo 参与人数统计
+export default {
+  name: 'AdminActivity',
+  layout: 'admin',
+  data: () => ({
+    valid: true,
+    breadcrumbList: [
+      {
+        text: '主页',
+        disabled: false,
+        href: '/admin',
       },
-      cardModelList: [
-        {
-          id: 1,
-          cardName: '卡券1',
-          cardDescription: '卡券详情1卡券详情1卡券详情1卡券详情1卡券详情1',
-          startDateTime: null,
-          endDateTime: new Date(new Date().getTime() + 1000000000),
-          src: 'https://cdn.vuetifyjs.com/images/employeeList/house.jpg',
-        },
-        {
-          id: 2,
-          cardName: '卡券1',
-          cardDescription: '卡券详情1卡券详情1卡券详情1卡券详情1卡券详情1',
-          startDateTime: null,
-          endDateTime: new Date(new Date().getTime() + 1000000000),
-          src: 'https://cdn.vuetifyjs.com/images/employeeList/house.jpg',
-        },
-        {
-          id: 3,
-          cardName: '卡券1',
-          cardDescription: '卡券详情1卡券详情1卡券详情1卡券详情1卡券详情1',
-          startDateTime: null,
-          endDateTime: new Date(new Date().getTime() + 1000000000),
-          src: 'https://cdn.vuetifyjs.com/images/employeeList/house.jpg',
-        },
-        {
-          id: 4,
-          cardName: '卡券1',
-          cardDescription: '卡券详情1卡券详情1卡券详情1卡券详情1卡券详情1',
-          startDateTime: null,
-          endDateTime: new Date(new Date().getTime() + 1000000000),
-          src: 'https://cdn.vuetifyjs.com/images/employeeList/house.jpg',
-        },
-        {
-          id: 5,
-          cardName: '卡券1',
-          cardDescription: '卡券详情1卡券详情1卡券详情1卡券详情1卡券详情1',
-          startDateTime: null,
-          endDateTime: new Date(new Date().getTime() + 1000000000),
-          src: 'https://cdn.vuetifyjs.com/images/employeeList/house.jpg',
-        },
+      {
+        text: '抽奖活动管理',
+        disabled: true,
+        href: '/admin/activity',
+      },
+    ],
+    dialog: false,
+    headers: [
+      {text: 'ID', align: 'center', sortable: true, value: 'id'},
+      {text: '活动名称', align: 'center', value: 'activity_name'},
+      {text: '活动详情', align: 'center', value: 'activity_description'},
+      {text: '活动缩略图', align: 'center', value: 'activity_thumbnail'},
+      {text: '回复关键词', align: 'center', value: 'reply_keyword'},
+      {text: '活动状态', align: 'center', value: 'state'},
+      {text: '参与人数', align: 'center', value: 'customer_num'},
+      {text: '备注', align: 'center', value: 'remarks'},
+      {text: '添加时间', align: 'center', value: 'created_at'},
+      {text: '当前卡券', align: 'center', value: 'cardModelList'},
+      {text: '使用的商铺', align: 'center', value: 'shop'},
+      {text: '操作', align: 'center', value: 'action', sortable: false},
+    ],
+    rules: {
+      activity_name: [
+        {required: true, message: '请输入活动名称', trigger: 'blur'},
+        {min: 3, max: 20, message: '长度在 3 到 20 个字符', trigger: 'change'},
+        {pattern: /^(\w|[\u4e00-\u9fa5])+$/, message: '请不要包含特殊字符', trigger: 'change'},
       ],
-      editedIndex: -1,
-      editedItem: {
-        activityName: '',
-        activityAddress: '',
-        startDateTime: '',
-        activityState: false,
-        selectedCardOptions: [],
-        activityThumbnail: null,
-        remarks: '',
-      },
-      defaultItem: {
-        activityName: '',
-        activityAddress: '',
-        startDateTime: '',
-        startTime: '',
-        activityState: false,
-        selectedCardOptions: [],
-        activityThumbnail: null,
-        remarks: ''
-      },
-      search: '',
-      
-      cardOptions: [{
-        value: '1',
-        label: '卡券1'
-      }, {
-        value: '2',
-        label: '卡券2'
-      }, {
-        value: '3',
-        label: '卡券2'
-      }, {
-        value: '4',
-        label: '卡券4'
-      }, {
-        value: '5',
-        label: '卡券5'
-      }],
-      value5: [],
+      activity_description: [
+        {type: 'string', pattern: /^(\w|[\u4e00-\u9fa5])+$/, message: '请不要包含特殊字符', trigger: 'change'},
+      ],
+      activity_thumbnail: [
+        {type: 'url', message: '活动缩略图URL链接格式错误', trigger: 'change'},
+      ],
+      reply_keyword: [
+        {required: true, message: '请输入活动回复关键词', trigger: 'blur'},
+        {min: 1, max: 20, message: '长度在 1 到 20 个字符', trigger: 'change'},
+        {pattern: /^(\w|[\u4e00-\u9fa5])+$/, message: '请不要包含特殊字符', trigger: 'change'},
+      ],
+      remarks: [
+        {type: 'string', pattern: /^(\w|[\u4e00-\u9fa5])+$/, message: '请不要包含特殊字符', trigger: 'change'},
+      ],
+    },
+    editedIndex: -1,
+    editedItem: {
+      activity_name: '',
+      activity_description: '',
+      activity_thumbnail: '',
+      reply_keyword: '',
+      remarks: '',
+      state: false,
+      shop_id: null,
+      card_model_id_list: [],
+    },
+    defaultItem: {
+      activity_name: '',
+      activity_description: '',
+      activity_thumbnail: '',
+      reply_keyword: '',
+      remarks: '',
+      state: false,
+      shop_id: null,
+      card_model_id_list: [],
+    },
+    search: '',
+  }),
+  computed: {
+    ...mapState({
+      activityList: state => state.activity.activityList ? state.activity.activityList : [],
+      cardModelList: state => state.card.cardModelList ? state.card.cardModelList : [],
+      shopList: state => state.shop.shopList ? state.shop.shopList : [],
     }),
-    computed: {
-      formTitle() {
-        return this.editedIndex === -1 ? '添加活动' : '修改活动'
+    formTitle() {
+      return this.editedIndex === -1 ? '添加活动' : '修改活动';
+    },
+  },
+  watch: {
+    dialog(val) {
+      val || this.close();
+    },
+  },
+  mounted() {
+    if (this.$route.query.activity) {
+      this.search = this.$route.query.activity;
+    }
+    this.addActivityList();
+    this.addCardModelList();
+    this.addShopList();
+  },
+  methods: {
+    ...mapActions({
+      addActivityList: 'activity/addActivityList',
+      addCardModelList: 'card/addCardModelList',
+      addShopList: 'shop/addShopList',
+    }),
+    changePage(url) {
+      this.$router.push(url);
+    },
+    editItem(item) {
+      const _item = JSON.parse(JSON.stringify(item));
+      _item.state = _item.state === 1;
+      this.editedIndex = this.activityList.indexOf(item);
+      this.editedItem = Object.assign({}, _item);
+      this.dialog = true;
+    },
+    async deleteItem(item) {
+      if (confirm(`确定要删除 ${item.activity_name} ?`)) {
+        await this.$axios.$delete(`/activity/${item.id}`);
+        this.addActivityList();
+        this.addShopList();
       }
     },
-    watch: {
-      dialog(val) {
-        val || this.close()
-      },
+    close() {
+      this.dialog = false;
+      setTimeout(() => {
+        this.editedItem = Object.assign({}, this.defaultItem);
+        this.editedIndex = -1;
+        this.$refs.editedItem.resetFields();
+        this.valid = true;
+      }, 100);
     },
-    methods: {
-      editItem(item) {
-        this.editedIndex = this.activityList.indexOf(item);
-        this.editedItem = Object.assign({}, item);
-        this.dialog = true
-      },
-      deleteItem(item) {
-        const index = this.activityList.indexOf(item);
-        confirm(`确定要删除 ${item.activityName} ?`) && this.activityList.splice(index, 1)
-      },
-      close() {
-        this.dialog = false;
-        setTimeout(() => {
-          this.editedItem = Object.assign({}, this.defaultItem);
-          this.editedIndex = -1;
-          this.$refs.editedItem.resetFields();
-          this.valid = true;
-        }, 100)
-      },
-      save() {
-        this.$refs.editedItem.validate((valid) => {
-          if (valid) {
-            if (this.editedIndex > -1) {
-              Object.assign(this.activityList[this.editedIndex], this.editedItem)
-            } else {
-              this.activityList.push(JSON.parse(JSON.stringify(this.editedItem)))
-            }
-            this.close()
+    save() {
+      this.$refs.editedItem.validate(async (valid) => {
+        if (valid) {
+          const _editedItem = {};
+          _editedItem.activity_name = this.editedItem.activity_name;
+          if (!!this.editedItem.activity_description || this.editedItem.activity_description !== '') {
+            _editedItem.activity_description = this.editedItem.activity_description;
           }
-        });
-      },
-      formatDate(dateTimeObj) {
-        if (!dateTimeObj) {
-          return '暂无';
+          if (!!this.editedItem.activity_thumbnail || this.editedItem.activity_thumbnail !== '') {
+            _editedItem.activity_thumbnail = this.editedItem.activity_thumbnail;
+          }
+          _editedItem.reply_keyword = this.editedItem.reply_keyword;
+          _editedItem.remarks = this.editedItem.remarks;
+          _editedItem.state = this.editedItem.state ? 1 : 0;
+          _editedItem.card_model_id_list = this.editedItem.card_model_id_list.length
+            ? this.editedItem.card_model_id_list
+            : null;
+          if (this.editedIndex > -1) {
+            await this.$axios.$put(`/activity/${this.editedItem.id}`, qs.stringify(_editedItem));
+          } else {
+            await this.$axios.$post(`/activity`, qs.stringify(_editedItem));
+          }
+          this.close();
+          this.addActivityList();
         }
-        dateTimeObj = new Date(dateTimeObj);
-        return dateTimeObj ? `${dateTimeObj.getFullYear()}-${dateTimeObj.getMonth() + 1}-${new Date().getDate()} ${dateTimeObj.getHours()}:${dateTimeObj.getMinutes()}:${dateTimeObj.getSeconds()}` : '暂无';
-      }
+      });
     },
-  }
+    formatDate(dateTimeObj) {
+      if (!dateTimeObj) {
+        return '暂无';
+      }
+      dateTimeObj = new Date(dateTimeObj);
+      return dateTimeObj
+        ? `${dateTimeObj.getFullYear()}-${dateTimeObj.getMonth() +
+        1}-${new Date().getDate()} ${dateTimeObj.getHours()}:${dateTimeObj.getMinutes()}:${dateTimeObj.getSeconds()}`
+        : '暂无';
+    },
+  },
+};
 </script>
 
 <style scoped lang="stylus">

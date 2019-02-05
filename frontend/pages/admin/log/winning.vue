@@ -90,14 +90,14 @@
         <template
           slot="items"
           slot-scope="props">
-          <td>{{ props.item.id }}</td>
-          <td class="text-xs-left">{{ props.item.shopName }}</td>
-          <td class="text-xs-left">{{ props.item.activityName }}</td>
-          <td class="text-xs-left">{{ props.item.cardName }}</td>
-          <td class="text-xs-left">{{ props.item.username }}</td>
-          <td class="text-xs-left">{{ props.item.realName }}</td>
-          <td class="text-xs-left">{{ props.item.phone }}</td>
-          <td class="text-xs-left">
+          <td class="text-xs-center">{{ props.item.id }}</td>
+          <td class="text-xs-center">{{ props.item.shopName }}</td>
+          <td class="text-xs-center">{{ props.item.activityName }}</td>
+          <td class="text-xs-center">{{ props.item.cardName }}</td>
+          <td class="text-xs-center">{{ props.item.username }}</td>
+          <td class="text-xs-center">{{ props.item.realName }}</td>
+          <td class="text-xs-center">{{ props.item.phone }}</td>
+          <td class="text-xs-center">
             <v-avatar
               slot="activator"
               size="48px">
@@ -106,11 +106,11 @@
                 alt="Avatar">
             </v-avatar>
           </td>
-          <td class="text-xs-left">{{ props.item.gps }}</td>
-          <td class="text-xs-left">{{ formatDate(props.item.createdAt) }}</td>
-          <td class="text-xs-left">{{ props.item.writeOff ? '已核销' : '未核销' }}</td>
-          <td class="text-xs-left">{{ formatDate(props.item.writeOffDate) }}</td>
-          <td class="text-xs-left">{{ props.item.remarks }}</td>
+          <td class="text-xs-center">{{ props.item.gps }}</td>
+          <td class="text-xs-center">{{ formatDate(props.item.createdAt) }}</td>
+          <td class="text-xs-center">{{ props.item.writeOff ? '已核销' : '未核销' }}</td>
+          <td class="text-xs-center">{{ formatDate(props.item.writeOffDate) }}</td>
+          <td class="text-xs-center">{{ props.item.remarks }}</td>
           <td class="justify-center layout px-0">
             <v-icon
               small
@@ -165,20 +165,20 @@
       ],
       dialog: false,
       headers: [
-        {text: 'ID', align: 'left', sortable: true, value: 'id'},
-        {text: '商家名称', align: 'left', value: 'shopName'},
-        {text: '活动名称', align: 'left', value: 'activityName'},
-        {text: '卡卷名称', align: 'left', value: 'cardName'},
-        {text: '用户名', align: 'left', value: 'username'},
-        {text: '真实姓名', align: 'left', value: 'realName'},
-        {text: '手机号', align: 'left', value: 'phone'},
-        {text: '用户头像', align: 'left', value: 'headImgUrl'},
-        {text: '用户位置', align: 'left', value: 'gps'},
-        {text: '中奖时间', align: 'left', value: 'createdAt'},
-        {text: '核销状态', align: 'left', value: 'writeOff'},
-        {text: '核销时间', align: 'left', value: 'writeOffDate'},
-        {text: '备注', align: 'left', value: 'remarks'},
-        {text: '操作', align: 'left', value: 'shopName', sortable: false},
+        {text: 'ID', align: 'center', sortable: true, value: 'id'},
+        {text: '商家名称', align: 'center', value: 'shopName'},
+        {text: '活动名称', align: 'center', value: 'activityName'},
+        {text: '卡卷名称', align: 'center', value: 'cardName'},
+        {text: '用户名', align: 'center', value: 'username'},
+        {text: '真实姓名', align: 'center', value: 'realName'},
+        {text: '手机号', align: 'center', value: 'phone'},
+        {text: '用户头像', align: 'center', value: 'headImgUrl'},
+        {text: '用户位置', align: 'center', value: 'gps'},
+        {text: '中奖时间', align: 'center', value: 'createdAt'},
+        {text: '核销状态', align: 'center', value: 'writeOff'},
+        {text: '核销时间', align: 'center', value: 'writeOffDate'},
+        {text: '备注', align: 'center', value: 'remarks'},
+        {text: '操作', align: 'center', value: 'shopName', sortable: false},
       ],
       winningLogList: [
         {

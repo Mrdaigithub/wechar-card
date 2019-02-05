@@ -86,19 +86,24 @@
                       </el-form-item>
                     </v-flex>
                     <v-flex
+                      v-if="!!shopList.length"
                       xs12
                       sm6>
                       <el-form-item label="参加的活动">
                         <el-select
                           v-model="editedItem.activity_id"
                           class="w100"
+                          clearable
                           filterable>
                           <el-option
                             v-for="item in activityList"
                             :key="item.id"
-                            :label="item.activity_name"
+                            :label="item['activity_name']"
                             :value="item.id"
-                            :disabled="item.state !== 1 || !!item.shop_id"/>
+                            :disabled="(item.state !== 1)
+                              || ((shopList[editedIndex] && !!shopList[editedIndex]['activity_id']) ?
+                                ((!!item.shop_id) && (shopList[editedIndex]['activity_id'] !== item.id))
+                            : !!item.shop_id)"/>
                         </el-select>
                       </el-form-item>
                     </v-flex>
@@ -147,16 +152,22 @@
         <template
           slot="items"
           slot-scope="props">
-          <td>{{ props.item.id }}</td>
-          <td class="text-xs-left">{{ props.item.shop_name ? props.item.shop_name : '暂无' }}</td>
-          <td class="text-xs-left">{{ props.item.shop_location ? props.item.shop_location : '暂无' }}</td>
-          <td class="text-xs-left">{{ props.item.started_at }}</td>
-          <td class="text-xs-left">{{ props.item.state ? '合作中' : '合作结束' }}</td>
-          <td class="text-xs-left">
-            {{ activityList.filter(e=>props.item.activity_id === e.id).length >=1 ?
-            activityList.filter(e=>props.item.activity_id === e.id)[0].activity_name : '暂无' }}
+          <td class="text-xs-center">{{ props.item.id }}</td>
+          <td class="text-xs-center">{{ props.item.shop_name ? props.item.shop_name : '暂无' }}</td>
+          <td class="text-xs-center">{{ props.item.shop_location ? props.item.shop_location : '暂无' }}</td>
+          <td class="text-xs-center">{{ props.item.started_at }}</td>
+          <td class="text-xs-center">{{ props.item.state ? '合作中' : '合作结束' }}</td>
+          <td class="text-xs-center">{{ props.item.remarks ? props.item.remarks : '暂无' }}</td>
+          <td class="text-xs-center">
+            <v-btn
+              v-if="props.item['activity_id'] && !!activityList.length"
+              small
+              flat
+              @click="changePage(`/admin/activity?activity=${activityList.filter(item=>item.id === props.item['activity_id'])[0]['activity_name']}`)">
+              {{ activityList.filter(item=>item.id === props.item['activity_id'])[0]['activity_name'] }}
+            </v-btn>
+            <div v-else>未参加活动</div>
           </td>
-          <td class="text-xs-left">{{ props.item.remarks ? props.item.remarks : '暂无' }}</td>
           <td class="justify-center layout px-0">
             <v-icon
               small
@@ -216,14 +227,14 @@ export default {
     ],
     dialog: false,
     headers: [
-      {text: 'ID', align: 'left', sortable: true, value: 'id'},
-      {text: '商家名称', align: 'left', value: 'shop_name'},
-      {text: '商家地址', align: 'left', value: 'shop_location'},
-      {text: '开始合作时间', align: 'left', value: 'started_atTime'},
-      {text: '商家状态', align: 'left', value: 'state'},
-      {text: '参与活动', align: 'left', value: 'activity_id'},
-      {text: '备注', align: 'left', value: 'remarks'},
-      {text: '操作', align: 'left', value: 'shop_name', sortable: false},
+      {text: 'ID', align: 'center', sortable: true, value: 'id'},
+      {text: '商家名称', align: 'center', value: 'shop_name'},
+      {text: '商家地址', align: 'center', value: 'shop_location'},
+      {text: '开始合作时间', align: 'center', value: 'started_atTime'},
+      {text: '商家状态', align: 'center', value: 'state'},
+      {text: '备注', align: 'center', value: 'remarks'},
+      {text: '参与活动', align: 'center', value: 'activity.activity_name'},
+      {text: '操作', align: 'center', value: 'action', sortable: false},
     ],
     rules: {
       shop_name: [
@@ -243,7 +254,7 @@ export default {
       shop_name: '',
       shop_location: '',
       started_at: '',
-      activity: '',
+      activity_id: null,
       state: false,
       remarks: '',
     },
@@ -252,7 +263,7 @@ export default {
       shop_location: '',
       started_at: '',
       startTime: '',
-      activity: '',
+      activity_id: null,
       state: false,
       remarks: '',
     },
@@ -273,6 +284,9 @@ export default {
     },
   },
   mounted() {
+    if (this.$route.query.shop) {
+      this.search = this.$route.query.shop;
+    }
     this.addShopList();
     this.addActivityList();
   },
@@ -281,6 +295,9 @@ export default {
       addShopList: 'shop/addShopList',
       addActivityList: 'activity/addActivityList',
     }),
+    changePage(url) {
+      this.$router.push(url);
+    },
     editItem(item) {
       const _item = JSON.parse(JSON.stringify(item));
       _item.state = _item.state === 1;
@@ -292,6 +309,7 @@ export default {
       if (confirm(`确定要删除 ${item.shop_name} ?`)) {
         await this.$axios.$delete(`/shop/${item.id}`);
         this.addShopList();
+        this.addActivityList();
       }
     },
     close() {
@@ -312,9 +330,7 @@ export default {
           _editedItem.remarks = this.editedItem.remarks;
           _editedItem.started_at = this.editedItem.started_at;
           _editedItem.state = this.editedItem.state ? 1 : 0;
-          if (!!this.editedItem.activity_id) {
-            _editedItem.activity_id = this.editedItem.activity_id;
-          }
+          _editedItem.activity_id = this.editedItem.activity_id ? this.editedItem.activity_id : null;
 
           if (this.editedIndex > -1) {
             // 编辑
@@ -325,6 +341,7 @@ export default {
           }
           this.close();
           this.addShopList();
+          this.addActivityList();
         }
       });
     },

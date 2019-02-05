@@ -108,11 +108,11 @@
         <template
           slot="items"
           slot-scope="props">
-          <td>{{ props.item.id }}</td>
-          <td class="text-xs-left">{{ props.item.username }}</td>
-          <td class="text-xs-left">{{ props.item.real_name ? props.item.real_name : '暂无' }}</td>
-          <td class="text-xs-left">{{ props.item.phone ? props.item.phone : '暂无' }}</td>
-          <td class="text-xs-left">
+          <td class="text-xs-center">{{ props.item.id }}</td>
+          <td class="text-xs-center">{{ props.item.username }}</td>
+          <td class="text-xs-center">{{ props.item.real_name ? props.item.real_name : '暂无' }}</td>
+          <td class="text-xs-center">{{ props.item.phone ? props.item.phone : '暂无' }}</td>
+          <td class="text-xs-center">
             <v-avatar
               slot="activator"
               size="48px">
@@ -121,11 +121,11 @@
                 alt="Avatar">
             </v-avatar>
           </td>
-          <td class="text-xs-left">{{ props.item.openid }}</td>
-          <td class="text-xs-left">{{ props.item.sign_in_num }}</td>
-          <td class="text-xs-left">{{ props.item.lottery_num }}</td>
-          <td class="text-xs-left">{{ formatDate(props.item.created_at) }}</td>
-          <td class="text-xs-left">{{ props.item.remarks }}</td>
+          <td class="text-xs-center">{{ props.item.openid }}</td>
+          <td class="text-xs-center">{{ props.item.sign_in_num }}</td>
+          <td class="text-xs-center">{{ props.item.lottery_num }}</td>
+          <td class="text-xs-center">{{ formatDate(props.item.created_at) }}</td>
+          <td class="text-xs-center">{{ props.item.remarks ? props.item.remarks : '暂无' }}</td>
           <td class="justify-center layout px-0">
             <v-icon
               small
@@ -183,17 +183,17 @@ export default {
     ],
     dialog: false,
     headers: [
-      {text: 'ID', align: 'left', sortable: true, value: 'id'},
-      {text: '用户名称', align: 'left', value: 'username'},
-      {text: '真实姓名', align: 'left', value: 'real_name'},
-      {text: '电话号码', align: 'left', value: 'phone'},
-      {text: '用户头像', align: 'left', value: 'head_img_url'},
-      {text: 'open ID', align: 'left', value: 'openid'},
-      {text: '本月签到次数', align: 'left', value: 'sign_in_num'},
-      {text: '抽奖次数', align: 'left', value: 'lottery_num'},
-      {text: '创建时间', align: 'left', value: 'created_at'},
-      {text: '备注', align: 'left', value: 'remarks'},
-      {text: '操作', align: 'left', value: 'username', sortable: false},
+      {text: 'ID', align: 'center', sortable: true, value: 'id'},
+      {text: '用户名称', align: 'center', value: 'username'},
+      {text: '真实姓名', align: 'center', value: 'real_name'},
+      {text: '电话号码', align: 'center', value: 'phone'},
+      {text: '用户头像', align: 'center', value: 'head_img_url'},
+      {text: 'open ID', align: 'center', value: 'openid'},
+      {text: '本月签到次数', align: 'center', value: 'sign_in_num'},
+      {text: '抽奖次数', align: 'center', value: 'lottery_num'},
+      {text: '创建时间', align: 'center', value: 'created_at'},
+      {text: '备注', align: 'center', value: 'remarks'},
+      {text: '操作', align: 'center', value: 'username', sortable: false},
     ],
     rules: {
       real_name: [

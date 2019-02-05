@@ -138,26 +138,39 @@
         :headers="headers"
         :items="cardModelList"
         :search="search"
+        :filter="tableFilter"
         :rows-per-page-items="[ 5, 10, 30]"
-        rows-per-page-text="每页行数"
-        class="elevation-1">
+        rows-per-page-text="每页行数">
         <template
           slot="items"
           slot-scope="props">
-          <td>{{ props.item.id }}</td>
-          <td class="text-xs-left">{{ props.item['card_name'] }}</td>
-          <td class="text-xs-left">
+          <td class="text-xs-center">{{ props.item.id }}</td>
+          <td class="text-xs-center">{{ props.item['card_name'] }}</td>
+          <td class="text-xs-center">
             <v-img
               :src="props.item['card_thumbnail']"
               :lazy-src="props.item['cardThumbnail']"
               width="80px"/>
           </td>
-          <td class="text-xs-left">{{ props.item.remarks }}</td>
-          <td class="text-xs-left">
+          <td class="text-xs-center">{{ props.item.remarks ? props.item.remarks : '暂无' }}</td>
+          <td class="text-xs-center">
             {{ props.item['end_time_0'] ? props.item['end_time_0'] : `${div(props.item['end_time_1'], 60)}分钟之后过期` }}
           </td>
-          <td class="text-xs-left">{{ props.item.state ? '启用' : '未启用' }}</td>
-          <td class="text-xs-left">{{ `${mul(props.item['probability'], 100)}%` }}</td>
+          <td class="text-xs-center">{{ props.item.state ? '启用' : '未启用' }}</td>
+          <td class="text-xs-center">{{ `${mul(props.item['probability'], 100)}%` }}</td>
+          <td class="text-xs-center">
+            <div v-if="!!props.item['activity_id_list']">
+              <v-btn
+                v-for="item in props.item['activity_id_list']"
+                :key="item"
+                small
+                flat
+                @click="changePage(`/admin/activity?activity=${activityList.filter(v=>v.id===item)[0]['activity_name']}`)">
+                {{ activityList.filter(v=>v.id===item)[0]['activity_name'] }}
+              </v-btn>
+            </div>
+            <div v-else>未被使用</div>
+          </td>
           <td class="justify-center layout px-0">
             <v-icon
               small
@@ -216,14 +229,15 @@ export default {
     ],
     dialog: false,
     headers: [
-      {text: 'ID', align: 'left', sortable: true, value: 'id'},
-      {text: '卡券名称', align: 'left', value: 'card_name'},
-      {text: '卡券缩略图', align: 'left', value: 'card_thumbnail'},
-      {text: '备注', align: 'left', value: 'remarks'},
-      {text: '有效期截止', align: 'left', value: 'end_time_0'},
-      {text: '启用状态', align: 'left', value: 'state'},
-      {text: '中奖率', align: 'left', value: 'probability'},
-      {text: '操作', align: 'left', value: 'action', sortable: false},
+      {text: 'ID', align: 'center', sortable: true, value: 'id'},
+      {text: '卡券名称', align: 'center', value: 'card_name'},
+      {text: '卡券缩略图', align: 'center', value: 'card_thumbnail'},
+      {text: '备注', align: 'center', value: 'remarks'},
+      {text: '有效期截止', align: 'center', value: 'end_time_0'},
+      {text: '启用状态', align: 'center', value: 'state'},
+      {text: '中奖率', align: 'center', value: 'probability'},
+      {text: '活动', align: 'center', value: 'activity_id_list'},
+      {text: '操作', align: 'center', value: 'action', sortable: false},
     ],
     rules: {
       card_name: [
@@ -233,7 +247,7 @@ export default {
         {pattern: /^(\w|[\u4e00-\u9fa5])+$/, message: '请不要包含特殊字符', trigger: 'change'},
       ],
       card_thumbnail: [
-        {type: 'url', message: '请输入卡券缩略图URL链接', trigger: 'change'},
+        {type: 'url', message: '卡券缩略图URL链接格式错误', trigger: 'change'},
       ],
       remarks: [
         {type: 'string', pattern: /^(\w|[\u4e00-\u9fa5])+$/, message: '请不要包含特殊字符', trigger: 'change'},
@@ -263,6 +277,7 @@ export default {
   computed: {
     ...mapState({
       cardModelList: state => state.card.cardModelList ? state.card.cardModelList : [],
+      activityList: state => state.activity.activityList ? state.activity.activityList : [],
     }),
     formTitle() {
       return this.editedIndex === -1 ? '添加卡券' : '修改卡券';
@@ -274,12 +289,30 @@ export default {
     },
   },
   mounted() {
+    if (this.$route.query.activity) {
+      this.search = this.$route.query.activity;
+    }
     this.addCardModelList();
+    this.addActivityList();
   },
   methods: {
     ...mapActions({
       addCardModelList: 'card/addCardModelList',
+      addActivityList: 'activity/addActivityList',
     }),
+    changePage(url) {
+      this.$router.push(url);
+    },
+    tableFilter(val, search) {
+      if (Object.prototype.toString.call(val) === '[object Array]') {
+        return this.activityList.filter(item =>
+          (item['activity_name'] === search)
+          && val.indexOf(item.id) !== -1).length > 0;
+      }
+      if (!!val) {
+        return val.toString().indexOf(search) !== -1;
+      }
+    },
     editItem(item) {
       const _item = JSON.parse(JSON.stringify(item));
       _item.state = _item.state === 1;

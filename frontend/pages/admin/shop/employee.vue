@@ -168,11 +168,11 @@
         <template
           slot="items"
           slot-scope="props">
-          <td>{{ props.item.id }}</td>
-          <td class="text-xs-left">{{ props.item.username }}</td>
-          <td class="text-xs-left">{{ props.item.realName ? props.item.realName : '暂无' }}</td>
-          <td class="text-xs-left">{{ props.item.phone ? props.item.phone : '暂无' }}</td>
-          <td class="text-xs-left">
+          <td class="text-xs-center">{{ props.item.id }}</td>
+          <td class="text-xs-center">{{ props.item.username }}</td>
+          <td class="text-xs-center">{{ props.item.realName ? props.item.realName : '暂无' }}</td>
+          <td class="text-xs-center">{{ props.item.phone ? props.item.phone : '暂无' }}</td>
+          <td class="text-xs-center">
             <v-avatar
               slot="activator"
               size="48px">
@@ -181,12 +181,12 @@
                 alt="Avatar">
             </v-avatar>
           </td>
-          <td class="text-xs-left">{{ props.item.openid }}</td>
-          <td class="text-xs-left">{{ shopNameOptions.filter(e=>props.item.shopName ===e.value).length >=1 ? shopNameOptions.filter(e=>props.item.shopName ===e.value)[0].label : "暂无" }}</td>
-          <td class="text-xs-left">{{ props.item.userState ? '启用' : '未启用' }}</td>
-          <td class="text-xs-left">{{ props.item.userIdentity === 1 ? '老板' : '员工' }}</td>
-          <td class="text-xs-left">{{ formatDate(props.item.createdAt) }}</td>
-          <td class="text-xs-left">{{ props.item.remarks }}</td>
+          <td class="text-xs-center">{{ props.item.openid }}</td>
+          <td class="text-xs-center">{{ shopNameOptions.filter(e=>props.item.shopName ===e.value).length >=1 ? shopNameOptions.filter(e=>props.item.shopName ===e.value)[0].label : "暂无" }}</td>
+          <td class="text-xs-center">{{ props.item.userState ? '启用' : '未启用' }}</td>
+          <td class="text-xs-center">{{ props.item.userIdentity === 1 ? '老板' : '员工' }}</td>
+          <td class="text-xs-center">{{ formatDate(props.item.createdAt) }}</td>
+          <td class="text-xs-center">{{ props.item.remarks }}</td>
           <td class="justify-center layout px-0">
             <v-icon
               small
@@ -242,18 +242,18 @@
       dialog: false,
       addDialog: false,
       headers: [
-        {text: 'ID', align: 'left', sortable: true, value: 'id'},
-        {text: '店员名称', align: 'left', value: 'username'},
-        {text: '真实姓名', align: 'left', value: 'realName'},
-        {text: '电话号码', align: 'left', value: 'phone'},
-        {text: '店员头像', align: 'left', value: 'headImgUrl'},
-        {text: 'openid', align: 'left', value: 'openid'},
-        {text: '店名', align: 'left', value: 'shopName'},
-        {text: '人员状态', align: 'left', value: 'userState'},
-        {text: '人员岗位', align: 'left', value: 'userIdentity'},
-        {text: '创建时间', align: 'left', value: 'createdAt'},
-        {text: '备注', align: 'left', value: 'remarks'},
-        {text: '操作', align: 'left', value: 'username', sortable: false},
+        {text: 'ID', align: 'center', sortable: true, value: 'id'},
+        {text: '店员名称', align: 'center', value: 'username'},
+        {text: '真实姓名', align: 'center', value: 'realName'},
+        {text: '电话号码', align: 'center', value: 'phone'},
+        {text: '店员头像', align: 'center', value: 'headImgUrl'},
+        {text: 'openid', align: 'center', value: 'openid'},
+        {text: '店名', align: 'center', value: 'shopName'},
+        {text: '人员状态', align: 'center', value: 'userState'},
+        {text: '人员岗位', align: 'center', value: 'userIdentity'},
+        {text: '创建时间', align: 'center', value: 'createdAt'},
+        {text: '备注', align: 'center', value: 'remarks'},
+        {text: '操作', align: 'center', value: 'username', sortable: false},
       ],
       employeeList: [
         {

@@ -21,12 +21,12 @@
         <template
           slot="items"
           slot-scope="props">
-          <td class="text-xs-left">{{ props.item.id }}</td>
-          <td class="text-xs-left">{{ props.item.name }}</td>
-          <td class="text-xs-left">{{ props.item.operator }}</td>
-          <td class="text-xs-left">{{ props.item.customer }}</td>
-          <td class="text-xs-left">{{ props.item.operatedTime }}</td>
-          <td class="text-xs-left">{{ props.item.remarks }}</td>
+          <td class="text-xs-center">{{ props.item.id }}</td>
+          <td class="text-xs-center">{{ props.item.name }}</td>
+          <td class="text-xs-center">{{ props.item.operator }}</td>
+          <td class="text-xs-center">{{ props.item.customer }}</td>
+          <td class="text-xs-center">{{ props.item.operatedTime }}</td>
+          <td class="text-xs-center">{{ props.item.remarks }}</td>
         </template>
         <template slot="no-data">
           <v-alert
@@ -75,12 +75,12 @@
         },
       ],
       headers: [
-        {text: 'ID', align: 'left', value: 'id'},
-        {text: '卡券名称', align: 'left', sortable: true, value: 'name'},
-        {text: '核销人员', align: 'left', value: 'operator'},
-        {text: '客户', align: 'left', value: 'customer'},
-        {text: '核销时间', align: 'left', value: 'operatedTime'},
-        {text: '备注', align: 'left', value: 'remarks'},
+        {text: 'ID', align: 'center', value: 'id'},
+        {text: '卡券名称', align: 'center', sortable: true, value: 'name'},
+        {text: '核销人员', align: 'center', value: 'operator'},
+        {text: '客户', align: 'center', value: 'customer'},
+        {text: '核销时间', align: 'center', value: 'operatedTime'},
+        {text: '备注', align: 'center', value: 'remarks'},
       ],
       desserts: [
         {
