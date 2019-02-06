@@ -48,6 +48,7 @@
       // this.$router.replace(`${this.$route.path}?shopid=${this.$route.query.shopid}`); // 清除url上的openid
       const {data} = await this.$axios.$get(`/auth/client/${openid}`);
       this.addToken(data);
+      this.addLocation(this.$route.query.location);
       this.addOneself();
       this.addSystemConfig();
       this.addCard(this.$route.query.shopid);
@@ -60,6 +61,7 @@
       },
       ...mapMutations({
         addToken: 'oneself/addToken',
+        addLocation: 'oneself/addLocation',
       }),
       ...mapActions({
         addOneself: 'oneself/addOneself',

@@ -101,7 +101,7 @@ class WeChatController extends Controller {
         $user->openid       = $wechatUser["openid"];
         $user->username     = $wechatUser["nickname"];
         $user->head_img_url = $wechatUser["headimgurl"];
-        $user->identity  = 1;
+        $user->identity     = 1;
         $user->save();
 
         // 通过验证发送消息
@@ -161,9 +161,7 @@ class WeChatController extends Controller {
             return "缺少参数";
         }
         $client = new Client();
-        $res
-                = $client->get("http://api.map.baidu.com/geocoder/v2/?location=$location&output=json&pois=1&ak="
-            . env("AK"));
+        $res    = $client->get("http://api.map.baidu.com/geocoder/v2/?location=$location&output=json&pois=1&ak=" . env("AK"));
 
         return $res;
     }

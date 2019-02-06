@@ -157,9 +157,9 @@
           </td>
           <td class="text-xs-center">{{ props.item.reply_keyword }}</td>
           <td class="text-xs-center">{{ props.item.state ? '使用中' : '使用结束' }}</td>
-          <td class="text-xs-center">{{ props.item.customer_num }}</td>
-          <td class="text-xs-center">{{ props.item.remarks ? props.item.remarks : '暂无' }}</td>
-          <td class="text-xs-center">{{ formatDate(props.item['created_at']) }}</td>
+          <td class="text-xs-center">{{ props.item['customer_num'] }}</td>
+          <td class="text-xs-center">{{ props.item.remarks || '暂无' }}</td>
+          <td class="text-xs-center">{{ props.item['created_at'] }}</td>
           <td class="text-xs-center">
             <v-btn
               v-if="!!props.item['card_model_id_list'].length"
@@ -182,7 +182,6 @@
           <td class="text-xs-center">
             <v-icon
               small
-              class="mr-2"
               @click="editItem(props.item)">
               edit
             </v-icon>
@@ -375,16 +374,6 @@ export default {
           this.addActivityList();
         }
       });
-    },
-    formatDate(dateTimeObj) {
-      if (!dateTimeObj) {
-        return '暂无';
-      }
-      dateTimeObj = new Date(dateTimeObj);
-      return dateTimeObj
-        ? `${dateTimeObj.getFullYear()}-${dateTimeObj.getMonth() +
-        1}-${new Date().getDate()} ${dateTimeObj.getHours()}:${dateTimeObj.getMinutes()}:${dateTimeObj.getSeconds()}`
-        : '暂无';
     },
   },
 };

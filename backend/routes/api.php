@@ -63,4 +63,7 @@ Route::namespace("Api\V1")->prefix("v1")->group(function () {
         Route::get("/user/{id}", "SignInController@getSignInLogByUserId");
         Route::put("/user/{id}", "SignInController@UpdateTodaySignInLogByUserId");
     });
+    Route::prefix("log")->group(function () {
+        Route::get("/winning", "LogController@listWinningWriteOffLog");
+    });
 });

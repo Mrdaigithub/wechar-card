@@ -1,6 +1,7 @@
 export const state = () => ({
   oneself: null,
   token: null,
+  location: null,
   signInLogList: null,
   cardList: null,
 });
@@ -14,6 +15,9 @@ export const mutations = {
   },
   removeToken(state) {
     state.token = null;
+  },
+  addLocation(state, location) {
+    state.location = location;
   },
   addSignInLogList(state, signInLogList) {
     state.signInLogList = signInLogList;

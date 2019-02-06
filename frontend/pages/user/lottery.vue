@@ -178,6 +178,7 @@ export default {
   }),
   computed: {
     ...mapState({
+      location: state => state.oneself.location ? state.oneself.location : '', // 用户所在区域
       lotteryNum: state => state.oneself.oneself ? state.oneself.oneself['lottery_num'] : 0, // 剩余抽奖次数
       lotteryNeedsToFillInTheInformation: state => state.systemConfig.systemConfig ?
         /^true$/i.test(state.systemConfig.systemConfig.filter(
@@ -196,8 +197,7 @@ export default {
         return randomSort(cardList);
       }, // 显示的奖品列表带未中奖
       cardList1: state => state.card.cardModelList ?
-        state.card.cardModelList.map(item => ({id: item['id'], name: item['card_name'], isPrize: 1}))
-        : [], // 显示的奖品列表带未中奖
+        state.card.cardModelList.map(item => ({id: item['id'], name: item['card_name'], isPrize: 1})) : [], // 显示的奖品列表带未中奖
       activityName: state => state.shop.activity ? state.shop.activity['activity_name'] : '', // 剩余抽奖次数
       activityDescription: state => state.shop.activity ? state.shop.activity['activity_description'] : '', // 剩余抽奖次数
     }),
@@ -238,7 +238,7 @@ export default {
     },
     async rotating() {
       if (!this.click_flag) return;
-      const {data} = await this.$axios.$get(`/card/lottery/shop/${this.$route.query.shopid}`);
+      const {data} = await this.$axios.$get(`/card/lottery/shop/${this.$route.query.shopid}?location=${this.location}`);
       if (data) {
         this.cardModelList.forEach((item, index) => {
           if (item['id'] === data) {

@@ -3,11 +3,12 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Api\ApiController;
+use App\Http\Requests\GetLotteryCardByShopIdRequest;
 use App\Http\Requests\StoreCardModelRequest;
 use App\Http\Requests\UpdateCardModelRequest;
-use App\Model\Activity;
 use App\Model\Card;
 use App\Model\Shop;
+use App\Model\WinningLog;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
 class CardController extends ApiController {
@@ -122,34 +123,46 @@ class CardController extends ApiController {
     /**
      * 获取用户当前商铺中奖的奖品id
      *
-     * @param $id
+     * @param                   $id
+     *
+     * @param \http\Env\Request $request
      *
      * @return \Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response|mixed
      */
-    public function getLotteryCardIdByShopId($id) {
+    public function getLotteryCardIdByShopId($id, GetLotteryCardByShopIdRequest $request) {
+        $location   = $request->get("location");
         $activities = Shop::find($id)->activity();
-        if ($activities->count() <= 0) {
+
+        if ($activities->get()->isEmpty()) {
             return $this->badRequest(NULL, "单前商铺未参加任何活动");
         }
+        if ($activities->first()->shops()->get()->isEmpty()) {
+            return $this->badRequest(NULL, "未有商家参加当前活动");
+        }
+
+        // 判断用户单前地区
+        if ($activities->first()->shops()->first()->shop_location != $location) {
+            return $this->badRequest(NULL, "当前所在区域无法参加活动");
+        }
+
         $cardModelList = $activities->first()->cards();
 
         // 去除被禁用,类型不为卡券模板,已过期的卡券模板
-        $cardModelList = array_filter($cardModelList->get()->toArray(),
-            function ($item) {
-                if (($item["state"] == 1)
-                    && ($item["type"] == 0)
-                    && ($item["end_time_0"])
-                    && (strtotime($item["end_time_0"]) > strtotime(date('Y-m-d h:i:s',
-                            time())))) {
-                    return TRUE;
-                } elseif (($item["state"] == 1)
-                    && ($item["type"] == 0)
-                    && ($item["end_time_1"])) {
-                    return TRUE;
-                }
+        $cardModelList = $cardModelList->get()->filter(function ($item) {
+            if (($item["state"] == 1)
+                && ($item["type"] == 0)
+                && ($item["end_time_0"])
+                && (strtotime($item["end_time_0"]) > strtotime(date('Y-m-d h:i:s',
+                        time())))) {
+                return TRUE;
+            } elseif (($item["state"] == 1)
+                && ($item["type"] == 0)
+                && ($item["end_time_1"])) {
+                return TRUE;
+            }
 
-                return FALSE;
-            });
+            return FALSE;
+        });
 
         if (count($cardModelList) <= 0) {
             return $this->badRequest(NULL, "单前活动未选取任何卡券奖品");
@@ -157,28 +170,18 @@ class CardController extends ApiController {
         if ($this->oneself["lottery_num"] <= 0) {
             return $this->badRequest(NULL, "没有抽奖次数");
         }
-        $cardArray = $cardModelList;
-        if ($cardArray > 8) {
-            array_splice($cardArray, 8, count($cardArray));
+        if ($cardModelList->count() > 8) {
+            $cardModelList->splice(8, $cardModelList->count());
         }
 
-        // 去除概率为0的奖项
-        $cardArray = array_filter($cardArray, function ($item) {
+        // 去除概率为0的奖项,获取卡券的概率列表
+        $cardProbabilityList = $cardModelList->filter(function ($item) {
             if ($item["probability"] <= 0) {
                 return FALSE;
             }
 
             return TRUE;
-        });
-
-        // 获取卡券的概率列表
-        $cardProbabilityList = [];
-        foreach ($cardArray as $item) {
-            array_push($cardProbabilityList, [
-                "id"          => $item["id"],
-                "probability" => $item["probability"],
-            ]);
-        }
+        })->values();
 
         // 随机抽取卡券
         $res = NULL;
@@ -193,12 +196,8 @@ class CardController extends ApiController {
             }
         }
 
-        // 用户抽奖次数-1
-        $this->oneself["lottery_num"] -= 1;
-        $this->save_model($this->oneself);
-
-        // 为用户创建抽到的卡券
         if ($res) {
+            // 为用户创建抽到的卡券
             $cardModel               = Card::find($res);
             $newCard                 = new Card();
             $newCard->card_name      = $cardModel->card_name;
@@ -212,7 +211,21 @@ class CardController extends ApiController {
             $newCard->remarks        = $cardModel->remarks;
             $this->save_model($newCard);
             $newCard->user()->attach($this->oneself->id);
+
+            // 添加中奖记录
+            $winningLog           = new WinningLog();
+            $winningLog->location = $location;
+
+            $this->save_model($winningLog);
+
+            $winningLog->user()->attach($this->oneself["id"]);
+            $winningLog->card()->attach($newCard->id);
+            $winningLog->activity()->attach($activities->first()->id);
         }
+
+        // 用户抽奖次数-1
+        $this->oneself["lottery_num"] -= 1;
+        $this->save_model($this->oneself);
 
         return $this->success($res);
     }
@@ -316,6 +329,7 @@ class CardController extends ApiController {
     public function removeCardModel($id) {
         Card::find($id)->activity()->detach();
         Card::destroy($id);
+
         return;
     }
 }
