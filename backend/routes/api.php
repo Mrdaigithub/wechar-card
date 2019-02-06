@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Route;
 Route::namespace("Api\V1")->prefix("v1")->group(function () {
     Route::prefix('/qrcode')->group(function () {
         Route::get('/admin/login', 'QrCodeController@adminLogin');
+        Route::get('/add/boss', 'QrCodeController@addShopBoss');
     });
     Route::prefix("auth")->group(function () {
         Route::get("/", "AuthController@list");

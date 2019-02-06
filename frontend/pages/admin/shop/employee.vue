@@ -21,16 +21,17 @@
             slot="activator"
             color="primary"
             dark
-            @click="addDialog = true">添加店长
+            @click="addItem">添加店长
           </v-btn>
           <v-card>
             <v-card-title>
               <span>店长扫描此二维码以添加</span>
               <v-spacer/>
             </v-card-title>
-            <v-img
-              src="http://upload.mnw.cn/2016/0126/1453768615784.jpg"
-              contain/>
+            <img
+              v-if="addBossQrCodeBase64"
+              :src="`data:image/png;base64,${addBossQrCodeBase64}`"
+              alt="">
             <v-card-actions>
               <v-btn
                 color="primary"
@@ -233,11 +234,13 @@
 <script>
 import {mapState, mapActions} from 'vuex';
 import qs from 'qs';
+import {Message} from 'element-ui';
 
 export default {
   name: 'AdminShopEmployee',
   layout: 'admin',
   data: () => ({
+    addBossQrCodeBase64: '',
     valid: true,
     breadcrumbList: [
       {
@@ -331,6 +334,18 @@ export default {
     }),
     changePage(url) {
       this.$router.push(url);
+    },
+    async addItem() {
+      this.addDialog = true;
+      const {data} = await this.$axios.$get(`/qrcode/add/boss`);
+      this.addBossQrCodeBase64 = data;
+      window.Echo.channel('publicChannel').listen('MessageEvent', async (e) => {
+        if (e.message && JSON.parse(e.message).signal === 'allowAddBoss') {
+          Message.success('添加成功');
+          this.addDialog = false;
+          this.addShopEmployeeList();
+        }
+      });
     },
     editItem(item) {
       const _item = JSON.parse(JSON.stringify(item));

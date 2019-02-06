@@ -21,16 +21,11 @@
 
 <script>
 import {mapMutations, mapActions} from 'vuex';
-import rules from '~/utils/rules';
 
 export default {
   name: 'AdminLogin',
   layout: 'empty',
   data: () => ({
-    rules: rules,
-    gradient: 'to top, #F44336 ,#fff',
-    valid: true,
-    hidePassword: true,
     loginQrCodeBase64: '',
   }),
   async mounted() {
