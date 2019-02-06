@@ -19,7 +19,6 @@ class CreateActivityTable extends Migration {
                 $table->string("activity_description")->nullable()->comment("活动详情");
                 $table->string("activity_thumbnail")->default("https://randomuser.me/api/portraits/men/85.jpg")->comment("活动的缩略图");
                 $table->boolean("state")->default(FALSE)->comment("状态 0.停用 1.启用");
-                $table->integer("customer_num")->default(0)->comment("参与人数");
                 $table->string('remarks')->nullable()->comment("备注");
                 $table->string('reply_keyword')->unique()->comment("回复关键词");
                 $table->timestamps();

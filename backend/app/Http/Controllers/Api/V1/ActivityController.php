@@ -18,28 +18,26 @@ class ActivityController extends ApiController {
      * @return mixed
      */
     public function list() {
-        $activityList = Activity::all()
-            ->map(function ($item) {
-                $card_model_list = $item->cards();
-                $activityShops   = $item->shops();
-                if ($activityShops->get()->isEmpty()) {
-                    $item->shop_id = NULL;
-                } else {
-                    $item->shop_id = $activityShops->first()->id;
-                }
-                if ($card_model_list->get()->isEmpty()) {
-                    $item->card_model_id_list = [];
-                } else {
-                    $item->card_model_id_list = $card_model_list->get()
-                        ->map(function ($item) {
+        return $this->success(
+            Activity::all()
+                ->map(function ($item) {
+                    $card_model_list = $item->cards();
+                    $activityShops   = $item->shops();
+                    $winningLogs     = $item->winningLogs();
+
+                    $item->shop_id            = $activityShops->get()->isNotEmpty() ? $activityShops->first()->id : NULL;
+                    $item->card_model_id_list = $card_model_list->get()->isNotEmpty() ?
+                        $card_model_list->get()->map(function ($item) {
                             return $item->id;
-                        });
-                }
+                        }) : NULL;
+                    $item->customer_num       = $winningLogs->get()->isNotEmpty() ?
+                        $winningLogs->get()->map(function ($item) {
+                            return $item->user()->first()->id;
+                        })->unique()->values()->count() : 0;
 
-                return $item;
-            });
-
-        return $this->success($activityList);
+                    return $item;
+                })
+        );
     }
 
     /**
