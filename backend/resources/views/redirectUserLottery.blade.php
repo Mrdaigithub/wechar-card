@@ -14,11 +14,10 @@
     /**
      * 校验用户的地理位置通过并跳转至抽奖页面
      */
-
     wx.config(<?php
-      $app = app('wechat.official_account');
-      echo $app->jssdk->buildConfig(array("getLocation"), FALSE)
-      ?>);
+        $app = app('wechat.official_account');
+        echo $app->jssdk->buildConfig(array("getLocation"), FALSE)
+        ?>);
     var shopId = null;
     var openid = document.getElementById("openid").innerHTML;
     var url = document.getElementById("url").innerHTML;
@@ -76,17 +75,14 @@
                         var latitude = res.latitude; // 纬度，浮点数，范围为90 ~ -90
                         var longitude = res.longitude; // 经度，浮点数，范围为180 ~ -180。
                         var geocoderUrl = '<?php echo env("DOMAIN") . "/wechat/geocoder"?>';
-                        ajax("GET",
-                            geocoderUrl + "?location=" + latitude + "," + longitude,
-                            function (res) {
+                        ajax("GET", geocoderUrl + "?location=" + latitude + "," + longitude, function (res) {
                                 city = JSON.parse(res).result.addressComponent.city;
                                 var requestShopLocationUrl = '<?php echo env("DOMAIN") . "/wechat/shop/"?>' + shopId + '/location';
                                 ajax("GET", requestShopLocationUrl, function (res) {
                                     if (city !== res) {
                                         dialog("当前所在区域无法参加活动");
                                     } else {
-                                        window.location.href = `${url}?openid=${openid}&shopid=${shopId}`;
-                                        document.write(`${url}?openid=${openid}&shopid=${shopId}`);
+                                        window.location.href = `${url}?openid=${openid}&shopid=${shopId}&location=${encodeURIComponent(city)}`;
                                     }
                                 })
                             }

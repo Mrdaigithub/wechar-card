@@ -119,56 +119,63 @@
 </template>
 
 <script>
-  import {mapState, mapActions} from 'vuex';
-  import rules from '~/utils/rules';
-  import CountDownTimer from '~/components/CountDownTimer';
-  
-  export default {
-    name: 'Person',
-    layout: 'user',
-    components: {
-      CountDownTimer,
-    },
-    data: () => ({
-      formDialog: false,
-      qrCodeDialog: false,
-      rules: rules,
-      valid: true,
-      viewState: true, // 当前查看为有效券或失效券
+import {mapState, mapActions} from 'vuex';
+import rules from '~/utils/rules';
+import CountDownTimer from '~/components/CountDownTimer';
+
+export default {
+  name: 'Person',
+  layout: 'user',
+  components: {
+    CountDownTimer,
+  },
+  data: () => ({
+    formDialog: false,
+    qrCodeDialog: false,
+    rules: rules,
+    valid: true,
+    viewState: true, // 当前查看为有效券或失效券
+  }),
+  computed: {
+    ...mapState({
+      oneselfCardList: state => state.oneself.cardList ? state.oneself.cardList : [], // 剩余抽奖次数
+      lotteryNeedsToFillInTheInformation: state => state.systemConfig.systemConfig ?
+        /^true$/i.test(state.systemConfig.systemConfig.filter(
+          item => item['config_name'] === 'lotteryNeedsToFillInTheInformation')[0]['config_value'])
+        : true,// 抽奖填写信息配置
     }),
-    computed: {
-      ...mapState({
-        oneselfCardList: state => state.oneself.cardList ? state.oneself.cardList : [], // 剩余抽奖次数
-      }),
+  },
+  mounted() {
+    this.addOneself(this.$route.query.shopid);
+  },
+  methods: {
+    ...mapActions({
+      addOneself: 'oneself/addCardList',
+    }),
+    openFormDialog(item) {
+      if (!item.state) return false;
+      if (!this.lotteryNeedsToFillInTheInformation) {
+        return this.qrCodeDialog = true;
+      }
+      this.formDialog = true;
     },
-    mounted() {
-      this.addOneself(this.$route.query.shopid);
+    submit() {
+      if (this.$refs.form.validate()) {
+        this.qrCodeDialog = !this.qrCodeDialog;
+      }
     },
-    methods: {
-      ...mapActions({
-        addOneself: 'oneself/addCardList',
-      }),
-      openFormDialog(item) {
-        if (!item.state) return false;
-        this.formDialog = true;
-      },
-      submit() {
-        if (this.$refs.form.validate()) {
-          this.qrCodeDialog = !this.qrCodeDialog;
-        }
-      },
-      closeFormDialog() {
-        this.formDialog = false;
-        this.$refs.form.reset();
-      },
-      closeQrCodeDialog() {
-        this.qrCodeDialog = false;
-        this.closeFormDialog();
-      },
-      getCountDownTimerString(date) {
-        return `${date.getFullYear()}-${date.getMonth() +
-        1}-${date.getDate()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
-      },
+    closeFormDialog() {
+      this.formDialog = false;
+      this.$refs.form.reset();
     },
-  };
+    closeQrCodeDialog() {
+      this.qrCodeDialog = false;
+      this.closeFormDialog();
+    },
+    getCountDownTimerString(date) {
+      return `${date.getFullYear()}-${date.getMonth() +
+      1}-${date.getDate()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
+    },
+  },
+};
 </script>
