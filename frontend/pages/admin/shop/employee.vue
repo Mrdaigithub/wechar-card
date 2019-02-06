@@ -195,7 +195,7 @@
           </td>
           <td class="text-xs-center">{{ props.item.state ? '启用' : '未启用' }}</td>
           <td class="text-xs-center">{{ props.item.identity === 1 ? '老板' : '员工' }}</td>
-          <td class="text-xs-center">{{ formatDate(props.item.created_at) }}</td>
+          <td class="text-xs-center">{{ props.item['created_at'] }}</td>
           <td class="text-xs-center">{{ props.item.remarks }}</td>
           <td class="text-xs-center">
             <v-icon
@@ -394,16 +394,6 @@ export default {
           this.addShopEmployeeList();
         }
       });
-    },
-    formatDate(dateTimeObj) {
-      if (!dateTimeObj) {
-        return '暂无';
-      }
-      dateTimeObj = new Date(dateTimeObj);
-      return dateTimeObj
-        ? `${dateTimeObj.getFullYear()}-${dateTimeObj.getMonth() +
-        1}-${new Date().getDate()} ${dateTimeObj.getHours()}:${dateTimeObj.getMinutes()}:${dateTimeObj.getSeconds()}`
-        : '暂无';
     },
   },
 };

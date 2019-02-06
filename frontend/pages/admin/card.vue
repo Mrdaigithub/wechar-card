@@ -368,18 +368,6 @@ export default {
         }
       });
     },
-    formatDate(dateTimeObj) {
-      if (!dateTimeObj) {
-        return '暂无';
-      }
-      if (!(dateTimeObj instanceof Date)) {
-        dateTimeObj = new Date(dateTimeObj);
-      }
-      return dateTimeObj
-        ? `${dateTimeObj.getFullYear()}-${dateTimeObj.getMonth() +
-        1}-${new Date().getDate()} ${dateTimeObj.getHours()}:${dateTimeObj.getMinutes()}:${dateTimeObj.getSeconds()}`
-        : '暂无';
-    },
     mul(num1, num2) {
       return calc.mul(num1, num2);
     },

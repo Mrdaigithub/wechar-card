@@ -124,7 +124,7 @@
           <td class="text-xs-center">{{ props.item.openid }}</td>
           <td class="text-xs-center">{{ props.item.sign_in_num }}</td>
           <td class="text-xs-center">{{ props.item.lottery_num }}</td>
-          <td class="text-xs-center">{{ formatDate(props.item.created_at) }}</td>
+          <td class="text-xs-center">{{ props.item.created_at }}</td>
           <td class="text-xs-center">{{ props.item.remarks ? props.item.remarks : '暂无' }}</td>
           <td class="text-xs-center">
             <v-icon
@@ -281,16 +281,6 @@ export default {
           this.addUserList();
         }
       });
-    },
-    formatDate(dateTimeObj) {
-      if (!dateTimeObj) {
-        return '暂无';
-      }
-      dateTimeObj = new Date(dateTimeObj);
-      return dateTimeObj
-        ? `${dateTimeObj.getFullYear()}-${dateTimeObj.getMonth() +
-        1}-${new Date().getDate()} ${dateTimeObj.getHours()}:${dateTimeObj.getMinutes()}:${dateTimeObj.getSeconds()}`
-        : '暂无';
     },
   },
 };
