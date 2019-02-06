@@ -13,13 +13,15 @@
       v-model="drawer"
       absolute
       temporary>
-      <v-list>
+      <v-list v-if="oneself">
         <v-list-tile avatar>
           <v-list-tile-avatar>
-            <img src="https://randomuser.me/api/portraits/men/85.jpg">
+            <v-img
+              :src="oneself['head_img_url']"
+              :lazy-src="oneself['head_img_url']"/>
           </v-list-tile-avatar>
           <v-list-tile-content>
-            <v-list-tile-title>Root</v-list-tile-title>
+            <v-list-tile-title>{{ oneself['username'] }}</v-list-tile-title>
           </v-list-tile-content>
         </v-list-tile>
       </v-list>
@@ -98,42 +100,42 @@
 </template>
 
 <script>
-  import {mapState, mapMutations, mapActions} from 'vuex';
-  
-  export default {
-    data: () => ({
-      drawer: false,
+import {mapState, mapMutations, mapActions} from 'vuex';
+
+export default {
+  data: () => ({
+    drawer: false,
+  }),
+  computed: {
+    ...mapState({
+      oneself: state => state.oneself.oneself ? state.oneself.oneself : null,
     }),
-    computed: {
-      ...mapState({
-        oneself: state => state.oneself.oneself ? state.oneself.oneself : null,
-      }),
+  },
+  async mounted() {
+    // Todo in dev
+    const openid = 'oWqQa6K2egw4ijKVOAC-tffxhxKf';
+    if (!this.oneself) {
+      const {data} = await this.$axios.$get(`/auth/client/${openid}`);
+      this.addToken(data);
+      this.addOneself();
+    }
+  },
+  methods: {
+    ...mapMutations({
+      addToken: 'oneself/addToken',
+    }),
+    ...mapActions({
+      addOneself: 'oneself/addOneself',
+    }),
+    clickDrawerHandler(url) {
+      this.changePage(url);
+      this.drawer = false;
     },
-    async mounted() {
-      // Todo in dev
-      const openid = 'oWqQa6K2egw4ijKVOAC-tffxhxKg';
-      if (!this.oneself) {
-        const {data} = await this.$axios.$get(`/auth/client/${openid}`);
-        this.addToken(data);
-        this.addOneself();
-      }
+    changePage(url) {
+      this.$router.push(url);
     },
-    methods: {
-      ...mapMutations({
-        addToken: 'oneself/addToken',
-      }),
-      ...mapActions({
-        addOneself: 'oneself/addOneself',
-      }),
-      clickDrawerHandler(url) {
-        this.changePage(url);
-        this.drawer = false;
-      },
-      changePage(url) {
-        this.$router.push(url);
-      },
-    },
-  };
+  },
+};
 </script>
 
 <style scoped lang="stylus">
