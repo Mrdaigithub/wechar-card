@@ -7,8 +7,15 @@ use App\Http\Requests\UpdateSystemConfigRequest;
 use App\Model\SystemConfig;
 use App\Utils\ResponseMessage;
 use function PHPSTORM_META\map;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class SystemConfigController extends ApiController {
+
+    private $oneself;
+
+    public function __construct() {
+        $this->oneself = JWTAuth::parseToken()->authenticate();
+    }
 
     /**
      * 获取配置列表
@@ -28,13 +35,17 @@ class SystemConfigController extends ApiController {
      * @return mixed
      */
     public function updateSystemConfig($id, UpdateSystemConfigRequest $request) {
+        if ($notAdmin = $this->isAdmin($this->oneself)) {
+            return $notAdmin;
+        }
+
         $systemConfig = SystemConfig::find($id);
         if ( ! $systemConfig) {
             return $this->notFound(NULL, ResponseMessage::$message[400010]);
         }
 
         $systemConfig->config_value = $request->get("config_value");
-        $this->save_model($systemConfig);
+        $this->saveModel($systemConfig);
 
         return $systemConfig;
     }

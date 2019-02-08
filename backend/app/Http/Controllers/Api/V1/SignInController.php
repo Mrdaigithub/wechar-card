@@ -25,9 +25,13 @@ class SignInController extends ApiController {
      *
      * @param $signInLogList
      *
-     * @return array
+     * @return \Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response
      */
     private function clearLastMonthSignInLog($signInLogList) {
+        if ($notPlainUser = $this->isPlainUser($this->oneself)) {
+            return $notPlainUser;
+        }
+
         return collect($signInLogList)->filter(function ($item) {
             return date("m", time()) == date("m", strtotime($item));
         })->values()->all();
@@ -41,6 +45,10 @@ class SignInController extends ApiController {
      * @return \Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response|mixed
      */
     public function getSignInLogByUserId($id) {
+        if ($notPlainUser = $this->isPlainUser($this->oneself)) {
+            return $notPlainUser;
+        }
+
         $signInLogs = NULL;
         $user       = NULL;
         if ($id == 0) {
@@ -69,6 +77,10 @@ class SignInController extends ApiController {
      * @return \Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response|null
      */
     public function UpdateTodaySignInLogByUserId($id) {
+        if ($notPlainUser = $this->isPlainUser($this->oneself)) {
+            return $notPlainUser;
+        }
+
         $user           = NULL;
         $signInLog      = NULL;
         $signInLogArray = [];
@@ -123,7 +135,7 @@ class SignInController extends ApiController {
 
         // 更新签到记录
         $signInLog->month_sign_in_log = implode(",", $signInLogArray);
-        $this->save_model($signInLog);
+        $this->saveModel($signInLog);
 
         // 如果关联新用户第一次签到用户模型和签到模型
         if ($signInLogs->count() <= 0) {
@@ -134,7 +146,7 @@ class SignInController extends ApiController {
             return $this->success(explode(",", $signInLog->month_sign_in_log), ResponseMessage::$message[200004]);
         } elseif ($count == $daysCount) {
             $user->lottery_num++;
-            $this->save_model($user);
+            $this->saveModel($user);
 
             return $this->success(explode(",", $signInLog->month_sign_in_log), ResponseMessage::$message[200006]);
         } else {

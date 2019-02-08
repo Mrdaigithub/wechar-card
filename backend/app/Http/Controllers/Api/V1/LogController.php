@@ -7,8 +7,15 @@ use App\Http\Requests\UpdateSystemConfigRequest;
 use App\Model\SystemConfig;
 use App\Model\WinningLog;
 use function PHPSTORM_META\map;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class LogController extends ApiController {
+
+    private $oneself;
+
+    public function __construct() {
+        $this->oneself = JWTAuth::parseToken()->authenticate();
+    }
 
     /**
      * 获取中奖核销日志列表
@@ -16,6 +23,10 @@ class LogController extends ApiController {
      * @return mixed
      */
     public function listWinningWriteOffLog() {
+        if ($notAdmin = $this->isAdmin($this->oneself)) {
+            return $notAdmin;
+        }
+
         return $this->success(
             WinningLog::all()->map(function ($item) {
                 $cards       = $item->card();

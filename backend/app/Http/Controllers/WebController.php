@@ -12,7 +12,7 @@ use App\Events\MessageEvent;
 use App\Utils\ResponseMessage;
 
 class WebController extends Controller {
-    protected function save_model($model) {
+    protected function saveModel($model) {
         if ( ! $model->save()) {
             return response(ResponseMessage::$message[500001]);
         }

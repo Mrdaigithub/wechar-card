@@ -47,6 +47,13 @@ class QrCodeController extends ApiController {
         );
     }
 
+    /**
+     * 获取卡券核销的二维码base64编码
+     *
+     * @param \App\Http\Requests\GetWriteOffQrCodeRequest $request
+     *
+     * @return \Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response|mixed
+     */
     public function writeOff(GetWriteOffQrCodeRequest $request) {
         // 添加用户手机号码和姓名如果有, 用户如果已填写信息则不需要
         $lotteryNeedsToFillInTheInformation = SystemConfig::where("config_name", "lotteryNeedsToFillInTheInformation")->first()->config_value;
@@ -62,7 +69,7 @@ class QrCodeController extends ApiController {
             } else {
                 $oneself->real_name = $request->get("real_name");
                 $oneself->phone     = $request->get("phone");
-                $this->save_model($oneself);
+                $this->saveModel($oneself);
             }
         }
 

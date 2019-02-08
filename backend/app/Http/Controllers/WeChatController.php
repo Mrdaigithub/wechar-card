@@ -112,7 +112,7 @@ class WeChatController extends WebController {
         $user->username     = $wechatUser["nickname"];
         $user->head_img_url = $wechatUser["headimgurl"];
         $user->identity     = 1;
-        $this->save_model($user);
+        $this->saveModel($user);
 
         // 通过验证发送消息
         $this->sendBroad([
@@ -164,7 +164,7 @@ class WeChatController extends WebController {
         if ($writeOfferShop->get()->isEmpty()) {
             return $this->response(ResponseMessage::$message[500004]);
         }
-        if ($writeOfferShop->first()->id !== $cardModelActivityShop->first()->id){
+        if ($writeOfferShop->first()->id !== $cardModelActivityShop->first()->id) {
             return $this->response(ResponseMessage::$message[403000]);
         }
 
@@ -184,7 +184,7 @@ class WeChatController extends WebController {
         }
 
         $card->state = FALSE;
-        $this->save_model($card);
+        $this->saveModel($card);
 
         $winningLog->write_off_state = TRUE;
         $winningLog->write_off_date  = date('Y-m-d h:i:s', time());
@@ -241,6 +241,13 @@ class WeChatController extends WebController {
         return $res;
     }
 
+    /**
+     * 通过商铺id获取城市名
+     *
+     * @param $id
+     *
+     * @return mixed
+     */
     public function getCityByShopId($id) {
         return Shop::find($id)["shop_location"];
     }

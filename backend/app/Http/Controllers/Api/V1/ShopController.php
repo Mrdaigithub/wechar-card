@@ -8,8 +8,15 @@ use App\Http\Requests\UpdateShopRequest;
 use App\Model\Activity;
 use App\Model\Shop;
 use App\Utils\ResponseMessage;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class ShopController extends ApiController {
+
+    private $oneself;
+
+    public function __construct() {
+        $this->oneself = JWTAuth::parseToken()->authenticate();
+    }
 
     /**
      * 获取所有商铺列表
@@ -17,17 +24,20 @@ class ShopController extends ApiController {
      * @return mixed
      */
     public function list() {
-        $shopList = Shop::all()
-            ->map(function ($item) {
-                $shopActivity = $item->activity();
-                if ($shopActivity->get()->isEmpty()) {
-                    $item->activity_id = NULL;
-                } else {
-                    $item->activity_id = $shopActivity->first()->id;
-                }
+        if ($notAdmin = $this->isAdmin($this->oneself)) {
+            return $notAdmin;
+        }
 
-                return $item;
-            });
+        $shopList = Shop::all()->map(function ($item) {
+            $shopActivity = $item->activity();
+            if ($shopActivity->get()->isEmpty()) {
+                $item->activity_id = NULL;
+            } else {
+                $item->activity_id = $shopActivity->first()->id;
+            }
+
+            return $item;
+        });
 
         return $this->success($shopList);
     }
@@ -40,6 +50,10 @@ class ShopController extends ApiController {
      * @return mixed
      */
     public function store(StoreShopRequest $request) {
+        if ($notAdmin = $this->isAdmin($this->oneself)) {
+            return $notAdmin;
+        }
+
         if ($request->has("activity_id")
             && (Activity::find($request->get("activity_id"))->shops()->count()
                 <= 0)) {
@@ -60,7 +74,7 @@ class ShopController extends ApiController {
             $shop->state = $request->get("state");
         }
 
-        $this->save_model($shop);
+        $this->saveModel($shop);
         if ($request->has("activity_id")) {
             $shop->activity()->attach($request->get("activity_id"));
         }
@@ -77,6 +91,10 @@ class ShopController extends ApiController {
      * @return \Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response
      */
     public function update(UpdateShopRequest $request, $id) {
+        if ($notAdmin = $this->isAdmin($this->oneself)) {
+            return $notAdmin;
+        }
+
         $shop = Shop::find($id);
 
         if ( ! $shop) {
@@ -110,7 +128,7 @@ class ShopController extends ApiController {
             $shop->state = $request->get("state");
         }
 
-        $this->save_model($shop);
+        $this->saveModel($shop);
 
         if ($request->has("activity_id")) {
             $shop->activity()->detach();
@@ -126,8 +144,14 @@ class ShopController extends ApiController {
      * 删除商铺
      *
      * @param $id
+     *
+     * @return \Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response|void
      */
     public function remove($id) {
+        if ($notAdmin = $this->isAdmin($this->oneself)) {
+            return $notAdmin;
+        }
+
         Shop::find($id)->activity()->detach();
         Shop::destroy($id);
 

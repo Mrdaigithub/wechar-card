@@ -13,12 +13,22 @@ use Tymon\JWTAuth\Facades\JWTAuth;
 
 class UserController extends ApiController {
 
+    private $oneself;
+
+    public function __construct() {
+        $this->oneself = JWTAuth::parseToken()->authenticate();
+    }
+
     /**
      * 获取所有用户列表
      *
      * @return \Illuminate\Database\Eloquent\Collection|static[]
      */
     public function list() {
+        if ($notAdmin = $this->isAdmin($this->oneself)) {
+            return $notAdmin;
+        }
+
         return $this->success(User::all());
     }
 
@@ -28,18 +38,20 @@ class UserController extends ApiController {
      * @return \Illuminate\Database\Eloquent\Collection|static[]
      */
     public function listPlainUser() {
-        $plainUserList = User::where("identity", 0)
-            ->get()
-            ->map(function ($item) {
-                $signInLogs = $item->signInLogs();
-                if ($signInLogs->get()->isEmpty()) {
-                    $item->sign_in_num = 0;
-                } else {
-                    $item->sign_in_num = collect(explode(",", $item->signInLogs()->first()->month_sign_in_log))->count();
-                }
+        if ($notAdmin = $this->isAdmin($this->oneself)) {
+            return $notAdmin;
+        }
 
-                return $item;
-            });
+        $plainUserList = User::where("identity", 0)->get()->map(function ($item) {
+            $signInLogs = $item->signInLogs();
+            if ($signInLogs->get()->isEmpty()) {
+                $item->sign_in_num = 0;
+            } else {
+                $item->sign_in_num = collect(explode(",", $item->signInLogs()->first()->month_sign_in_log))->count();
+            }
+
+            return $item;
+        });
 
         return $this->success($plainUserList);
     }
@@ -50,19 +62,20 @@ class UserController extends ApiController {
      * @return mixed
      */
     public function listShopEmployee() {
-        $plainUserList = User::where("identity", 1)
-            ->orWhere("identity", 2)
-            ->get()
-            ->map(function ($item) {
-                $shop = $item->shop();
-                if ($shop->get()->isEmpty()) {
-                    $item->shop_id = NULL;
-                } else {
-                    $item->shop_id = $shop->first()->id;
-                }
+        if ($notAdmin = $this->isAdmin($this->oneself)) {
+            return $notAdmin;
+        }
 
-                return $item;
-            });
+        $plainUserList = User::where("identity", 1)->orWhere("identity", 2)->get()->map(function ($item) {
+            $shop = $item->shop();
+            if ($shop->get()->isEmpty()) {
+                $item->shop_id = NULL;
+            } else {
+                $item->shop_id = $shop->first()->id;
+            }
+
+            return $item;
+        });
 
         return $this->success($plainUserList);
     }
@@ -104,6 +117,10 @@ class UserController extends ApiController {
      * @return \Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response
      */
     public function updatePlainUser(UpdatePlainUserRequest $request, $id) {
+        if ($notAdmin = $this->isAdmin($this->oneself)) {
+            return $notAdmin;
+        }
+
         $user = User::find($id);
 
         if ( ! $user) {
@@ -126,7 +143,7 @@ class UserController extends ApiController {
             $user->remarks = $request->get("remarks");
         }
 
-        $this->save_model($user);
+        $this->saveModel($user);
 
         return User::find($user->id);
     }
@@ -140,6 +157,10 @@ class UserController extends ApiController {
      * @return \Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response
      */
     public function updateShopEmployee(UpdateShopEmployeeRequest $request, $id) {
+        if ($notAdmin = $this->isAdmin($this->oneself)) {
+            return $notAdmin;
+        }
+
         $user = User::find($id);
 
         if ( ! $user) {
@@ -168,7 +189,7 @@ class UserController extends ApiController {
             $user->remarks = $request->get("remarks");
         }
 
-        $this->save_model($user);
+        $this->saveModel($user);
 
         if ($request->has("shop_id")) {
             $user->shop()->detach();
@@ -186,7 +207,13 @@ class UserController extends ApiController {
      * @return void
      */
     public function removeShopEmployee($id) {
+        if ($notAdmin = $this->isAdmin($this->oneself)) {
+            return $notAdmin;
+        }
+
         User::find($id)->shop()->detach();
         User::destroy($id);
+
+        return;
     }
 }
