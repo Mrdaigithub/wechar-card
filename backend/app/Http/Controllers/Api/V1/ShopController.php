@@ -7,6 +7,7 @@ use App\Http\Requests\StoreShopRequest;
 use App\Http\Requests\UpdateShopRequest;
 use App\Model\Activity;
 use App\Model\Shop;
+use App\Utils\ResponseMessage;
 
 class ShopController extends ApiController {
 
@@ -42,7 +43,7 @@ class ShopController extends ApiController {
         if ($request->has("activity_id")
             && (Activity::find($request->get("activity_id"))->shops()->count()
                 <= 0)) {
-            return $this->badRequest(NULL, "此活动已被占用");
+            return $this->badRequest(NULL, ResponseMessage::$message[400011]);
         }
 
         $shop                = new Shop();
@@ -88,7 +89,7 @@ class ShopController extends ApiController {
             }
             $activity_shops = $activity->shops();
             if ($activity_shops->count() > 0 && $activity_shops->first()->id != $id) {
-                return $this->badRequest(NULL, "此活动已被占用");
+                return $this->badRequest(NULL, ResponseMessage::$message[400011]);
             }
         }
 

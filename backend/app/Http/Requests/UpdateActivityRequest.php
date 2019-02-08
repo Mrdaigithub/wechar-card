@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Utils\ResponseMessage;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateActivityRequest extends FormRequest {
@@ -34,18 +35,18 @@ class UpdateActivityRequest extends FormRequest {
 
     public function messages() {
         return [
-            "activity_name.required"     => "必须有活动名参数",
-            "activity_name.string"       => "活动名数据类型不正确",
-            "activity_name.regex"        => "活动名含有非法字符",
-            "activity_description.regex" => "活动详情含有非法字符",
-            "activity_thumbnail.string"  => "活动缩略图数据类型不正确",
-            "activity_thumbnail.regex"   => "活动缩略图格式不正确",
-            "reply_keyword.required"     => "必须有活动回复关键词",
-            "reply_keyword.string"       => "活动回复关键词数据类型不正确",
-            "reply_keyword.regex"        => "活动回复关键词含有非法字符",
-            "remarks.regex"              => "活动备注含有非法字符",
-            "state.boolean"              => "活动状态数据类型不正确",
-            "card_model_id_list.array"   => "活动对应卡券列表数据类型不正确",
+            "activity_name.required"     => ResponseMessage::$message[400000],
+            "activity_name.string"       => ResponseMessage::$message[400002],
+            "activity_name.regex"        => ResponseMessage::$message[400005],
+            "activity_description.regex" => ResponseMessage::$message[400005],
+            "activity_thumbnail.string"  => ResponseMessage::$message[400002],
+            "activity_thumbnail.regex"   => ResponseMessage::$message[400006],
+            "reply_keyword.required"     => ResponseMessage::$message[400000],
+            "reply_keyword.string"       => ResponseMessage::$message[400002],
+            "reply_keyword.regex"        => ResponseMessage::$message[400005],
+            "remarks.regex"              => ResponseMessage::$message[400005],
+            "state.boolean"              => ResponseMessage::$message[400002],
+            "card_model_id_list.array"   => ResponseMessage::$message[400002],
         ];
     }
 }

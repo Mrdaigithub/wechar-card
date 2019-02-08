@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Utils\ResponseMessage;
 use Illuminate\Foundation\Http\FormRequest;
 
 class GetWriteOffQrCodeRequest extends FormRequest {
@@ -30,13 +31,13 @@ class GetWriteOffQrCodeRequest extends FormRequest {
 
     public function messages() {
         return [
-            "card_id.required" => "必须有卡券id参数",
-            "card_id.numeric"  => "卡券id数据类型不正确",
-            "card_id.exists"   => "卡券id不存在",
-            "real_name.regex"  => "名称含有非法字符",
-            "real_name.string" => "名称数据类型不正确",
-            "phone.regex"      => "手机号码格式不正确",
-            "phone.string"     => "手机号码数据类型不正确",
+            "card_id.required" => ResponseMessage::$message[400000],
+            "card_id.numeric"  => ResponseMessage::$message[400002],
+            "card_id.exists"   => ResponseMessage::$message[400001],
+            "real_name.regex"  => ResponseMessage::$message[400005],
+            "real_name.string" => ResponseMessage::$message[400002],
+            "phone.regex"      => ResponseMessage::$message[400023],
+            "phone.string"     => ResponseMessage::$message[400024],
         ];
     }
 }

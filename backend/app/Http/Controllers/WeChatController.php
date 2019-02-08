@@ -8,12 +8,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Events\MessageEvent;
 use App\Http\Controllers\Handler\EventMessageHandler;
 use App\Http\Controllers\Handler\TextMessageHandler;
 use App\Model\Card;
 use App\Model\Shop;
 use App\Model\User;
+use App\Utils\ResponseMessage;
 use EasyWeChat\Kernel\Messages\Message;
 use GuzzleHttp\Client;
 use Illuminate\Http\Request;
@@ -43,7 +43,7 @@ class WeChatController extends WebController {
      */
     public function wechatAuthorize(Request $request) {
         if ( ! $request->exists("url")) {
-            return $this->response("参数错误");
+            return $this->response(ResponseMessage::$message[400000]);
         }
         $url = $request->get("url");
 
@@ -79,9 +79,9 @@ class WeChatController extends WebController {
 
         $userList = User::where("openid", $wechatUser->getId())->get();
         if ($userList->isEmpty()) {
-            return $this->response("用户不存在");
+            return $this->response(ResponseMessage::$message[400007]);
         } elseif ($userList->first()->identity !== 3) {
-            return $this->response("无权限");
+            return $this->response(ResponseMessage::$message[403000]);
         }
 
         // 通过验证发送消息
@@ -90,7 +90,7 @@ class WeChatController extends WebController {
             "openid" => $wechatUser->getId(),
         ]);
 
-        return $this->response("登录成功");
+        return $this->response(ResponseMessage::$message[200001]);
     }
 
     /**
@@ -106,7 +106,7 @@ class WeChatController extends WebController {
         // 用户认证
         $userList = User::where("openid", $wechatUser["openid"])->get();
         if ($userList->isNotEmpty()) {
-            return $this->response("用户已存在");
+            return $this->response(ResponseMessage::$message[400007]);
         }
 
         $user               = new User;
@@ -121,7 +121,7 @@ class WeChatController extends WebController {
             "signal" => "allowAddBoss",
         ]);
 
-        return $this->response("添加成功");
+        return $this->response(ResponseMessage::$message[200002]);
     }
 
     /**
@@ -133,7 +133,7 @@ class WeChatController extends WebController {
      */
     public function grantWriteOff(Request $request) {
         if ( ! $request->has("card_id") || ! $request->get("card_id")) {
-            return $this->response("缺少卡券参数");
+            return $this->response(ResponseMessage::$message[400009]);
         }
 
         $app = app('wechat.official_account');
@@ -142,34 +142,34 @@ class WeChatController extends WebController {
         $writeOffer = User::where("openid", $app->oauth->user()->getId())->first();
 
         if ( ! $writeOffer) {
-            return $this->response("用户不存在");
+            return $this->response(ResponseMessage::$message[400008]);
         }
         if ($writeOffer->identity !== 1 && $writeOffer->identity !== 2) {
-            return $this->response("无权限");
+            return $this->response(ResponseMessage::$message[403000]);
         }
 
         $card = Card::find($request->get("card_id"));
         if ( ! $card) {
-            return $this->response("无效的卡券");
+            return $this->response(ResponseMessage::$message[500002]);
         }
 
         // 卡券中奖记录
         $winningLog = $card->winningLog()->first();
         if ( ! $winningLog) {
-            return $this->response("无效的卡券");
+            return $this->response(ResponseMessage::$message[500002]);
         }
         if ((boolean) $winningLog->write_off_state) {
-            return $this->response("次卡券已被核销");
+            return $this->response(ResponseMessage::$message[500003]);
         }
 
         // 卡券所属用户
         $user = $winningLog->user();
         if ($winningLog->user()->get()->isEmpty()) {
-            return $this->response("无主的卡券");
+            return $this->response(ResponseMessage::$message[500004]);
         }
 
         $card->state = FALSE;
-        $card->save();
+        $this->save_model($card);
 
         $winningLog->write_off_state = TRUE;
         $winningLog->write_off_date  = date('Y-m-d h:i:s', time());
@@ -183,7 +183,7 @@ class WeChatController extends WebController {
             "user_id" => $user->first()->id,
         ]);
 
-        return $this->response("核销成功");
+        return $this->response(ResponseMessage::$message[200003]);
     }
 
     /**
@@ -218,7 +218,7 @@ class WeChatController extends WebController {
     public function geocoder(Request $request) {
         $location = $request->exists("location") ? $request->get("location") : NULL;
         if ( ! $location) {
-            return "缺少参数";
+            return $this->response(ResponseMessage::$message[400000]);
         }
         $client = new Client();
         $res    = $client->get("http://api.map.baidu.com/geocoder/v2/?location=$location&output=json&pois=1&ak=" . env("AK"));

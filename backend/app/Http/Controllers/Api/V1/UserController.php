@@ -7,6 +7,7 @@ use App\Http\Requests\UpdatePlainUserRequest;
 use App\Http\Requests\UpdateShopEmployeeRequest;
 use App\Model\Shop;
 use App\Model\User;
+use App\Utils\ResponseMessage;
 use Illuminate\Http\Request;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
@@ -79,7 +80,7 @@ class UserController extends ApiController {
         }
         $user = User::find($id);
         if ( ! $user) {
-            return $this->notFound(NULL, "未找到此用户");
+            return $this->notFound(NULL, ResponseMessage::$message[400007]);
         }
 
         return $this->success($user);
@@ -109,7 +110,7 @@ class UserController extends ApiController {
             return $this->notFound();
         }
         if ($user->identity != 0) {
-            return $this->badRequest(NULL, "用户身份不符合");
+            return $this->badRequest(NULL, ResponseMessage::$message[403000]);
         }
 
         if ($request->has("real_name")) {
@@ -145,7 +146,7 @@ class UserController extends ApiController {
             return $this->notFound();
         }
         if ($user->identity != 1 && $user->identity != 2) {
-            return $this->badRequest(NULL, "用户身份不符合");
+            return $this->badRequest(NULL, ResponseMessage::$message[403000]);
         }
         if ($request->has("shop_id") && ! ! Shop::find($request->get("shop_id"))) {
             $this->notFound();

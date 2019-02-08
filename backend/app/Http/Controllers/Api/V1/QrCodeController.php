@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\Api\ApiController;
 use App\Http\Requests\GetWriteOffQrCodeRequest;
 use App\Model\SystemConfig;
+use App\Utils\ResponseMessage;
 use function PHPSTORM_META\map;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Tymon\JWTAuth\Facades\JWTAuth;
@@ -59,7 +60,7 @@ class QrCodeController extends ApiController {
             // 校验参数
             if (( ! $request->has("real_name") || ! $request->has("phone")) ||
                 ( ! $request->get("real_name") || ! $request->get("phone"))) {
-                return $this->badRequest(NULL, "请填写姓名与电话再领取卡券");
+                return $this->badRequest(NULL, ResponseMessage::$message[400015]);
             } else {
                 $oneself->real_name = $request->get("real_name");
                 $oneself->phone     = $request->get("phone");

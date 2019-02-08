@@ -8,6 +8,7 @@ use App\Http\Requests\UpdateActivityRequest;
 use App\Model\Activity;
 use App\Model\Card;
 use App\Model\Shop;
+use App\Utils\ResponseMessage;
 use Illuminate\Http\Request;
 
 class ActivityController extends ApiController {
@@ -50,7 +51,7 @@ class ActivityController extends ApiController {
     public function getActivityByShopId($id) {
         $activities = Shop::find($id)->activity();
         if ($activities->count() <= 0) {
-            return $this->badRequest(NULL, "单前商铺未参加任何活动");
+            return $this->badRequest(NULL, ResponseMessage::$message[400012]);
         }
 
         return $this->success($activities->first());
@@ -66,7 +67,7 @@ class ActivityController extends ApiController {
     public function store(StoreActivityRequest $request) {
         if ($request->has("reply_keyword")
             && Activity::where("reply_keyword", $request->get("reply_keyword"))->get()->isNotEmpty()) {
-            return $this->badRequest(NULL, "重复的回复关键词");
+            return $this->badRequest(NULL, ResponseMessage::$message[400019]);
         }
 
         $activity                = new Activity();
@@ -129,7 +130,7 @@ class ActivityController extends ApiController {
         if ($request->has("reply_keyword")) {
             $activityReplyKeyword = Activity::where("reply_keyword", $request->get("reply_keyword"));
             if ($activityReplyKeyword->get()->isNotEmpty() && $activityReplyKeyword->first()->id != $id) {
-                return $this->badRequest(NULL, "关键词已存在");
+                return $this->badRequest(NULL, ResponseMessage::$message[400019]);
             }
         }
         if ($request->has("state")) {

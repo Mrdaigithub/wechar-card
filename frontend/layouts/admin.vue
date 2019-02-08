@@ -112,10 +112,10 @@ export default {
     }),
   },
   async mounted() {
-    // Todo in dev
-    const openid = 'oWqQa6K2egw4ijKVOAC-tffxhxKf';
     if (!this.oneself) {
-      const {data} = await this.$axios.$get(`/auth/client/${openid}`);
+      // Todo in dev
+      const {data} = await this.$axios.$get(`/auth/client/${'oWqQa6K2egw4ijKVOAC-tffxhxKf'}`);
+      // const {data} = await this.$axios.$get(`/auth/client/${this.oneself.openid}`);
       this.addToken(data);
       this.addOneself();
     }

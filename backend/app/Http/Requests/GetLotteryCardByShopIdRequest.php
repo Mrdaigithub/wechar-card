@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Utils\ResponseMessage;
 use Illuminate\Foundation\Http\FormRequest;
 
 class GetLotteryCardByShopIdRequest extends FormRequest {
@@ -28,9 +29,9 @@ class GetLotteryCardByShopIdRequest extends FormRequest {
 
     public function messages() {
         return [
-            "location.required" => "必须有地址参数",
-            "location.string"   => "地址数据类型不正确",
-            "location.regex"    => "地址含有非法字符",
+            "location.required" => ResponseMessage::$message[400020],
+            "location.string"   => ResponseMessage::$message[400021],
+            "location.regex"    => ResponseMessage::$message[400022],
         ];
     }
 }

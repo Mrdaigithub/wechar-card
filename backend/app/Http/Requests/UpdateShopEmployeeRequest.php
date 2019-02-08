@@ -8,6 +8,7 @@
 
 namespace App\Http\Requests;
 
+use App\Utils\ResponseMessage;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateShopEmployeeRequest extends FormRequest {
@@ -39,12 +40,12 @@ class UpdateShopEmployeeRequest extends FormRequest {
 
     public function messages() {
         return [
-            "real_name.regex"  => "姓名含有非法字符",
-            "phone.regex"      => "手机号格式不正确",
-            "shop_id.numeric"  => "商铺id数据类型不正确",
-            "identity.numeric" => "身份数据类型不正确",
-            "state.numeric"    => "启用状态数据类型不正确",
-            "remarks.numeric"  => "备注含有非法字符",
+            "real_name.regex"  => ResponseMessage::$message[400005],
+            "phone.regex"      => ResponseMessage::$message[400006],
+            "shop_id.numeric"  => ResponseMessage::$message[400002],
+            "identity.numeric" => ResponseMessage::$message[400002],
+            "state.numeric"    => ResponseMessage::$message[400002],
+            "remarks.numeric"  => ResponseMessage::$message[400005],
         ];
     }
 }

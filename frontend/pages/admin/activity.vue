@@ -216,7 +216,6 @@
 import {mapState, mapActions} from 'vuex';
 import qs from 'qs';
 
-// Todo 参与人数统计
 export default {
   name: 'AdminActivity',
   layout: 'admin',

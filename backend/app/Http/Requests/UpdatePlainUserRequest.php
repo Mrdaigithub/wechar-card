@@ -8,42 +8,43 @@
 
 namespace App\Http\Requests;
 
+use App\Utils\ResponseMessage;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdatePlainUserRequest extends FormRequest {
 
-  /**
-   * Determine if the user is authorized to make this request.
-   *
-   * @return bool
-   */
-  public function authorize() {
-    return TRUE;
-  }
+    /**
+     * Determine if the user is authorized to make this request.
+     *
+     * @return bool
+     */
+    public function authorize() {
+        return TRUE;
+    }
 
-  /**
-   * Get the validation rules that apply to the request.
-   *
-   * @return array
-   */
-  public function rules() {
-    return [
-      "real_name"   => ["nullable", "regex:/^(\w|[\x{4e00}-\x{9fa5}])+$/u"],
-      "phone"       => [
-        "nullable",
-        "regex:/^(0|86|17951)?(13[0-9]|15[012356789]|166|17[3678]|18[0-9]|14[57])[0-9]{8}$/u",
-      ],
-      "lottery_num" => "numeric",
-      "remarks"     => ["nullable", "regex:/^(\w|[\x{4e00}-\x{9fa5}])+$/u"],
-    ];
-  }
+    /**
+     * Get the validation rules that apply to the request.
+     *
+     * @return array
+     */
+    public function rules() {
+        return [
+            "real_name"   => ["nullable", "regex:/^(\w|[\x{4e00}-\x{9fa5}])+$/u"],
+            "phone"       => [
+                "nullable",
+                "regex:/^(0|86|17951)?(13[0-9]|15[012356789]|166|17[3678]|18[0-9]|14[57])[0-9]{8}$/u",
+            ],
+            "lottery_num" => "numeric",
+            "remarks"     => ["nullable", "regex:/^(\w|[\x{4e00}-\x{9fa5}])+$/u"],
+        ];
+    }
 
-  public function messages() {
-    return [
-      "real_name.regex"     => "姓名含有非法字符",
-      "phone.regex"         => "手机号格式不正确",
-      "lottery_num.numeric" => "抽奖次数数据类型不正确",
-      "remarks.regex"       => "卡券备注格式不正确",
-    ];
-  }
+    public function messages() {
+        return [
+            "real_name.regex"     => ResponseMessage::$message[400006],
+            "phone.regex"         => ResponseMessage::$message[400006],
+            "lottery_num.numeric" => ResponseMessage::$message[400006],
+            "remarks.regex"       => ResponseMessage::$message[400006],
+        ];
+    }
 }

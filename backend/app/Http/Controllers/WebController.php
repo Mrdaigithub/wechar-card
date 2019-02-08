@@ -9,11 +9,12 @@
 namespace App\Http\Controllers;
 
 use App\Events\MessageEvent;
+use App\Utils\ResponseMessage;
 
 class WebController extends Controller {
     protected function save_model($model) {
         if ( ! $model->save()) {
-            return response("数据库存储失败");
+            return response(ResponseMessage::$message[500001]);
         }
 
         return TRUE;
@@ -23,6 +24,13 @@ class WebController extends Controller {
         return "<script>alert('$message');document.write('<h1 style=\'text-align:center\'>$message</h1>')</script>";
     }
 
+    /**
+     * 发送广播信号
+     *
+     * @param $data
+     *
+     * @return \Illuminate\Broadcasting\PendingBroadcast
+     */
     protected function sendBroad($data) {
         return broadcast(new MessageEvent(json_encode($data)));
     }

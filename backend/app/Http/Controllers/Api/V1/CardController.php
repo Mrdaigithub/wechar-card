@@ -9,6 +9,7 @@ use App\Http\Requests\UpdateCardModelRequest;
 use App\Model\Card;
 use App\Model\Shop;
 use App\Model\WinningLog;
+use App\Utils\ResponseMessage;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
 class CardController extends ApiController {
@@ -57,29 +58,28 @@ class CardController extends ApiController {
     public function getCardByShopId($id) {
         $activities = Shop::find($id)->activity();
         if ($activities->count() <= 0) {
-            return $this->badRequest(NULL, "单前商铺未参加任何活动");
+            return $this->badRequest(NULL, ResponseMessage::$message[400012]);
         }
         $cardModelList = $activities->first()->cards();
 
         // 去除被禁用,类型不为卡券模板,已过期的卡券模板
-        $cardModelList = array_filter($cardModelList->get()->toArray(),
-            function ($item) {
-                if (($item["state"] == 1)
-                    && ($item["type"] == 0)
-                    && ($item["end_time_0"])
-                    && (strtotime($item["end_time_0"]) > strtotime(date('Y-m-d h:i:s',
-                            time())))) {
-                    return TRUE;
-                } elseif (($item["state"] == 1)
-                    && ($item["type"] == 0)
-                    && ($item["end_time_1"])) {
-                    return TRUE;
-                }
+        $cardModelList = array_filter($cardModelList->get()->toArray(), function ($item) {
+            if (($item["state"] == 1)
+                && ($item["type"] == 0)
+                && ($item["end_time_0"])
+                && (strtotime($item["end_time_0"]) > strtotime(date('Y-m-d h:i:s',
+                        time())))) {
+                return TRUE;
+            } elseif (($item["state"] == 1)
+                && ($item["type"] == 0)
+                && ($item["end_time_1"])) {
+                return TRUE;
+            }
 
-                return FALSE;
-            });
+            return FALSE;
+        });
         if (count($cardModelList) <= 0) {
-            return $this->badRequest(NULL, "单前活动未选取任何卡券奖品");
+            return $this->badRequest(NULL, ResponseMessage::$message[400013]);
         }
         $cardArray = $cardModelList;
         if ($cardArray > 8) {
@@ -89,6 +89,8 @@ class CardController extends ApiController {
         return $this->success($cardArray);
     }
 
+    // Todo 暂时为在所有商铺中的卡券
+
     /**
      * 获取与用户在当前商铺中过的卡券
      *
@@ -97,25 +99,23 @@ class CardController extends ApiController {
      * @return \Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response|mixed
      */
     public function getUserCardByShopId($id) {
-        $cardList = array_map(function ($item) {
+        $cardList = $this->oneself->cardList()->get()->map(function ($item) {
             // 时间1过期卡券失效
-            if ( ! ! $item["end_time_0"]) {
-                $item["state"] = strtotime($item["end_time_0"])
-                > strtotime(date('Y-m-d h:i:s', time())) ? 1 : 0;
+            if ( ! ! $item->end_time_0) {
+                $item->state = strtotime($item->end_time_0) > strtotime(date('Y-m-d h:i:s', time())) ? 1 : 0;
             } // 时间2过期卡券失效
-            elseif ( ! ! $item["end_time_1"]) {
+            elseif ( ! ! $item->end_time_1) {
                 $item["state"] = strtotime(date('Y-m-d H:i:s',
-                    strtotime("+" . $item["end_time_1"] . " seconds",
-                        date(strtotime($item["created_at"])))))
+                    strtotime("+" . $item["end_time_1"] . " seconds", date(strtotime($item["created_at"])))))
                 > strtotime(date('Y-m-d h:i:s', time())) ? 1 : 0;
             }
             // 如果卡券模板被禁用下级卡券全部失效(优先级最高,要放最下面)
-            if ( ! Card::find($item["parentid"])["state"]) {
-                $item["state"] = 0;
+            if ( ! Card::find($item->parentid)->state) {
+                $item->state = 0;
             }
 
             return $item;
-        }, $this->oneself->cardList()->get()->toArray());
+        });
 
         return $this->success($cardList);
     }
@@ -134,15 +134,15 @@ class CardController extends ApiController {
         $activities = Shop::find($id)->activity();
 
         if ($activities->get()->isEmpty()) {
-            return $this->badRequest(NULL, "单前商铺未参加任何活动");
+            return $this->badRequest(NULL, ResponseMessage::$message[400012]);
         }
         if ($activities->first()->shops()->get()->isEmpty()) {
-            return $this->badRequest(NULL, "未有商家参加当前活动");
+            return $this->badRequest(NULL, ResponseMessage::$message[400014]);
         }
 
         // 判断用户单前地区
         if ($activities->first()->shops()->first()->shop_location != $location) {
-            return $this->badRequest(NULL, "当前所在区域无法参加活动");
+            return $this->badRequest(NULL, ResponseMessage::$message[400016]);
         }
 
         $cardModelList = $activities->first()->cards();
@@ -165,10 +165,10 @@ class CardController extends ApiController {
         });
 
         if (count($cardModelList) <= 0) {
-            return $this->badRequest(NULL, "单前活动未选取任何卡券奖品");
+            return $this->badRequest(NULL, ResponseMessage::$message[400013]);
         }
         if ($this->oneself["lottery_num"] <= 0) {
-            return $this->badRequest(NULL, "没有抽奖次数");
+            return $this->badRequest(NULL, ResponseMessage::$message[400017]);
         }
         if ($cardModelList->count() > 8) {
             $cardModelList->splice(8, $cardModelList->count());
@@ -240,7 +240,7 @@ class CardController extends ApiController {
      */
     public function storeCardModel(StoreCardModelRequest $request) {
         if ( ! $request->has("end_time_0") && ! $request->has("end_time_1")) {
-            return $this->badRequest(NULL, "卡券结束时间参数缺失");
+            return $this->badRequest(NULL, ResponseMessage::$message[400018]);
         }
 
         $cardModel = new Card();

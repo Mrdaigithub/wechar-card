@@ -6,7 +6,7 @@ use App\Http\Controllers\Api\ApiController;
 use App\Model\SignIn;
 use App\Model\SystemConfig;
 use App\Model\User;
-use mysql_xdevapi\Collection;
+use App\Utils\ResponseMessage;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
 class SignInController extends ApiController {
@@ -48,7 +48,7 @@ class SignInController extends ApiController {
         } else {
             $user = User::find($id);
             if ( ! $user) {
-                return $this->notFound(NULL, "未找到此用户");
+                return $this->notFound(NULL, ResponseMessage::$message[400007]);
             }
         }
 
@@ -81,7 +81,7 @@ class SignInController extends ApiController {
         } else {
             $user = User::find($id);
             if ( ! $user) {
-                return $this->notFound(NULL, "未找到此用户");
+                return $this->notFound(NULL, ResponseMessage::$message[400007]);
             }
         }
 
@@ -101,7 +101,7 @@ class SignInController extends ApiController {
 
         // 今天是否签到
         if (in_array($today, $signInLogArray, TRUE)) {
-            return $this->badRequest(NULL, "今日已经签到过了, 明天再来");
+            return $this->badRequest(NULL, ResponseMessage::$message[200005]);
         }
         array_push($signInLogArray, $today);
 
@@ -131,14 +131,14 @@ class SignInController extends ApiController {
         }
 
         if ($count < $daysCount) {
-            return $this->success(explode(",", $signInLog->month_sign_in_log), "签到成功,请再接再厉");
+            return $this->success(explode(",", $signInLog->month_sign_in_log), ResponseMessage::$message[200004]);
         } elseif ($count == $daysCount) {
             $user->lottery_num++;
             $this->save_model($user);
 
-            return $this->success(explode(",", $signInLog->month_sign_in_log), "签到成功,抽奖次数+1");
+            return $this->success(explode(",", $signInLog->month_sign_in_log), ResponseMessage::$message[200006]);
         } else {
-            return $this->success(explode(",", $signInLog->month_sign_in_log), "签到成功,请再接再厉");
+            return $this->success(explode(",", $signInLog->month_sign_in_log), ResponseMessage::$message[200004]);
         }
     }
 }
