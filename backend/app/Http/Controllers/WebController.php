@@ -24,6 +24,12 @@ class WebController extends Controller {
         return "<script>alert('$message');document.write('<h1 style=\'text-align:center\'>$message</h1>')</script>";
     }
 
+    protected function getOneself() {
+        $app = app('wechat.official_account');
+
+        return $app->oauth->user();
+    }
+
     /**
      * 发送广播信号
      *

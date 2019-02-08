@@ -259,7 +259,8 @@ export default {
         JSON.parse(e.message).signal === 'writeOff' &&
         this.oneself.id === JSON.parse(e.message)['user_id']) {
         Message.success('核销成功');
-        setTimeout(() => this.qrCodeDialog = false, 500);
+        this.formDialog = false;
+        this.qrCodeDialog = false;
       }
     });
   },

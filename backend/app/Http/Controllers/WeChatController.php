@@ -59,8 +59,7 @@ class WeChatController extends WebController {
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
     public function grantLotteryUser() {
-        $app  = app('wechat.official_account');
-        $user = $app->oauth->user();
+        $user = $this->getOneself();
 
         return view("redirectUserLottery", [
             "openid" => $user->getId(),
@@ -74,8 +73,7 @@ class WeChatController extends WebController {
      * @return string
      */
     public function grantLoginAdmin() {
-        $app        = app('wechat.official_account');
-        $wechatUser = $app->oauth->user();
+        $wechatUser = $this->getOneself();
 
         $userList = User::where("openid", $wechatUser->getId())->get();
         if ($userList->isEmpty()) {
@@ -100,7 +98,7 @@ class WeChatController extends WebController {
      */
     public function grantAddBoss() {
         $app        = app('wechat.official_account');
-        $openid     = $app->oauth->user()->getId();
+        $openid     = $this->getOneself()->getId();
         $wechatUser = $app->user->get($openid);
 
         // 用户认证
@@ -132,15 +130,14 @@ class WeChatController extends WebController {
      * @return string
      */
     public function grantWriteOff(Request $request) {
+        $user = $this->getOneself();
+
         if ( ! $request->has("card_id") || ! $request->get("card_id")) {
             return $this->response(ResponseMessage::$message[400009]);
         }
 
-        $app = app('wechat.official_account');
-
         // 用户认证确认是否为店员老板
-        $writeOffer = User::where("openid", $app->oauth->user()->getId())->first();
-
+        $writeOffer = User::where("openid", $user->getId())->first();
         if ( ! $writeOffer) {
             return $this->response(ResponseMessage::$message[400008]);
         }
@@ -148,9 +145,27 @@ class WeChatController extends WebController {
             return $this->response(ResponseMessage::$message[403000]);
         }
 
+        // 卡券是否存在
         $card = Card::find($request->get("card_id"));
-        if ( ! $card) {
+        if ( ! $card || $card->type === 0 || ! $card->parentid) {
             return $this->response(ResponseMessage::$message[500002]);
+        }
+
+        // 是否为本店的人员
+        $cardModelActivity = Card::find($card->parentid)->activity();
+        if ($cardModelActivity->get()->isEmpty()) {
+            return $this->response(ResponseMessage::$message[500004]);
+        }
+        $cardModelActivityShop = $cardModelActivity->first()->shops();
+        if ($cardModelActivityShop->get()->isEmpty()) {
+            return $this->response(ResponseMessage::$message[500004]);
+        }
+        $writeOfferShop = $writeOffer->shop();
+        if ($writeOfferShop->get()->isEmpty()) {
+            return $this->response(ResponseMessage::$message[500004]);
+        }
+        if ($writeOfferShop->first()->id !== $cardModelActivityShop->first()->id){
+            return $this->response(ResponseMessage::$message[403000]);
         }
 
         // 卡券中奖记录
@@ -163,7 +178,7 @@ class WeChatController extends WebController {
         }
 
         // 卡券所属用户
-        $user = $winningLog->user();
+        $client = $winningLog->user();
         if ($winningLog->user()->get()->isEmpty()) {
             return $this->response(ResponseMessage::$message[500004]);
         }
@@ -180,7 +195,7 @@ class WeChatController extends WebController {
         // 通过发送核销成功消息
         $this->sendBroad([
             "signal"  => "writeOff",
-            "user_id" => $user->first()->id,
+            "user_id" => $client->first()->id,
         ]);
 
         return $this->response(ResponseMessage::$message[200003]);

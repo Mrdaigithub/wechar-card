@@ -36,42 +36,43 @@
 </template>
 
 <script>
-  import {mapMutations, mapActions} from 'vuex';
-  
-  export default {
-    data: () => ({
-      bottomNav: '',
+import {mapMutations, mapActions} from 'vuex';
+
+export default {
+  data: () => ({
+    bottomNav: '',
+  }),
+  async created() {
+    const openid = this.$route.query.openid;
+    // Todo 清除url上的openid
+    // this.$router.replace(`${this.$route.path}?shopid=${this.$route.query.shopid}`); // 清除url上的openid
+    const {data} = await this.$axios.$get(`/auth/client/${openid}`);
+    this.addToken(data);
+    this.addLocation(this.$route.query.location);
+    this.addOneself();
+    this.addSystemConfig();
+    this.addCard(this.$route.query.shopid);
+    this.addShopActivity(this.$route.query.shopid);
+    this.bottomNav = this.$route.path.split('/')[this.$route.path.split('/').length - 1];
+  },
+  methods: {
+    changePage(url) {
+      this.$router.push(url);
+    },
+    ...mapMutations({
+      addToken: 'oneself/addToken',
+      addLocation: 'oneself/addLocation',
     }),
-    async created() {
-      const openid = this.$route.query.openid;
-      // Todo 清除url上的openid
-      // this.$router.replace(`${this.$route.path}?shopid=${this.$route.query.shopid}`); // 清除url上的openid
-      const {data} = await this.$axios.$get(`/auth/client/${openid}`);
-      this.addToken(data);
-      this.addLocation(this.$route.query.location);
-      this.addOneself();
-      this.addSystemConfig();
-      this.addCard(this.$route.query.shopid);
-      this.addShopActivity(this.$route.query.shopid);
-      this.bottomNav = this.$route.path.split('/')[this.$route.path.split('/').length - 1];
-    },
-    methods: {
-      changePage(url) {
-        this.$router.push(url);
-      },
-      ...mapMutations({
-        addToken: 'oneself/addToken',
-        addLocation: 'oneself/addLocation',
-      }),
-      ...mapActions({
-        addOneself: 'oneself/addOneself',
-        addSystemConfig: 'systemConfig/addSystemConfig',
-        addCard: 'card/addCardModelListByShopId',
-        addShopActivity: 'shop/addShopActivity',
-      }),
-    },
-  };
+    ...mapActions({
+      addOneself: 'oneself/addOneself',
+      addSystemConfig: 'systemConfig/addSystemConfig',
+      addCard: 'card/addCardModelListByShopId',
+      addShopActivity: 'shop/addShopActivity',
+    }),
+  },
+};
 </script>
+
 <style scoped lang="stylus">
   .bottom_nav {
     position: fixed;

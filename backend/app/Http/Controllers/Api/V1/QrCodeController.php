@@ -11,8 +11,6 @@ use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
 class QrCodeController extends ApiController {
-    // Todo 添加二维码过期失效
-
     /**
      * 获取管理员登录的二维码base64编码
      *

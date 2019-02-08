@@ -127,6 +127,7 @@ import {mapState, mapActions} from 'vuex';
 import qs from 'qs';
 import rules from '~/utils/rules';
 import CountDownTimer from '~/components/CountDownTimer';
+import {Message} from 'element-ui';
 
 export default {
   name: 'Person',
@@ -137,12 +138,13 @@ export default {
   data: () => ({
     formDialog: false,
     qrCodeDialog: false,
-    writeOffQrCodeBase64: '',
     rules: rules,
     valid: true,
+    viewState: true, // 当前查看为有效券或失效券
+    writeOffQrCodeBase64: '',
     realName: '',
     phone: '',
-    viewState: true, // 当前查看为有效券或失效券
+    cardId: null, // 抽到的卡券id
   }),
   computed: {
     ...mapState({
@@ -154,24 +156,48 @@ export default {
         : true,// 抽奖填写信息配置
     }),
   },
+  watch: {
+    qrCodeDialog(val) {
+      if (val) {
+        this.getQrCode(`/qrcode/writeoff?${qs.stringify({
+          real_name: this.realName,
+          phone: this.phone,
+          card_id: this.cardId,
+        })}`);
+      } else {
+        this.realName = '';
+        this.phone = '';
+        this.cardId = null;
+      }
+    },
+  },
   mounted() {
-    this.addOneself(this.$route.query.shopid);
+    this.addCardList(this.$route.query.shopid);
+    window.Echo.channel('publicChannel').listen('MessageEvent', async (e) => {
+      if (e.message && this.oneself &&
+        JSON.parse(e.message).signal === 'writeOff' &&
+        this.oneself.id === JSON.parse(e.message)['user_id']) {
+        this.addCardList(this.$route.query.shopid);
+        Message.success('核销成功');
+        this.formDialog = false;
+        this.qrCodeDialog = false;
+      }
+    });
   },
   methods: {
     ...mapActions({
-      addOneself: 'oneself/addCardList',
+      addCardList: 'oneself/addCardList',
     }),
     openFormDialog(item) {
       if (!item.state) return false;
+      this.cardId = item.id;
       if (!this.lotteryNeedsToFillInTheInformation || (this.oneself['real_name'] && this.oneself['phone'])) {
-        this.getQrCode(`/qrcode/writeoff`);
         return this.qrCodeDialog = true;
       }
       this.formDialog = true;
     },
     async submit() {
       if (this.$refs.form.validate()) {
-        this.getQrCode(`/qrcode/writeoff?real_name=${qs.stringify(this.realName)}&phone=${this.phone}`);
         this.qrCodeDialog = !this.qrCodeDialog;
       }
     },
