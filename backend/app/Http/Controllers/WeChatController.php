@@ -179,7 +179,7 @@ class WeChatController extends WebController {
 
         // 卡券所属用户
         $client = $winningLog->user();
-        if ($winningLog->user()->get()->isEmpty()) {
+        if ($client->get()->isEmpty()) {
             return $this->response(ResponseMessage::$message[500004]);
         }
 
@@ -188,7 +188,7 @@ class WeChatController extends WebController {
 
         $winningLog->write_off_state = TRUE;
         $winningLog->write_off_date  = date('Y-m-d h:i:s', time());
-        $winningLog->save();
+        $this->saveModel($winningLog);
 
         $winningLog->writeOffer()->attach($writeOffer->id);
 

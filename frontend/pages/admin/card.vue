@@ -159,14 +159,16 @@
           <td class="text-xs-center">{{ props.item.state ? '启用' : '未启用' }}</td>
           <td class="text-xs-center">{{ `${mul(props.item['probability'], 100)}%` }}</td>
           <td class="text-xs-center">
-            <div v-if="!!props.item['activity_id_list']">
+            <div v-if="props.item['activity_id_list'].length">
               <v-btn
                 v-for="item in props.item['activity_id_list']"
                 :key="item"
                 small
                 flat
-                @click="changePage(`/admin/activity?activity=${activityList.filter(v=>v.id===item)[0]['activity_name']}`)">
-                {{ activityList.filter(v=>v.id===item)[0]['activity_name'] }}
+                @click="changePage(`/admin/activity?activity=${activityList.filter(v=>v.id===item)[0] ?
+                activityList.filter(v=>v.id===item)[0]['activity_name'] : ''}`)">
+                {{ activityList.filter(v=>v.id===item)[0] ? activityList.filter(v=>v.id===item)[0]['activity_name'] :
+                '暂无' }}
               </v-btn>
             </div>
             <div v-else>未被使用</div>
