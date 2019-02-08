@@ -13,13 +13,14 @@ use App\Helpers\Api\ApiResponse;
 use App\Http\Controllers\Controller;
 
 class ApiController extends Controller {
-  
-  use ApiResponse;
-  
-  protected function save_model($model) {
-    if (!$model->save()) {
-      return $this->internalServerError();
+
+    use ApiResponse;
+
+    protected function save_model($model) {
+        if ( ! $model->save()) {
+            return $this->internalServerError();
+        }
+
+        return TRUE;
     }
-    return TRUE;
-  }
 }

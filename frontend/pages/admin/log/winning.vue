@@ -85,18 +85,22 @@
             userList.filter(item=>item.id===props.item['user_id'])[0]['username'] : '暂无' }}
           </td>
           <td class="text-xs-center">
-            {{ userList.filter(item=>item.id===props.item['user_id'])[0]['real_name'] || '暂无' }}
+            {{ userList.filter(item=>item.id===props.item['user_id'])[0] ?
+            userList.filter(item=>item.id===props.item['user_id'])[0]['real_name'] : '暂无' }}
           </td>
           <td class="text-xs-center">
-            {{ userList.filter(item=>item.id===props.item['user_id'])[0]['phone'] || '暂无' }}
+            {{ userList.filter(item=>item.id===props.item['user_id'])[0] ?
+            userList.filter(item=>item.id===props.item['user_id'])[0]['phone'] : '暂无' }}
           </td>
           <td class="text-xs-center">
             <v-avatar
               slot="activator"
               size="48px">
               <img
+                v-if="userList.filter(item=>item.id===props.item['user_id'])[0]"
                 :src="userList.filter(item=>item.id===props.item['user_id'])[0]['head_img_url']"
                 alt="Avatar">
+              <div v-else>暂无</div>
             </v-avatar>
           </td>
           <td class="text-xs-center">{{ props.item.location }}</td>

@@ -18,9 +18,20 @@ use EasyWeChat\Kernel\Messages\Message;
 use GuzzleHttp\Client;
 use Illuminate\Http\Request;
 
-class WeChatController extends Controller {
+class WeChatController extends WebController {
 
-    public function test() {
+    /**
+     * 处理微信的请求消息
+     *
+     * @return string
+     */
+    public function serve() {
+        $app = app('wechat.official_account');
+
+        $app->server->push(TextMessageHandler::class, Message::TEXT); // 文本消息
+        $app->server->push(EventMessageHandler::class, Message::EVENT); // 事件消息
+
+        return $app->server->serve();
     }
 
     /**
@@ -32,7 +43,7 @@ class WeChatController extends Controller {
      */
     public function wechatAuthorize(Request $request) {
         if ( ! $request->exists("url")) {
-            return "参数错误";
+            return $this->response("参数错误");
         }
         $url = $request->get("url");
 
@@ -68,18 +79,18 @@ class WeChatController extends Controller {
 
         $userList = User::where("openid", $wechatUser->getId())->get();
         if ($userList->isEmpty()) {
-            return "用户不存在";
+            return $this->response("用户不存在");
         } elseif ($userList->first()->identity !== 3) {
-            return "无权限";
+            return $this->response("无权限");
         }
 
         // 通过验证发送消息
-        broadcast(new MessageEvent(json_encode([
+        $this->sendBroad([
             "signal" => "allowLogin",
             "openid" => $wechatUser->getId(),
-        ])));
+        ]);
 
-        return "登录成功";
+        return $this->response("登录成功");
     }
 
     /**
@@ -95,7 +106,7 @@ class WeChatController extends Controller {
         // 用户认证
         $userList = User::where("openid", $wechatUser["openid"])->get();
         if ($userList->isNotEmpty()) {
-            return "用户已存在";
+            return $this->response("用户已存在");
         }
 
         $user               = new User;
@@ -103,14 +114,14 @@ class WeChatController extends Controller {
         $user->username     = $wechatUser["nickname"];
         $user->head_img_url = $wechatUser["headimgurl"];
         $user->identity     = 1;
-        $user->save();
+        $this->save_model($user);
 
         // 通过验证发送消息
-        broadcast(new MessageEvent(json_encode([
+        $this->sendBroad([
             "signal" => "allowAddBoss",
-        ])));
+        ]);
 
-        return "添加成功";
+        return $this->response("添加成功");
     }
 
     /**
@@ -122,10 +133,7 @@ class WeChatController extends Controller {
      */
     public function grantWriteOff(Request $request) {
         if ( ! $request->has("card_id") || ! $request->get("card_id")) {
-            return "缺少卡券参数";
-        }
-        if ( ! $request->has("card_id") || ! $request->get("card_id")) {
-            return "缺少卡券参数";
+            return $this->response("缺少卡券参数");
         }
 
         $app = app('wechat.official_account');
@@ -134,30 +142,30 @@ class WeChatController extends Controller {
         $writeOffer = User::where("openid", $app->oauth->user()->getId())->first();
 
         if ( ! $writeOffer) {
-            return "用户不存在";
+            return $this->response("用户不存在");
         }
         if ($writeOffer->identity !== 1 && $writeOffer->identity !== 2) {
-            return "无权限";
+            return $this->response("无权限");
         }
 
         $card = Card::find($request->get("card_id"));
         if ( ! $card) {
-            return "无效的卡券";
+            return $this->response("无效的卡券");
         }
 
         // 卡券中奖记录
         $winningLog = $card->winningLog()->first();
         if ( ! $winningLog) {
-            return "无效的卡券";
+            return $this->response("无效的卡券");
         }
         if ((boolean) $winningLog->write_off_state) {
-            return "次卡券已被核销";
+            return $this->response("次卡券已被核销");
         }
 
         // 卡券所属用户
         $user = $winningLog->user();
         if ($winningLog->user()->get()->isEmpty()) {
-            return "无主的卡券";
+            return $this->response("无主的卡券");
         }
 
         $card->state = FALSE;
@@ -170,26 +178,12 @@ class WeChatController extends Controller {
         $winningLog->writeOffer()->attach($writeOffer->id);
 
         // 通过发送核销成功消息
-        broadcast(new MessageEvent(json_encode([
+        $this->sendBroad([
             "signal"  => "writeOff",
             "user_id" => $user->first()->id,
-        ])));
+        ]);
 
-        return "核销成功";
-    }
-
-    /**
-     * 处理微信的请求消息
-     *
-     * @return string
-     */
-    public function serve() {
-        $app = app('wechat.official_account');
-
-        $app->server->push(TextMessageHandler::class, Message::TEXT); // 文本消息
-        $app->server->push(EventMessageHandler::class, Message::EVENT); // 事件消息
-
-        return $app->server->serve();
+        return $this->response("核销成功");
     }
 
     /**
