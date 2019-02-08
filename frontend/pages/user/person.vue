@@ -71,11 +71,13 @@
           <v-card-text>
             <v-text-field
               :rules="rules.nameRules"
+              v-model="realName"
               :counter="10"
               label="姓名"
               append-icon="account_circle"/>
             <v-text-field
               :rules="rules.phoneRules"
+              v-model="phone"
               label="电话号码"
               required
               append-icon="phone_iphone"/>
@@ -105,7 +107,9 @@
           <span>请将二维码交予老板核销</span>
           <v-spacer/>
         </v-card-title>
-        <v-img src="http://upload.mnw.cn/2016/0126/1453768615784.jpg"/>
+        <v-img
+          v-if="writeOffQrCodeBase64"
+          :src="`data:image/png;base64,${writeOffQrCodeBase64}`"/>
         <v-card-actions>
           <v-btn
             color="primary"
@@ -120,6 +124,7 @@
 
 <script>
 import {mapState, mapActions} from 'vuex';
+import qs from 'qs';
 import rules from '~/utils/rules';
 import CountDownTimer from '~/components/CountDownTimer';
 
@@ -132,13 +137,17 @@ export default {
   data: () => ({
     formDialog: false,
     qrCodeDialog: false,
+    writeOffQrCodeBase64: '',
     rules: rules,
     valid: true,
+    realName: '',
+    phone: '',
     viewState: true, // 当前查看为有效券或失效券
   }),
   computed: {
     ...mapState({
       oneselfCardList: state => state.oneself.cardList ? state.oneself.cardList : [], // 剩余抽奖次数
+      oneself: state => state.oneself.oneself ? state.oneself.oneself : {}, // 当前用户
       lotteryNeedsToFillInTheInformation: state => state.systemConfig.systemConfig ?
         /^true$/i.test(state.systemConfig.systemConfig.filter(
           item => item['config_name'] === 'lotteryNeedsToFillInTheInformation')[0]['config_value'])
@@ -154,19 +163,25 @@ export default {
     }),
     openFormDialog(item) {
       if (!item.state) return false;
-      if (!this.lotteryNeedsToFillInTheInformation) {
+      if (!this.lotteryNeedsToFillInTheInformation || (this.oneself['real_name'] && this.oneself['phone'])) {
+        this.getQrCode(`/qrcode/writeoff`);
         return this.qrCodeDialog = true;
       }
       this.formDialog = true;
     },
-    submit() {
+    async submit() {
       if (this.$refs.form.validate()) {
+        this.getQrCode(`/qrcode/writeoff?real_name=${qs.stringify(this.realName)}&phone=${this.phone}`);
         this.qrCodeDialog = !this.qrCodeDialog;
       }
     },
     closeFormDialog() {
       this.formDialog = false;
       this.$refs.form.reset();
+    },
+    async getQrCode(url) {
+      const {data} = await this.$axios.$get(url);
+      this.writeOffQrCodeBase64 = data;
     },
     closeQrCodeDialog() {
       this.qrCodeDialog = false;

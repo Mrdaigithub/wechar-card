@@ -123,9 +123,9 @@ class CardController extends ApiController {
     /**
      * 获取用户当前商铺中奖的奖品id
      *
-     * @param                   $id
+     * @param                                                  $id
      *
-     * @param \http\Env\Request $request
+     * @param \App\Http\Requests\GetLotteryCardByShopIdRequest $request
      *
      * @return \Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response|mixed
      */
@@ -184,11 +184,9 @@ class CardController extends ApiController {
         })->values();
 
         // 随机抽取卡券
-        $res = NULL;
-        for (
-            $randomNum = lcg_value(), $sum = 0, $item = 0;
-            $item < count($cardProbabilityList); $item++
-        ) {
+        $res     = NULL;
+        $newCard = NULL;
+        for ($randomNum = lcg_value(), $sum = 0, $item = 0; $item < count($cardProbabilityList); $item++) {
             $sum += $cardProbabilityList[ $item ]["probability"];
             if ($randomNum <= $sum) {
                 $res = $cardProbabilityList[ $item ]["id"];
@@ -227,7 +225,10 @@ class CardController extends ApiController {
         $this->oneself["lottery_num"] -= 1;
         $this->save_model($this->oneself);
 
-        return $this->success($res);
+        return $this->success([
+            "index"   => $res,
+            "card_id" => $newCard ? $newCard->id : NULL,
+        ]);
     }
 
     /**

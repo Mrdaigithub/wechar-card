@@ -90,11 +90,13 @@
             <v-text-field
               :rules="rules.nameRules"
               :counter="10"
+              v-model="realName"
               label="姓名"
               required
               append-icon="account_circle"/>
             <v-text-field
               :rules="rules.phoneRules"
+              v-model="phone"
               label="电话号码"
               required
               append-icon="phone_iphone"/>
@@ -124,7 +126,9 @@
           <span>请将二维码交予老板核销</span>
           <v-spacer/>
         </v-card-title>
-        <v-img src="http://upload.mnw.cn/2016/0126/1453768615784.jpg"/>
+        <v-img
+          v-if="writeOffQrCodeBase64"
+          :src="`data:image/png;base64,${writeOffQrCodeBase64}`"/>
         <v-card-actions>
           <v-btn
             color="primary"
@@ -139,6 +143,8 @@
 
 <script>
 import {mapState, mapActions} from 'vuex';
+import qs from 'qs';
+import {Message} from 'element-ui';
 import rules from '~/utils/rules';
 import randomSort from '~/utils/randomSort';
 import rangeRandom from '~/utils/rangeRandom';
@@ -175,10 +181,15 @@ export default {
     qrCodeDialog: false,
     rules: rules,
     valid: true,
+    writeOffQrCodeBase64: '',
+    realName: '',
+    phone: '',
+    cardId: null, // 抽到的卡券id
   }),
   computed: {
     ...mapState({
       location: state => state.oneself.location ? state.oneself.location : '', // 用户所在区域
+      oneself: state => state.oneself.oneself ? state.oneself.oneself : {}, // 当前用户
       lotteryNum: state => state.oneself.oneself ? state.oneself.oneself['lottery_num'] : 0, // 剩余抽奖次数
       lotteryNeedsToFillInTheInformation: state => state.systemConfig.systemConfig ?
         /^true$/i.test(state.systemConfig.systemConfig.filter(
@@ -224,8 +235,33 @@ export default {
       return res;
     },
   },
+  watch: {
+    qrCodeDialog(val) {
+      if (val) {
+        this.getQrCode(`/qrcode/writeoff?${qs.stringify({
+          real_name: this.realName,
+          phone: this.phone,
+          card_id: this.cardId,
+        })}`);
+      } else {
+        this.realName = '';
+        this.phone = '';
+        this.cardId = null;
+      }
+    },
+  },
   created() {
     this.initPrizeList();
+  },
+  mounted() {
+    window.Echo.channel('publicChannel').listen('MessageEvent', async (e) => {
+      if (e.message && this.oneself &&
+        JSON.parse(e.message).signal === 'writeOff' &&
+        this.oneself.id === JSON.parse(e.message)['user_id']) {
+        Message.success('核销成功');
+        setTimeout(() => this.qrCodeDialog = false, 500);
+      }
+    });
   },
   methods: {
     ...mapActions({
@@ -234,14 +270,16 @@ export default {
     //此方法为处理奖品数据
     initPrizeList(list) {},
     rotateHandle() {
+      this.cardId = null;
       this.rotating();
     },
     async rotating() {
       if (!this.click_flag) return;
       const {data} = await this.$axios.$get(`/card/lottery/shop/${this.$route.query.shopid}?location=${this.location}`);
-      if (data) {
+      if (data.index) {
+        this.cardId = data['card_id'];
         this.cardModelList.forEach((item, index) => {
-          if (item['id'] === data) {
+          if (item['id'] === data.index) {
             this.index = index;
           }
         });
@@ -293,10 +331,10 @@ export default {
         return false;
       }
       this.closeToast();
-      if (this.lotteryNeedsToFillInTheInformation) {
-        this.formDialog = true;
-      } else {
+      if (!this.lotteryNeedsToFillInTheInformation || (this.oneself['real_name'] && this.oneself['phone'])) {
         this.qrCodeDialog = true;
+      } else {
+        this.formDialog = true;
       }
     },
     submit() {
@@ -308,6 +346,10 @@ export default {
       this.qrCodeDialog = false;
       this.formDialog = false;
       this.$refs.form.reset();
+    },
+    async getQrCode(url) {
+      const {data} = await this.$axios.$get(url);
+      this.writeOffQrCodeBase64 = data;
     },
   },
 };

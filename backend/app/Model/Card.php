@@ -21,4 +21,11 @@ class Card extends Model {
             "card_id",
             "activity_id");
     }
+
+    public function winningLog() {
+        return $this->belongsToMany("App\Model\WinningLog",
+            "winning_log_card",
+            "card_id",
+            "winning_log_id");
+    }
 }

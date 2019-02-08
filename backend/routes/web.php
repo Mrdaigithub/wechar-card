@@ -24,6 +24,7 @@ Route::prefix('/wechat')->group(function() {
   Route::get("/grant/lottery/user", "WeChatController@grantLotteryUser");
   Route::get("/grant/login/admin", "WeChatController@grantLoginAdmin");
   Route::get("/grant/add/boss", "WeChatController@grantAddBoss");
+  Route::get("/grant/writeoff", "WeChatController@grantWriteOff");
   Route::get('/token', 'WeChatController@getAccessToken');
   Route::get('/jssdk/config', 'WeChatController@getJsSdkConfig');
   Route::get('/geocoder', 'WeChatController@geocoder');

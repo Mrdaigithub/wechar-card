@@ -75,18 +75,17 @@
                         var latitude = res.latitude; // 纬度，浮点数，范围为90 ~ -90
                         var longitude = res.longitude; // 经度，浮点数，范围为180 ~ -180。
                         var geocoderUrl = '<?php echo env("DOMAIN") . "/wechat/geocoder"?>';
-                        ajax("GET", geocoderUrl + "?location=" + latitude + "," + longitude, function (res) {
-                                city = JSON.parse(res).result.addressComponent.city;
-                                var requestShopLocationUrl = '<?php echo env("DOMAIN") . "/wechat/shop/"?>' + shopId + '/location';
-                                ajax("GET", requestShopLocationUrl, function (res) {
-                                    if (city !== res) {
-                                        dialog("当前所在区域无法参加活动");
-                                    } else {
-                                        window.location.href = `${url}?openid=${openid}&shopid=${shopId}&location=${encodeURIComponent(city)}`;
-                                    }
-                                })
-                            }
-                        );
+                        ajax("GET", geocoderUrl + "?location=" + latitude + "," + longitude + "&time=" + new Date().getTime(), function (res) {
+                            city = JSON.parse(res).result.addressComponent.city;
+                            var requestShopLocationUrl = '<?php echo env("DOMAIN") . "/wechat/shop/"?>' + shopId + '/location';
+                            ajax("GET", requestShopLocationUrl, function (res) {
+                                if (city !== res) {
+                                    dialog("当前所在区域无法参加活动");
+                                } else {
+                                    window.location.href = `${url}?openid=${openid}&shopid=${shopId}&location=${encodeURIComponent(city)}`;
+                                }
+                            })
+                        });
                     },
                     fail: function () {
                         alert("无法获取你的位置信息")

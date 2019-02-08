@@ -11,6 +11,7 @@ namespace App\Http\Controllers;
 use App\Events\MessageEvent;
 use App\Http\Controllers\Handler\EventMessageHandler;
 use App\Http\Controllers\Handler\TextMessageHandler;
+use App\Model\Card;
 use App\Model\Shop;
 use App\Model\User;
 use EasyWeChat\Kernel\Messages\Message;
@@ -110,6 +111,71 @@ class WeChatController extends Controller {
         ])));
 
         return "添加成功";
+    }
+
+    /**
+     * 认证通过店员信息并进行核销操作
+     *
+     * @param \Illuminate\Http\Request $request
+     *
+     * @return string
+     */
+    public function grantWriteOff(Request $request) {
+        if ( ! $request->has("card_id") || ! $request->get("card_id")) {
+            return "缺少卡券参数";
+        }
+        if ( ! $request->has("card_id") || ! $request->get("card_id")) {
+            return "缺少卡券参数";
+        }
+
+        $app = app('wechat.official_account');
+
+        // 用户认证确认是否为店员老板
+        $writeOffer = User::where("openid", $app->oauth->user()->getId())->first();
+
+        if ( ! $writeOffer) {
+            return "用户不存在";
+        }
+        if ($writeOffer->identity !== 1 && $writeOffer->identity !== 2) {
+            return "无权限";
+        }
+
+        $card = Card::find($request->get("card_id"));
+        if ( ! $card) {
+            return "无效的卡券";
+        }
+
+        // 卡券中奖记录
+        $winningLog = $card->winningLog()->first();
+        if ( ! $winningLog) {
+            return "无效的卡券";
+        }
+        if ((boolean) $winningLog->write_off_state) {
+            return "次卡券已被核销";
+        }
+
+        // 卡券所属用户
+        $user = $winningLog->user();
+        if ($winningLog->user()->get()->isEmpty()) {
+            return "无主的卡券";
+        }
+
+        $card->state = FALSE;
+        $card->save();
+
+        $winningLog->write_off_state = TRUE;
+        $winningLog->write_off_date  = date('Y-m-d h:i:s', time());
+        $winningLog->save();
+
+        $winningLog->writeOffer()->attach($writeOffer->id);
+
+        // 通过发送核销成功消息
+        broadcast(new MessageEvent(json_encode([
+            "signal"  => "writeOff",
+            "user_id" => $user->first()->id,
+        ])));
+
+        return "核销成功";
     }
 
     /**
