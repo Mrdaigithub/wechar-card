@@ -53,6 +53,7 @@
 <script>
 import {mapState, mapActions} from 'vuex';
 import qs from 'qs';
+import {Loading} from 'element-ui';
 
 export default {
   name: 'AdminSystemConfig',
@@ -91,13 +92,15 @@ export default {
     },
   },
   mounted() {
-    this.addSystemConfig();
+    Loading.service({fullscreen: true});
+    this.addSystemConfig(Loading.service({fullscreen: true}).close());
   },
   methods: {
     ...mapActions({
       addSystemConfig: 'systemConfig/addSystemConfig',
     }),
     async save() {
+      Loading.service({fullscreen: true});
       for (let item of this.systemConfigList) {
         let _item = JSON.parse(JSON.stringify(item));
         if (_item['config_name'] === 'lotteryNeedsToFillInTheInformation') {
@@ -108,7 +111,7 @@ export default {
           const {data} = await this.$axios.$put(`/system/config/${item['id']}`, qs.stringify(_item));
         }
       }
-      this.addSystemConfig();
+      this.addSystemConfig(Loading.service({fullscreen: true}).close());
     },
   },
 };

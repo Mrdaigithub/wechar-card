@@ -159,7 +159,7 @@
           <td class="text-xs-center">{{ props.item.state ? '启用' : '未启用' }}</td>
           <td class="text-xs-center">{{ `${mul(props.item['probability'], 100)}%` }}</td>
           <td class="text-xs-center">
-            <div v-if="props.item['activity_id_list'].length">
+            <div v-if="props.item['activity_id_list'] && props.item['activity_id_list'].length">
               <v-btn
                 v-for="item in props.item['activity_id_list']"
                 :key="item"
@@ -211,6 +211,7 @@
 import {mapState, mapActions} from 'vuex';
 import qs from 'qs';
 import calc from 'calculatorjs';
+import {Loading} from 'element-ui';
 
 export default {
   name: 'AdminCard',
@@ -291,11 +292,12 @@ export default {
     },
   },
   mounted() {
+    Loading.service({fullscreen: true});
     if (this.$route.query.activity) {
       this.search = this.$route.query.activity;
     }
     this.addCardModelList();
-    this.addActivityList();
+    this.addActivityList(Loading.service({fullscreen: true}).close());
   },
   methods: {
     ...mapActions({
@@ -326,8 +328,9 @@ export default {
     },
     async deleteItem(item) {
       if (confirm(`确定要删除 ${item.card_name} ?`)) {
+        Loading.service({fullscreen: true});
         await this.$axios.$delete(`/card/${item.id}`);
-        this.addCardModelList();
+        this.addCardModelList(Loading.service({fullscreen: true}).close());
       }
     },
     close() {
@@ -358,6 +361,7 @@ export default {
             _editedItem.end_time_1 = this.mul(this.editedItem.end_time_1, 60) || 0;
           }
 
+          Loading.service({fullscreen: true});
           if (this.editedIndex > -1) {
             // 编辑
             await this.$axios.$put(`/card/${this.editedItem.id}`, qs.stringify(_editedItem));
@@ -366,7 +370,7 @@ export default {
             await this.$axios.$post(`/card`, qs.stringify(_editedItem));
           }
           this.close();
-          this.addCardModelList();
+          this.addCardModelList(Loading.service({fullscreen: true}).close());
         }
       });
     },

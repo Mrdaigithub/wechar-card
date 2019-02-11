@@ -9,8 +9,9 @@ export const mutations = {
 };
 
 export const actions = {
-  async addWinningLogList({commit}) {
+  async addWinningLogList({commit}, cb = () => null) {
     const {data} = await this.$axios.$get(`/log/winning`);
     commit('addWinningLogList', data);
+    cb();
   },
 };

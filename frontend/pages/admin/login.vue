@@ -10,10 +10,14 @@
         sm8
         xs12>
         <h2>管理员登录</h2>
-        <img
-          v-if="loginQrCodeBase64"
-          :src="`data:image/png;base64,${loginQrCodeBase64}`"
-          alt="">
+        <v-content style="height: 300px">
+          <v-img
+            v-if="loginQrCodeBase64"
+            :src="`data:image/png;base64,${loginQrCodeBase64}`"
+            style="margin: auto;"
+            width="300"
+            alt=""/>
+        </v-content>
       </v-flex>
     </v-layout>
   </v-container>
@@ -21,6 +25,7 @@
 
 <script>
 import {mapMutations, mapActions} from 'vuex';
+import {Loading} from 'element-ui';
 
 export default {
   name: 'AdminLogin',
@@ -29,8 +34,10 @@ export default {
     loginQrCodeBase64: '',
   }),
   async mounted() {
+    Loading.service({fullscreen: true});
     const {data} = await this.$axios.$get(`/qrcode/admin/login`);
     this.loginQrCodeBase64 = data;
+    Loading.service({fullscreen: true}).close();
 
     window.Echo.channel('publicChannel').listen('MessageEvent', async (e) => {
       if (e.message && JSON.parse(e.message).signal === 'allowLogin' && JSON.parse(e.message).openid) {

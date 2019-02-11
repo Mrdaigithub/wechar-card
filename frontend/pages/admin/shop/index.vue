@@ -206,6 +206,7 @@
 import {mapState, mapActions} from 'vuex';
 import qs from 'qs';
 import cityList from '@/utils/cityList';
+import {Loading} from 'element-ui';
 
 export default {
   name: 'AdminShop',
@@ -284,11 +285,12 @@ export default {
     },
   },
   mounted() {
+    Loading.service({fullscreen: true});
     if (this.$route.query.shop) {
       this.search = this.$route.query.shop;
     }
     this.addShopList();
-    this.addActivityList();
+    this.addActivityList(Loading.service({fullscreen: true}).close());
   },
   methods: {
     ...mapActions({
@@ -307,9 +309,10 @@ export default {
     },
     async deleteItem(item) {
       if (confirm(`确定要删除 ${item.shop_name} ?`)) {
+        Loading.service({fullscreen: true});
         await this.$axios.$delete(`/shop/${item.id}`);
         this.addShopList();
-        this.addActivityList();
+        this.addActivityList(Loading.service({fullscreen: true}).close());
       }
     },
     close() {
@@ -332,6 +335,7 @@ export default {
           _editedItem.state = this.editedItem.state ? 1 : 0;
           _editedItem.activity_id = this.editedItem.activity_id ? this.editedItem.activity_id : null;
 
+          Loading.service({fullscreen: true});
           if (this.editedIndex > -1) {
             // 编辑
             await this.$axios.$put(`/shop/${this.editedItem.id}`, qs.stringify(_editedItem));
@@ -341,7 +345,7 @@ export default {
           }
           this.close();
           this.addShopList();
-          this.addActivityList();
+          this.addActivityList(Loading.service({fullscreen: true}).close());
         }
       });
     },

@@ -28,10 +28,12 @@
               <span>店长扫描此二维码以添加</span>
               <v-spacer/>
             </v-card-title>
-            <img
-              v-if="addBossQrCodeBase64"
-              :src="`data:image/png;base64,${addBossQrCodeBase64}`"
-              alt="">
+            <v-content style="height: 300px">
+              <v-img
+                v-if="addBossQrCodeBase64"
+                :src="`data:image/png;base64,${addBossQrCodeBase64}`"
+                alt=""/>
+            </v-content>
             <v-card-actions>
               <v-btn
                 color="primary"
@@ -171,18 +173,18 @@
           slot-scope="props">
           <td class="text-xs-center">{{ props.item.id }}</td>
           <td class="text-xs-center">{{ props.item.username }}</td>
-          <td class="text-xs-center">{{ props.item.real_name ? props.item.real_name : '暂无' }}</td>
+          <td class="text-xs-center">{{ props.item['real_name'] ? props.item['real_name'] : '暂无' }}</td>
           <td class="text-xs-center">{{ props.item.phone ? props.item.phone : '暂无' }}</td>
           <td class="text-xs-center">
             <v-avatar
               slot="activator"
               size="48px">
-              <img
-                :src="props.item.head_img_url"
-                alt="Avatar">
+              <v-img
+                :src="props.item['head_img_url']"
+                alt="Avatar"/>
             </v-avatar>
           </td>
-          <td class="text-xs-center">{{ props.item.openid }}</td>
+          <td class="text-xs-center">{{ props.item['openid'] }}</td>
           <td class="text-xs-center">
             <v-btn
               v-if="!!props.item.shop_id && shopList.filter(e=>props.item.shop_id ===e.id).length >=1"
@@ -234,7 +236,7 @@
 <script>
 import {mapState, mapActions} from 'vuex';
 import qs from 'qs';
-import {Message} from 'element-ui';
+import {Message, Loading} from 'element-ui';
 
 export default {
   name: 'AdminShopEmployee',
@@ -336,9 +338,11 @@ export default {
       this.$router.push(url);
     },
     async addItem() {
+      Loading.service({fullscreen: true});
       this.addDialog = true;
       const {data} = await this.$axios.$get(`/qrcode/add/boss`);
       this.addBossQrCodeBase64 = data;
+      Loading.service({fullscreen: true}).close();
       window.Echo.channel('publicChannel').listen('MessageEvent', async (e) => {
         if (e.message && JSON.parse(e.message).signal === 'allowAddBoss') {
           Message.success('添加成功');
@@ -356,9 +360,10 @@ export default {
     },
     async deleteItem(item) {
       if (confirm(`确定要删除 ${item.identity === 1 ? '老板' : '员工'}--${item.username} ?`)) {
+        Loading.service({fullscreen: true});
         await this.$axios.$delete(`/user/shop/${item.id}`);
         this.addShopEmployeeList();
-        this.addShopList();
+        this.addShopList(Loading.service({fullscreen: true}).close());
       }
     },
     close() {
@@ -386,12 +391,14 @@ export default {
           _editedItem.shop_id = this.editedItem.shop_id;
           _editedItem.state = this.editedItem.state ? 1 : 0;
           _editedItem.remarks = this.editedItem.remarks;
+
+          Loading.service({fullscreen: true});
           if (this.editedIndex > -1) {
             await this.$axios.$put(`/user/shop/${this.editedItem.id}`, qs.stringify(_editedItem));
           } else {
           }
           this.close();
-          this.addShopEmployeeList();
+          this.addShopEmployeeList(Loading.service({fullscreen: true}).close());
         }
       });
     },

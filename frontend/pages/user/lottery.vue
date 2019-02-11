@@ -144,7 +144,7 @@
 <script>
 import {mapState, mapActions} from 'vuex';
 import qs from 'qs';
-import {Message} from 'element-ui';
+import {Message, Loading} from 'element-ui';
 import rules from '~/utils/rules';
 import randomSort from '~/utils/randomSort';
 import rangeRandom from '~/utils/rangeRandom';
@@ -275,8 +275,10 @@ export default {
       this.rotating();
     },
     async rotating() {
+      Loading.service({fullscreen: true});
       if (!this.click_flag) return;
       const {data} = await this.$axios.$get(`/card/lottery/shop/${this.$route.query.shopid}?location=${this.location}`);
+      Loading.service({fullscreen: true}).close();
       if (data.index) {
         this.cardId = data['card_id'];
         this.cardModelList.forEach((item, index) => {

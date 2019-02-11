@@ -6,15 +6,14 @@ export default function({$axios, store}) {
       config.headers.common['Authorization'] = `Bearer ${store.state.oneself.token}`;
     }
   });
-  $axios.onResponse((res) => {
-    return res;
-  });
   $axios.onRequestError(error => {
     Message.error(
       error.response.data.message ? error.response.data.message : '客户端请求错误');
+    Loading.service({fullscreen: true}).close();
   });
   $axios.onResponseError(error => {
     Message.error(
       error.response.data.message ? error.response.data.message : '未知错误');
+    Loading.service({fullscreen: true}).close();
   });
 }

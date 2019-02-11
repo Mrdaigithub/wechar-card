@@ -154,15 +154,15 @@ class WeChatController extends WebController {
         // 是否为本店的人员
         $cardModelActivity = Card::find($card->parentid)->activity();
         if ($cardModelActivity->get()->isEmpty()) {
-            return $this->response(ResponseMessage::$message[500004]);
+            return $this->response(ResponseMessage::$message[500005]);
         }
         $cardModelActivityShop = $cardModelActivity->first()->shops();
         if ($cardModelActivityShop->get()->isEmpty()) {
-            return $this->response(ResponseMessage::$message[500004]);
+            return $this->response(ResponseMessage::$message[400025]);
         }
         $writeOfferShop = $writeOffer->shop();
         if ($writeOfferShop->get()->isEmpty()) {
-            return $this->response(ResponseMessage::$message[500004]);
+            return $this->response(ResponseMessage::$message[400026]);
         }
         if ($writeOfferShop->first()->id !== $cardModelActivityShop->first()->id) {
             return $this->response(ResponseMessage::$message[403000]);

@@ -9,8 +9,9 @@ export const mutations = {
 };
 
 export const actions = {
-  async addSystemConfig({commit}) {
+  async addSystemConfig({commit}, cb = () => null) {
     const {data} = await this.$axios.$get(`/system/config`);
     commit('addSystemConfig', data);
+    cb();
   },
 };

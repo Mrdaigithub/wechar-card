@@ -96,10 +96,10 @@
             <v-avatar
               slot="activator"
               size="48px">
-              <img
+              <v-img
                 v-if="userList.filter(item=>item.id===props.item['user_id'])[0]"
                 :src="userList.filter(item=>item.id===props.item['user_id'])[0]['head_img_url']"
-                alt="Avatar">
+                alt="Avatar"/>
               <div v-else>暂无</div>
             </v-avatar>
           </td>
@@ -110,7 +110,7 @@
             shopEmployeeList.filter(item=>item.id===props.item['write_offer_id'])[0]['username'] : '暂无' }}
           </td>
           <td class="text-xs-center">{{ props.item['write_off_state'] ? '已核销' : '未核销' }}</td>
-          <td class="text-xs-center">{{ props.item.write_off_date || '暂无' }}</td>
+          <td class="text-xs-center">{{ props.item['write_off_date'] || '暂无' }}</td>
         </template>
         <template slot="no-data">
           <v-alert

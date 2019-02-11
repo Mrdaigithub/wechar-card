@@ -110,21 +110,21 @@
           slot-scope="props">
           <td class="text-xs-center">{{ props.item.id }}</td>
           <td class="text-xs-center">{{ props.item.username }}</td>
-          <td class="text-xs-center">{{ props.item.real_name ? props.item.real_name : '暂无' }}</td>
+          <td class="text-xs-center">{{ props.item['real_name'] ? props.item['real_name'] : '暂无' }}</td>
           <td class="text-xs-center">{{ props.item.phone ? props.item.phone : '暂无' }}</td>
           <td class="text-xs-center">
             <v-avatar
               slot="activator"
               size="48px">
-              <img
-                :src="props.item.head_img_url"
-                alt="Avatar">
+              <v-img
+                :src="props.item['head_img_url']"
+                alt="Avatar"/>
             </v-avatar>
           </td>
-          <td class="text-xs-center">{{ props.item.openid }}</td>
-          <td class="text-xs-center">{{ props.item.sign_in_num }}</td>
-          <td class="text-xs-center">{{ props.item.lottery_num }}</td>
-          <td class="text-xs-center">{{ props.item.created_at }}</td>
+          <td class="text-xs-center">{{ props.item['openid'] }}</td>
+          <td class="text-xs-center">{{ props.item['sign_in_num'] }}</td>
+          <td class="text-xs-center">{{ props.item['lottery_num'] }}</td>
+          <td class="text-xs-center">{{ props.item['created_at'] }}</td>
           <td class="text-xs-center">{{ props.item.remarks ? props.item.remarks : '暂无' }}</td>
           <td class="text-xs-center">
             <v-icon
@@ -132,11 +132,6 @@
               class="mr-2"
               @click="editItem(props.item)">
               edit
-            </v-icon>
-            <v-icon
-              small
-              @click="deleteItem(props.item)">
-              delete
             </v-icon>
           </td>
         </template>
@@ -163,6 +158,7 @@
 <script>
 import {mapState, mapActions} from 'vuex';
 import qs from 'qs';
+import {Loading} from 'element-ui';
 
 export default {
   name: 'AdminUser',
@@ -240,7 +236,8 @@ export default {
     },
   },
   mounted() {
-    this.addUserList();
+    Loading.service({fullscreen: true});
+    this.addUserList(Loading.service({fullscreen: true}).close());
   },
   methods: {
     ...mapActions({
@@ -250,10 +247,6 @@ export default {
       this.editedIndex = this.userList.indexOf(item);
       this.editedItem = Object.assign({}, item);
       this.dialog = true;
-    },
-    deleteItem(item) {
-      const index = this.userList.indexOf(item);
-      confirm(`确定要删除 ${item.username} ?`) && this.userList.splice(index, 1);
     },
     close() {
       this.dialog = false;
@@ -272,13 +265,15 @@ export default {
           _editedItem.phone = this.editedItem.phone;
           _editedItem.lottery_num = this.editedItem.lottery_num;
           _editedItem.remarks = this.editedItem.remarks;
+
+          Loading.service({fullscreen: true});
           if (this.editedIndex > -1) {
             // 编辑
             await this.$axios.$put(`/user/plain_user/${this.editedItem.id}`, qs.stringify(_editedItem));
           } else {
           }
           this.close();
-          this.addUserList();
+          this.addUserList(Loading.service({fullscreen: true}).close());
         }
       });
     },

@@ -37,12 +37,14 @@
 
 <script>
 import {mapMutations, mapActions} from 'vuex';
+import {Loading} from 'element-ui';
 
 export default {
   data: () => ({
     bottomNav: '',
   }),
   async created() {
+    Loading.service({fullscreen: true});
     const openid = this.$route.query.openid;
     // Todo 清除url上的openid
     // this.$router.replace(`${this.$route.path}?shopid=${this.$route.query.shopid}`); // 清除url上的openid
@@ -51,8 +53,8 @@ export default {
     this.addLocation(this.$route.query.location);
     this.addOneself();
     this.addSystemConfig();
-    this.addCard(this.$route.query.shopid);
-    this.addShopActivity(this.$route.query.shopid);
+    this.addCard({arg: this.$route.query.shopid});
+    this.addShopActivity({arg: this.$route.query.shopid, cb: () => Loading.service({fullscreen: true}).close()});
     this.bottomNav = this.$route.path.split('/')[this.$route.path.split('/').length - 1];
   },
   methods: {

@@ -107,9 +107,11 @@
           <span>请将二维码交予老板核销</span>
           <v-spacer/>
         </v-card-title>
-        <v-img
-          v-if="writeOffQrCodeBase64"
-          :src="`data:image/png;base64,${writeOffQrCodeBase64}`"/>
+        <v-content style="height: 300px">
+          <v-img
+            v-if="writeOffQrCodeBase64"
+            :src="`data:image/png;base64,${writeOffQrCodeBase64}`"/>
+        </v-content>
         <v-card-actions>
           <v-btn
             color="primary"
@@ -125,9 +127,9 @@
 <script>
 import {mapState, mapActions} from 'vuex';
 import qs from 'qs';
+import {Message, Loading} from 'element-ui';
 import rules from '~/utils/rules';
 import CountDownTimer from '~/components/CountDownTimer';
-import {Message} from 'element-ui';
 
 export default {
   name: 'Person',
@@ -172,12 +174,14 @@ export default {
     },
   },
   mounted() {
-    this.addCardList(this.$route.query.shopid);
+    Loading.service({fullscreen: true});
+    this.addCardList({arg: this.$route.query.shopid, cb: Loading.service({fullscreen: true}).close()});
     window.Echo.channel('publicChannel').listen('MessageEvent', async (e) => {
       if (e.message && this.oneself &&
         JSON.parse(e.message).signal === 'writeOff' &&
         this.oneself.id === JSON.parse(e.message)['user_id']) {
-        this.addCardList(this.$route.query.shopid);
+        Loading.service({fullscreen: true});
+        this.addCardList({arg: this.$route.query.shopid, cb: () => Loading.service({fullscreen: true}).close()});
         Message.success('核销成功');
         this.formDialog = false;
         this.qrCodeDialog = false;
@@ -206,8 +210,10 @@ export default {
       this.$refs.form.reset();
     },
     async getQrCode(url) {
+      Loading.service({fullscreen: true});
       const {data} = await this.$axios.$get(url);
       this.writeOffQrCodeBase64 = data;
+      Loading.service({fullscreen: true}).close();
     },
     closeQrCodeDialog() {
       this.qrCodeDialog = false;

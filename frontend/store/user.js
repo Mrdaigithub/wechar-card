@@ -13,12 +13,14 @@ export const mutations = {
 };
 
 export const actions = {
-  async addUserList({commit}) {
+  async addUserList({commit}, cb = () => null) {
     const {data} = await this.$axios.$get(`/user/plain_user`);
     commit('addUserList', data);
+    cb();
   },
-  async addShopEmployeeList({commit}) {
+  async addShopEmployeeList({commit}, cb = () => null) {
     const {data} = await this.$axios.$get(`/user/shop`);
     commit('addShopEmployeeList', data);
+    cb();
   },
 };

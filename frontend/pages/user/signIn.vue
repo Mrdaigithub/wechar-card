@@ -32,8 +32,9 @@
           v-model="signInLogList"
           full-width
           locale="zh-cn"
-          color="red"
+          color="deep-orange lighten-3"
           readonly
+          disabled
           no-title
           multiple/>
       </v-flex>
@@ -42,39 +43,41 @@
 </template>
 
 <script>
-  import {mapState, mapMutations, mapActions} from 'vuex';
-  import {Message} from 'element-ui';
-  
-  export default {
-    name: 'SignIn',
-    layout: 'user',
-    data: () => ({}),
-    computed: {
-      ...mapState({
-        signInLogList: state => state.oneself.signInLogList ? state.oneself.signInLogList : [],
-        oneself: state => state.oneself.oneself ? state.oneself.oneself : {},
-      }),
+import {mapState, mapMutations, mapActions} from 'vuex';
+import {Message, Loading} from 'element-ui';
+
+export default {
+  name: 'SignIn',
+  layout: 'user',
+  data: () => ({}),
+  computed: {
+    ...mapState({
+      signInLogList: state => state.oneself.signInLogList ? state.oneself.signInLogList : [],
+      oneself: state => state.oneself.oneself ? state.oneself.oneself : {},
+    }),
+  },
+  mounted() {
+    Loading.service({fullscreen: true});
+    this.asyncAddSignInLog({arg: 0, cb: () => Loading.service({fullscreen: true}).close()});
+  },
+  methods: {
+    ...mapMutations({
+      addSignInLog: 'oneself/addSignInLogList',
+      addOneself: 'oneself/addOneself',
+    }),
+    ...mapActions({
+      asyncAddSignInLog: 'oneself/addSignInLogList',
+      asyncAddOneself: 'oneself/addOneself',
+    }),
+    async signIn() {
+      Loading.service({fullscreen: true});
+      const {data, message} = await this.$axios.$put(`/signin/user/0`);
+      this.addSignInLog(data);
+      this.asyncAddOneself(Loading.service({fullscreen: true}).close());
+      Message.success(message);
     },
-    mounted() {
-      this.asyncAddSignInLog(0);
-    },
-    methods: {
-      ...mapMutations({
-        addSignInLog: 'oneself/addSignInLogList',
-        addOneself: 'oneself/addOneself',
-      }),
-      ...mapActions({
-        asyncAddSignInLog: 'oneself/addSignInLogList',
-        asyncAddOneself: 'oneself/addOneself',
-      }),
-      async signIn() {
-        const {data, message} = await this.$axios.$put(`/signin/user/0`);
-        Message.success(message);
-        this.addSignInLog(data);
-        this.asyncAddOneself();
-      },
-    },
-  };
+  },
+};
 </script>
 
 <style lang="stylus" scoped>

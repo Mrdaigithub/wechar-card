@@ -28,24 +28,29 @@ export const mutations = {
 };
 
 export const actions = {
-  async addOneself({commit}) {
+  async addOneself({commit}, cb = () => null) {
     const {data} = await this.$axios.$get(`/user/0`);
     commit('addOneself', data);
+    cb();
   },
-  async addToken({commit}, openid) {
+  async addToken({commit}, openid, cb = () => null) {
     const {data} = await this.$axios.$get(`/auth/client/${openid}`);
     commit('addToken', data);
+    cb();
   },
-  async removeToken({commit}) {
+  async removeToken({commit}, cb = () => null) {
     await this.$axios.$delete(`/auth`);
     commit('removeToken');
+    cb();
   },
-  async addSignInLogList({commit}, userId) {
-    const {data} = await this.$axios.$get(`/signin/user/${userId}`);
+  async addSignInLogList({commit}, {arg, cb = () => null}) {
+    const {data} = await this.$axios.$get(`/signin/user/${arg}`);
     commit('addSignInLogList', data);
+    cb();
   },
-  async addCardList({commit}, shopId) {
-    const {data} = await this.$axios.$get(`/card/user/shop/${shopId}`);
+  async addCardList({commit}, {arg, cb = () => null}) {
+    const {data} = await this.$axios.$get(`/card/user/shop/${arg}`);
     commit('addCardList', data);
+    cb();
   },
 };

@@ -9,12 +9,14 @@ export const mutations = {
 };
 
 export const actions = {
-  async addCardModelList({commit}) {
+  async addCardModelList({commit}, cb = () => null) {
     const {data} = await this.$axios.$get(`/card`);
     commit('addCardModelList', data);
+    cb();
   },
-  async addCardModelListByShopId({commit}, shopId) {
-    const {data} = await this.$axios.$get(`/card/shop/${shopId}`);
+  async addCardModelListByShopId({commit}, {arg, cb = () => null}) {
+    const {data} = await this.$axios.$get(`/card/shop/${arg}`);
     commit('addCardModelList', data);
+    cb();
   },
 };
