@@ -23,4 +23,21 @@ export const actions = {
     commit('addShopEmployeeList', data);
     cb();
   },
+  async addShopEmployeeListByShopId({commit}, {arg, cb = () => null}) {
+    const {data} = await this.$axios.$get(`/user/shop/${arg}`);
+    commit('addShopEmployeeList', data);
+    cb();
+  },
+  /**
+   * 老板删除员工
+   * @param commit
+   * @param arg
+   * @param cb
+   * @returns {Promise<void>}
+   */
+  async addShopEmployeeListByBoss({commit}, {arg, cb = () => null}) {
+    const {data} = await this.$axios.$get(`/user/shop/${arg}`);
+    commit('addShopEmployeeList', data);
+    cb();
+  },
 };

@@ -48,6 +48,28 @@ class QrCodeController extends ApiController {
     }
 
     /**
+     * 获取添加指定商铺员工的二维码base64编码
+     *
+     * @param $id
+     *
+     * @return mixed
+     */
+    public function addShopEmployee($id) {
+        $expiredTime = strtotime("+ 5 minutes");
+        $url         = env("DOMAIN") . "/wechat/authorize?url=" . urlencode(env("DOMAIN") . "/wechat/grant/add/employee?expired_time=$expiredTime&shopid=$id");
+
+        return $url;
+        return $this->success(
+            base64_encode(
+                QrCode::encoding('UTF-8')
+                    ->format("png")
+                    ->size(300)
+                    ->generate($url)
+            )
+        );
+    }
+
+    /**
      * 获取卡券核销的二维码base64编码
      *
      * @param \App\Http\Requests\GetWriteOffQrCodeRequest $request

@@ -12,6 +12,11 @@ use App\Events\MessageEvent;
 use App\Utils\ResponseMessage;
 
 class WebController extends Controller {
+    /**
+     * @param $model
+     *
+     * @return bool|\Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response
+     */
     protected function saveModel($model) {
         if ( ! $model->save()) {
             return response(ResponseMessage::$message[500001]);
@@ -20,10 +25,18 @@ class WebController extends Controller {
         return TRUE;
     }
 
+    /**
+     * @param $message
+     *
+     * @return string
+     */
     protected function response($message) {
         return "<script>alert('$message');document.write('<h1 style=\'text-align:center\'>$message</h1>')</script>";
     }
 
+    /**
+     * @return mixed
+     */
     protected function getOneself() {
         $app = app('wechat.official_account');
 

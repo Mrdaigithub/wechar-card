@@ -57,7 +57,7 @@ class UserController extends ApiController {
     }
 
     /**
-     * 获取所有商铺用户列表(老板、员工)
+     * 获取所有商铺成员列表
      *
      * @return mixed
      */
@@ -78,6 +78,35 @@ class UserController extends ApiController {
         });
 
         return $this->success($plainUserList);
+    }
+
+    /**
+     * 获取指定商铺成员列表
+     *
+     * @param $id
+     *
+     * @return mixed
+     */
+    public function listShopEmployeeByShopId($id) {
+        if ($notBoss = $this->isBoss($this->oneself)) {
+            return $notBoss;
+        }
+
+        $shop = Shop::find($id);
+        if ( ! $shop) {
+            return $this->badRequest(NULL, ResponseMessage::$message[400028]);
+        }
+
+        $shopId = $this->oneself->shop()->get()->isNotEmpty() ? $this->oneself->shop()->first()->id : NULL;
+        if ($shopId !== $shop->id) {
+            return $this->forbidden(NULL, ResponseMessage::$message[403000]);
+        }
+
+        return $this->success(
+            $shop->users()->get()->map(function ($item) {
+                return collect($item)->except(["openid", "lottery_num", "real_name", "phone", "remarks"]);
+            })
+        );
     }
 
     /**
@@ -215,5 +244,26 @@ class UserController extends ApiController {
         User::destroy($id);
 
         return;
+    }
+
+    /**
+     * 老板删除自己的雇员
+     *
+     * @param $id
+     *
+     * @return bool|\Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response
+     */
+    public function removeShopEmployeeByBoss($id) {
+        if ($notBoss = $this->isBoss($this->oneself)) {
+            return $notBoss;
+        }
+
+        $shops = $this->oneself->shops();
+        if ( ! $shops->get()->isEmpty()) {
+            return $this->badRequest(NULL, ResponseMessage::$message[400028]);
+        }
+
+        User::find($id)->shop()->detach();
+        User::destroy($id);
     }
 }

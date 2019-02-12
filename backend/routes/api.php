@@ -14,10 +14,11 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::namespace("Api\V1")->prefix("v1")->group(function () {
-    Route::prefix('qrcode')->group(function () {
-        Route::get('/admin/login', 'QrCodeController@adminLogin');
-        Route::get('/add/boss', 'QrCodeController@addShopBoss');
-        Route::get('/writeoff', 'QrCodeController@writeOff');
+    Route::prefix("qrcode")->group(function () {
+        Route::get("admin/login", "QrCodeController@adminLogin");
+        Route::get("add/boss", "QrCodeController@addShopBoss");
+        Route::get("shop/{id}/add/employee", "QrCodeController@addShopEmployee");
+        Route::get("writeoff", "QrCodeController@writeOff");
     });
     Route::prefix("auth")->group(function () {
         Route::get("/", "AuthController@list");
@@ -28,11 +29,13 @@ Route::namespace("Api\V1")->prefix("v1")->group(function () {
         Route::get("/", "UserController@list");
         Route::get("/plain_user", "UserController@listPlainUser");
         Route::get("/shop", "UserController@listShopEmployee");
+        Route::get("/shop/{id}", "UserController@listShopEmployeeByShopId");
         Route::get("/{id}", "UserController@getUserById");
         Route::post("/", "UserController@save");
         Route::put("/plain_user/{id}", "UserController@updatePlainUser");
         Route::put("/shop/{id}", "UserController@updateShopEmployee");
         Route::delete("/shop/{id}", "UserController@removeShopEmployee");
+        Route::delete("/shop/employee/{id}", "UserController@removeShopEmployeeByBoss");
     });
     Route::prefix("system/config")->group(function () {
         Route::get("/", "SystemConfigController@list");
@@ -66,5 +69,6 @@ Route::namespace("Api\V1")->prefix("v1")->group(function () {
     });
     Route::prefix("log")->group(function () {
         Route::get("/winning", "LogController@listWinningWriteOffLog");
+        Route::get("/winning/shop/{id}", "LogController@listWinningWriteOffLogByShopId");
     });
 });

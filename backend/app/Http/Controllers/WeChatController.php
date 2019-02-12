@@ -96,27 +96,76 @@ class WeChatController extends WebController {
      *
      * @return string
      */
-    public function grantAddBoss() {
+    public function grantAddShopBoss() {
         $app        = app('wechat.official_account');
         $openid     = $this->getOneself()->getId();
         $wechatUser = $app->user->get($openid);
 
         // 用户认证
         $userList = User::where("openid", $wechatUser["openid"])->get();
-        if ($userList->isNotEmpty()) {
+        if ($userList->isEmpty()) {
             return $this->response(ResponseMessage::$message[400007]);
         }
 
-        $user               = new User;
-        $user->openid       = $wechatUser["openid"];
-        $user->username     = $wechatUser["nickname"];
-        $user->head_img_url = $wechatUser["headimgurl"];
-        $user->identity     = 1;
+        $user = User::where("openid", $wechatUser["openid"]);
+        if ($user->get()->isNotEmpty()) {
+            $user->identity = 1;
+        } else {
+            $user               = new User;
+            $user->openid       = $wechatUser["openid"];
+            $user->username     = $wechatUser["nickname"];
+            $user->head_img_url = $wechatUser["headimgurl"];
+            $user->identity     = 1;
+        }
         $this->saveModel($user);
 
         // 通过验证发送消息
         $this->sendBroad([
             "signal" => "allowAddBoss",
+        ]);
+
+        return $this->response(ResponseMessage::$message[200002]);
+    }
+
+    /**
+     * 认证通过发送允许添加商铺员工的消息
+     *
+     * @param \Illuminate\Http\Request $request
+     *
+     * @return string
+     */
+    public function grantAddShopEmployee(Request $request) {
+        $shopId = $request->has("shopid") ? $request->get("shopid") : NULL;
+        if ( ! $shopId) {
+            return $this->response(ResponseMessage::$message[400000]);
+        }
+
+        $app        = app('wechat.official_account');
+        $openid     = $this->getOneself()->getId();
+        $wechatUser = $app->user->get($openid);
+
+        // 用户认证
+        $user = User::where("openid", $wechatUser["openid"]);
+        if ($user->get()->isNotEmpty()) {
+            // 此用户已为其他角色
+            $user           = $user->first();
+            $user->identity = 2;
+        } else {
+            // 此用户暂未存在于数据库
+            $user               = new User;
+            $user->openid       = $wechatUser["openid"];
+            $user->username     = $wechatUser["nickname"];
+            $user->head_img_url = $wechatUser["headimgurl"];
+            $user->identity     = 2;
+        }
+
+        $this->saveModel($user);
+        $user->shop()->detach();
+        $user->shop()->attach($shopId);
+
+        // 通过验证发送消息
+        $this->sendBroad([
+            "signal" => "allowAddEmployee",
         ]);
 
         return $this->response(ResponseMessage::$message[200002]);

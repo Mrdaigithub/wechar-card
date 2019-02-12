@@ -14,4 +14,9 @@ export const actions = {
     commit('addWinningLogList', data);
     cb();
   },
+  async addWinningLogListByShopId({commit}, {arg, cb = () => null}) {
+    const {data} = await this.$axios.$get(`/log/winning/shop/${arg}`);
+    commit('addWinningLogList', data);
+    cb();
+  },
 };

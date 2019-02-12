@@ -48,7 +48,22 @@ class ApiController extends Controller {
     }
 
     /**
-     * 是否为商铺人员
+     * 是否为商铺老板
+     *
+     * @param $user
+     *
+     * @return bool|\Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response
+     */
+    protected function isBoss($user) {
+        if ($user->identity !== 1) {
+            return $this->forbidden(NULL, ResponseMessage::$message[403000]);
+        }
+
+        return FALSE;
+    }
+
+    /**
+     * 是否为商铺员工老板
      *
      * @param $user
      *
@@ -73,6 +88,7 @@ class ApiController extends Controller {
         if ($user->identity !== 0) {
             return $this->forbidden(NULL, ResponseMessage::$message[403000]);
         }
+
         return FALSE;
     }
 }

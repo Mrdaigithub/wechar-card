@@ -197,8 +197,8 @@
           </td>
           <td class="text-xs-center">{{ props.item.state ? '启用' : '未启用' }}</td>
           <td class="text-xs-center">{{ props.item.identity === 1 ? '老板' : '员工' }}</td>
-          <td class="text-xs-center">{{ props.item['created_at'] }}</td>
-          <td class="text-xs-center">{{ props.item.remarks }}</td>
+          <td class="text-xs-center">{{ props.item['created_at'] || '暂无' }}</td>
+          <td class="text-xs-center">{{ props.item.remarks || '暂无' }}</td>
           <td class="text-xs-center">
             <v-icon
               small
