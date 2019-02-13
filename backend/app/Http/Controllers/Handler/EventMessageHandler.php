@@ -25,7 +25,7 @@ class EventMessageHandler extends Controller implements EventHandlerInterface {
         $openid = $payload["FromUserName"];
 
         if ($payload['Event'] == "subscribe") {
-            if (User::where("openid", $openid)->count() <= 0) {
+            if (User::where("openid", $openid)->get()->isEmpty()) {
                 $wechat_user = $app->user->get($openid);
 
                 $user               = new User;

@@ -6,7 +6,7 @@
     <title>Laravel</title>
 </head>
 <body>
-<div>Loding...</div>
+<div style="text-align: center">Loading...</div>
 <div id="openid" style="display: none">{{$openid}}</div>
 <div id="url" style="display: none">{{$url}}</div>
 <script src="https://res.wx.qq.com/open/js/jweixin-1.4.0.js"></script>
@@ -36,13 +36,13 @@
     }
 
     function ajax(method, url, callback) {
-        var xmlhttp = new XMLHttpRequest();
-        xmlhttp.open(method, url, true);
-        xmlhttp.send();
-        xmlhttp.onreadystatechange = function () {
-            if (xmlhttp.readyState == 4) {
-                if (xmlhttp.status == 200) {
-                    callback(xmlhttp.responseText);
+        var xmlHttp = new XMLHttpRequest();
+        xmlHttp.open(method, url, true);
+        xmlHttp.send();
+        xmlHttp.onreadystatechange = function () {
+            if (xmlHttp.readyState === 4) {
+                if (xmlHttp.status === 200) {
+                    callback(xmlHttp.responseText);
                 } else {
                     alert("网络错误");
                 }

@@ -53,4 +53,64 @@ class WebController extends Controller {
     protected function sendBroad($data) {
         return broadcast(new MessageEvent(json_encode($data)));
     }
+
+    /**
+     * 是否为管理员
+     *
+     * @param $user
+     *
+     * @return bool|\Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response
+     */
+    protected function isAdmin($user) {
+        if ($user->identity !== 3) {
+            return $this->response(ResponseMessage::$message[403000]);
+        }
+
+        return FALSE;
+    }
+
+    /**
+     * 是否为商铺老板
+     *
+     * @param $user
+     *
+     * @return bool|\Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response
+     */
+    protected function isBoss($user) {
+        if ($user->identity !== 1) {
+            return $this->response(ResponseMessage::$message[403000]);
+        }
+
+        return FALSE;
+    }
+
+    /**
+     * 是否为商铺员工老板
+     *
+     * @param $user
+     *
+     * @return bool|\Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response
+     */
+    protected function isEmployee($user) {
+        if ($user->identity !== 1 || $user->identity !== 2) {
+            return $this->response(ResponseMessage::$message[403000]);
+        }
+
+        return FALSE;
+    }
+
+    /**
+     * 是否为普通用户
+     *
+     * @param $user
+     *
+     * @return bool|\Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response
+     */
+    protected function isPlainUser($user) {
+        if ($user->identity !== 0) {
+            return $this->response(ResponseMessage::$message[403000]);
+        }
+
+        return FALSE;
+    }
 }

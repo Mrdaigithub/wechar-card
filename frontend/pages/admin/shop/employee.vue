@@ -172,19 +172,21 @@
           slot="items"
           slot-scope="props">
           <td class="text-xs-center">{{ props.item.id }}</td>
-          <td class="text-xs-center">{{ props.item.username }}</td>
-          <td class="text-xs-center">{{ props.item['real_name'] ? props.item['real_name'] : '暂无' }}</td>
-          <td class="text-xs-center">{{ props.item.phone ? props.item.phone : '暂无' }}</td>
+          <td class="text-xs-center">{{ props.item.username || '暂无' }}</td>
+          <td class="text-xs-center">{{ props.item['real_name'] || '暂无' }}</td>
+          <td class="text-xs-center">{{ props.item.phone || '暂无' }}</td>
           <td class="text-xs-center">
             <v-avatar
+              v-if="props.item['head_img_url']"
               slot="activator"
               size="48px">
               <v-img
                 :src="props.item['head_img_url']"
                 alt="Avatar"/>
             </v-avatar>
+            <div v-else>暂无</div>
           </td>
-          <td class="text-xs-center">{{ props.item['openid'] }}</td>
+          <td class="text-xs-center">{{ props.item['openid'] || '暂无' }}</td>
           <td class="text-xs-center">
             <v-btn
               v-if="!!props.item.shop_id && shopList.filter(e=>props.item.shop_id ===e.id).length >=1"

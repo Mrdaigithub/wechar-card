@@ -148,26 +148,28 @@
           slot="items"
           slot-scope="props">
           <td class="text-xs-center">{{ props.item.id }}</td>
-          <td class="text-xs-center">{{ props.item.activity_name }}</td>
-          <td class="text-xs-center">{{ props.item.activity_description }}</td>
+          <td class="text-xs-center">{{ props.item.activity_name || '暂无' }}</td>
+          <td class="text-xs-center">{{ props.item.activity_description || '暂无' }}</td>
           <td class="text-xs-center">
             <v-img
+              v-if="props.item.activity_thumbnail"
               :src="props.item.activity_thumbnail"
               :lazy-src="props.item.activity_thumbnail"/>
+            <div v-else>暂无</div>
           </td>
-          <td class="text-xs-center">{{ props.item.reply_keyword }}</td>
+          <td class="text-xs-center">{{ props.item.reply_keyword || '暂无' }}</td>
           <td class="text-xs-center">{{ props.item.state ? '使用中' : '使用结束' }}</td>
-          <td class="text-xs-center">{{ props.item['customer_num'] }}</td>
+          <td class="text-xs-center">{{ props.item['customer_num'] || 0 }}</td>
           <td class="text-xs-center">{{ props.item.remarks || '暂无' }}</td>
-          <td class="text-xs-center">{{ props.item['created_at'] }}</td>
+          <td class="text-xs-center">{{ props.item['created_at'] || '暂无' }}</td>
           <td class="text-xs-center">
             <v-btn
-              v-if="!!props.item['card_model_id_list'].length"
+              v-if="!!props.item['card_model_id_list'] && props.item['card_model_id_list'].length"
               small
               flat
               @click="changePage(`/admin/card?activity=${props.item.activity_name}`)">查看
             </v-btn>
-            <div v-if="!props.item['card_model_id_list'].length">暂无</div>
+            <div v-else>暂无</div>
           </td>
           <td class="text-xs-center">
             <v-btn
@@ -329,6 +331,7 @@ export default {
     editItem(item) {
       const _item = JSON.parse(JSON.stringify(item));
       _item.state = _item.state === 1;
+      _item['card_model_id_list'] = _item['card_model_id_list'] || [];
       this.editedIndex = this.activityList.indexOf(item);
       this.editedItem = Object.assign({}, _item);
       this.dialog = true;

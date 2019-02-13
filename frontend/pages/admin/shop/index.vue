@@ -153,14 +153,14 @@
           slot="items"
           slot-scope="props">
           <td class="text-xs-center">{{ props.item.id }}</td>
-          <td class="text-xs-center">{{ props.item.shop_name ? props.item.shop_name : '暂无' }}</td>
-          <td class="text-xs-center">{{ props.item.shop_location ? props.item.shop_location : '暂无' }}</td>
-          <td class="text-xs-center">{{ props.item.started_at }}</td>
+          <td class="text-xs-center">{{ props.item.shop_name || '暂无' }}</td>
+          <td class="text-xs-center">{{ props.item.shop_location || '暂无' }}</td>
+          <td class="text-xs-center">{{ props.item.started_at || '暂无' }}</td>
           <td class="text-xs-center">{{ props.item.state ? '合作中' : '合作结束' }}</td>
-          <td class="text-xs-center">{{ props.item.remarks ? props.item.remarks : '暂无' }}</td>
+          <td class="text-xs-center">{{ props.item.remarks || '暂无' }}</td>
           <td class="text-xs-center">
             <v-btn
-              v-if="props.item['activity_id'] && !!activityList.length"
+              v-if="props.item['activity_id'] && activityList.length"
               small
               flat
               @click="changePage(`/admin/activity?activity=${activityList.filter(item=>item.id === props.item['activity_id'])[0]['activity_name']}`)">

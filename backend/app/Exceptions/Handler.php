@@ -8,6 +8,7 @@ use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Tymon\JWTAuth\Exceptions\JWTException;
 use Tymon\JWTAuth\Exceptions\TokenExpiredException;
 
 class Handler extends ExceptionHandler {
@@ -62,6 +63,10 @@ class Handler extends ExceptionHandler {
     // 处理jwt token 失效异常
     if ($e instanceof TokenExpiredException) {
       return $this->unauthorized(NULL, "token已失效");
+    }
+
+    if ($e instanceof JWTException){
+        return $this->unauthorized(NULL, "请求体未携带token");
     }
     // 无效的请求方法
     if ($e instanceof MethodNotAllowedHttpException) {

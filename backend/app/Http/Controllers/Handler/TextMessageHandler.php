@@ -16,38 +16,36 @@ use EasyWeChat\Kernel\Messages\News;
 use EasyWeChat\Kernel\Messages\NewsItem;
 
 class TextMessageHandler implements EventHandlerInterface {
-  
-  /**
-   * @param mixed $payload
-   *
-   * @return string
-   */
-  public function handle($payload = NULL) {
-    if (!array_key_exists("Content", $payload)) {
-      return "local";
+
+    /**
+     * @param mixed $payload
+     *
+     * @return string
+     */
+    public function handle($payload = NULL) {
+        if ( ! array_key_exists("Content", $payload)) {
+            return "local";
+        }
+
+        $content = $payload["Content"];
+
+        $activities = Activity::where("reply_keyword", $content);
+        if ($activities->get()->isNotEmpty() && $activities->first()->shops()->get()->isNotEmpty()) {
+            $activity = $activities->first();
+            $shop_id  = $activities->first()->shops()->first()->id;
+
+            $url = env("DOMAIN") . "/wechat/authorize?url=" . urlencode(env("DOMAIN") . "/wechat/grant/lottery/user?shopid=$shop_id");
+
+            return new News([
+                new NewsItem([
+                    'title'       => $activity->activity_name,
+                    'description' => $activity->activity_description,
+                    'url'         => $url,
+                    'image'       => $activity->activity_thumbnail,
+                ]),
+            ]);
+        } else {
+            return "未找到此活动";
+        }
     }
-    
-    $content = $payload["Content"];
-    
-    $activities = Activity::where("reply_keyword", $content);
-    if ($activities->count() > 0
-        && $activities->first()->shops()->count() > 0) {
-      $activity = $activities->first();
-      $shop_id  = $activities->first()->shops()->first()->id;
-      
-      $url = env("DOMAIN") . "/wechat/authorize?url="
-             . urlencode(env("DOMAIN") . "/wechat/grant/lottery/user?shopid=$shop_id");
-      
-      return new News([
-        new NewsItem([
-          'title'       => $activity->activity_name,
-          'description' => $activity->activity_description,
-          'url'         => $url,
-          'image'       => $activity->activity_thumbnail,
-        ]),
-      ]);
-    }
-    
-    return "未找到此卡券";
-  }
 }

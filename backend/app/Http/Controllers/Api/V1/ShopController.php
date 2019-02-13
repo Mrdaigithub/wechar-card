@@ -43,6 +43,24 @@ class ShopController extends ApiController {
     }
 
     /**
+     * 获取老板的商铺
+     *
+     * @return mixed
+     */
+    public function getShopByBoss() {
+        if ($notBoss = $this->isBoss($this->oneself)) {
+            return $notBoss;
+        }
+
+        $shops = $this->oneself->shop();
+        if ($shops->get()->isEmpty()) {
+            return $this->badRequest(NULL, ResponseMessage::$message[400028]);
+        }
+
+        return $this->success($shops->first());
+    }
+
+    /**
      * 新建商铺
      *
      * @param \App\Http\Requests\StoreShopRequest $request
@@ -54,9 +72,9 @@ class ShopController extends ApiController {
             return $notAdmin;
         }
 
-        if ($request->has("activity_id")
-            && (Activity::find($request->get("activity_id"))->shops()->count()
-                <= 0)) {
+        if ($request->has("activity_id") &&
+            $request->get("activity_id") &&
+            (Activity::find($request->get("activity_id"))->shops()->get()->isEmpty())) {
             return $this->badRequest(NULL, ResponseMessage::$message[400011]);
         }
 
@@ -75,7 +93,7 @@ class ShopController extends ApiController {
         }
 
         $this->saveModel($shop);
-        if ($request->has("activity_id")) {
+        if ($request->has("activity_id") && $request->get("activity_id")) {
             $shop->activity()->attach($request->get("activity_id"));
         }
 

@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: mrdai
- * Date: 2018-12-19
- * Time: 21:06
- */
 
 namespace App\Http\Controllers;
 
@@ -56,14 +50,43 @@ class WeChatController extends WebController {
     /**
      * 普通用户认证跳转到地理位置验证界面通过则跳转到抽奖界面
      *
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     * @return bool|\Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Contracts\View\Factory|\Illuminate\Http\Response|\Illuminate\View\View|mixed
      */
     public function grantLotteryUser() {
-        $user = $this->getOneself();
+        $wechatUser = $this->getOneself();
+        $users      = User::where("openid", $wechatUser->getId());
+        if ($users->get()->isEmpty()) {
+            return $this->response(ResponseMessage::$message[400007]);
+        }
+
+        if ($res = $this->isPlainUser($users->first())) {
+            return $res;
+        }
 
         return view("redirectUserLottery", [
-            "openid" => $user->getId(),
+            "openid" => $wechatUser->getId(),
             "url"    => env("FRONT_DOMAIN") . "/user/lottery",
+        ]);
+    }
+
+    /**
+     * 认证通过跳转到商铺管理界面
+     *
+     * @return string
+     */
+    public function grantToShop() {
+        $wechatUser = $this->getOneself();
+
+        $users = User::where("openid", $wechatUser->getId())->get();
+        if ($users->isEmpty()) {
+            return $this->response(ResponseMessage::$message[400007]);
+        } elseif ($isBoss = $this->isBoss($users->first())) {
+            return $isBoss;
+        }
+
+        return view("redirectShop", [
+            "openid" => $wechatUser->getId(),
+            "url"    => env("FRONT_DOMAIN") . "/shop",
         ]);
     }
 
@@ -102,13 +125,9 @@ class WeChatController extends WebController {
         $wechatUser = $app->user->get($openid);
 
         // 用户认证
-        $userList = User::where("openid", $wechatUser["openid"])->get();
-        if ($userList->isEmpty()) {
-            return $this->response(ResponseMessage::$message[400007]);
-        }
-
         $user = User::where("openid", $wechatUser["openid"]);
         if ($user->get()->isNotEmpty()) {
+            $user           = $user->first();
             $user->identity = 1;
         } else {
             $user               = new User;

@@ -25,7 +25,7 @@
 
 <script>
 import {mapMutations, mapActions} from 'vuex';
-import {Loading} from 'element-ui';
+import {Loading, Message} from 'element-ui';
 
 export default {
   name: 'AdminLogin',
@@ -42,8 +42,8 @@ export default {
     window.Echo.channel('publicChannel').listen('MessageEvent', async (e) => {
       if (e.message && JSON.parse(e.message).signal === 'allowLogin' && JSON.parse(e.message).openid) {
         const {data} = await this.$axios.$get(`/auth/client/${JSON.parse(e.message).openid}`);
-        this.addToken(data);
-        this.addOneself();
+        sessionStorage.token = data;
+        Message.success('登录成功');
         this.$router.replace('/admin');
       }
     });

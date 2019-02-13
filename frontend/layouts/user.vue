@@ -11,7 +11,7 @@
         color="red"
         flat
         value="lottery"
-        @click="changePage(`/user/lottery?shopid=${$route.query.shopid}&openid=${$route.query.openid}`)">
+        @click="changePage(`/user/lottery?shopid=${$route.query.shopid}`)">
         <span>抽奖界面</span>
         <v-icon>card_giftcard</v-icon>
       </v-btn>
@@ -19,7 +19,7 @@
         color="red"
         flat
         value="signIn"
-        @click="changePage(`/user/signIn?shopid=${$route.query.shopid}&openid=${$route.query.openid}`)">
+        @click="changePage(`/user/signIn?shopid=${$route.query.shopid}`)">
         <span>签到中心</span>
         <v-icon>create</v-icon>
       </v-btn>
@@ -27,7 +27,7 @@
         color="red"
         flat
         value="person"
-        @click="changePage(`/user/person?shopid=${$route.query.shopid}&openid=${$route.query.openid}`)">
+        @click="changePage(`/user/person?shopid=${$route.query.shopid}`)">
         <span>个人中心</span>
         <v-icon>person</v-icon>
       </v-btn>
@@ -37,7 +37,7 @@
 
 <script>
 import {mapMutations, mapActions} from 'vuex';
-import {Loading} from 'element-ui';
+import {Loading, Message} from 'element-ui';
 
 export default {
   data: () => ({
@@ -46,15 +46,24 @@ export default {
   async created() {
     Loading.service({fullscreen: true});
     const openid = this.$route.query.openid;
-    // Todo 清除url上的openid
-    // this.$router.replace(`${this.$route.path}?shopid=${this.$route.query.shopid}`); // 清除url上的openid
+    const shopId = this.$route.query.shopid;
+    const location = this.$route.query.location;
+
+    if (!shopId || !location || shopId === '' || location === '') {
+      return Message.error('缺失商铺参数,请退回公众号重新进入');
+    }
+    // Todo dev
+    if ((!openid || openid === '') && !sessionStorage.token) {
+      // window.location.href = `https://mrdaisite.club/wechat/authorize?url=%2Fwechat%2Fgrant%2Flottery%2Fuser%3Fshopid%3D${shopId}`;
+    }
     const {data} = await this.$axios.$get(`/auth/client/${openid}`);
-    this.addToken(data);
-    this.addLocation(this.$route.query.location);
+    sessionStorage.token = data;
+    this.$router.replace(`${this.$route.path}?shopid=${shopId}`); // 清除url上的openid
+    this.addLocation(location);
     this.addOneself();
     this.addSystemConfig();
-    this.addCard({arg: this.$route.query.shopid});
-    this.addShopActivity({arg: this.$route.query.shopid, cb: () => Loading.service({fullscreen: true}).close()});
+    this.addCard({arg: shopId});
+    this.addShopActivity({arg: shopId, cb: () => Loading.service({fullscreen: true}).close()});
     this.bottomNav = this.$route.path.split('/')[this.$route.path.split('/').length - 1];
   },
   methods: {
@@ -62,7 +71,6 @@ export default {
       this.$router.push(url);
     },
     ...mapMutations({
-      addToken: 'oneself/addToken',
       addLocation: 'oneself/addLocation',
     }),
     ...mapActions({

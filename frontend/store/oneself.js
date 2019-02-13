@@ -1,6 +1,5 @@
 export const state = () => ({
   oneself: null,
-  token: null,
   location: null,
   signInLogList: null,
   cardList: null,
@@ -9,12 +8,6 @@ export const state = () => ({
 export const mutations = {
   addOneself(state, user) {
     state.oneself = user;
-  },
-  addToken(state, token) {
-    state.token = token;
-  },
-  removeToken(state) {
-    state.token = null;
   },
   addLocation(state, location) {
     state.location = location;
@@ -31,16 +24,6 @@ export const actions = {
   async addOneself({commit}, cb = () => null) {
     const {data} = await this.$axios.$get(`/user/0`);
     commit('addOneself', data);
-    cb();
-  },
-  async addToken({commit}, openid, cb = () => null) {
-    const {data} = await this.$axios.$get(`/auth/client/${openid}`);
-    commit('addToken', data);
-    cb();
-  },
-  async removeToken({commit}, cb = () => null) {
-    await this.$axios.$delete(`/auth`);
-    commit('removeToken');
     cb();
   },
   async addSignInLogList({commit}, {arg, cb = () => null}) {

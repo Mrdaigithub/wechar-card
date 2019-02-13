@@ -118,13 +118,15 @@ export default {
       winningLogList: state => state.log.winningLogList ? state.log.winningLogList : [],
       userList: state => state.user.userList ? state.user.userList : [],
       shopEmployeeList: state => state.user.shopEmployeeList ? state.user.shopEmployeeList : [],
-      shopList: state => state.shop.shopList ? state.shop.shopList : [],
+      shop: state => state.shop.shop ? state.shop.shop : null,
     }),
   },
-  mounted() {
-    Loading.service({fullscreen: true});
-    // Todo shopid
-    this.addWinningLogListByShopId({arg: 1, cb: () => Loading.service({fullscreen: true}).close()});
+  watch: {
+    shop(val) {
+      if (!val) return;
+      Loading.service({fullscreen: true});
+      this.addWinningLogListByShopId({arg: val.id, cb: () => Loading.service({fullscreen: true}).close()});
+    },
   },
   methods: {
     ...mapActions({

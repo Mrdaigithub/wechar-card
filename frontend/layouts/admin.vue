@@ -100,7 +100,7 @@
 </template>
 
 <script>
-import {mapState, mapMutations, mapActions} from 'vuex';
+import {mapState, mapActions} from 'vuex';
 import {Loading} from 'element-ui';
 
 export default {
@@ -115,17 +115,13 @@ export default {
   async mounted() {
     if (!this.oneself) {
       Loading.service({fullscreen: true});
-      // Todo in dev
-      const {data} = await this.$axios.$get(`/auth/client/${'oWqQa6K2egw4ijKVOAC-tffxhxKf'}`);
-      // const {data} = await this.$axios.$get(`/auth/client/${this.oneself.openid}`);
-      this.addToken(data);
+      if (!sessionStorage.token) {
+        this.$router.replace('/admin/login');
+      }
       this.addOneself(() => Loading.service({fullscreen: true}).close());
     }
   },
   methods: {
-    ...mapMutations({
-      addToken: 'oneself/addToken',
-    }),
     ...mapActions({
       addOneself: 'oneself/addOneself',
     }),

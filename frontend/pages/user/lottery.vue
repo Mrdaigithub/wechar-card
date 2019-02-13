@@ -351,7 +351,9 @@ export default {
       this.$refs.form.reset();
     },
     async getQrCode(url) {
+      Loading.service({fullscreen: true});
       const {data} = await this.$axios.$get(url);
+      Loading.service({fullscreen: true}).close();
       this.writeOffQrCodeBase64 = data;
     },
   },

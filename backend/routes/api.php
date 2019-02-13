@@ -52,6 +52,7 @@ Route::namespace("Api\V1")->prefix("v1")->group(function () {
     });
     Route::prefix("shop")->group(function () {
         Route::get("/", "ShopController@list");
+        Route::get("/boss", "ShopController@getShopByBoss");
         Route::post("/", "ShopController@store");
         Route::put("/{id}", "ShopController@update");
         Route::delete("/{id}", "ShopController@remove");

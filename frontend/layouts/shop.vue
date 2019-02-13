@@ -60,8 +60,8 @@
 </template>
 
 <script>
-import {mapState, mapMutations, mapActions} from 'vuex';
-import {Loading} from 'element-ui';
+import {mapState, mapActions} from 'vuex';
+import {Loading, Message} from 'element-ui';
 
 export default {
   data: () => ({
@@ -70,24 +70,28 @@ export default {
   computed: {
     ...mapState({
       oneself: state => state.oneself.oneself ? state.oneself.oneself : null,
+      shop: state => state.shop.shop ? state.shop.shop : null,
     }),
   },
   async mounted() {
     if (!this.oneself) {
       Loading.service({fullscreen: true});
+      const openid = this.$route.query.openid;
       // Todo in dev
-      const {data} = await this.$axios.$get(`/auth/client/${'ocYxcuBt0mRugKZ7tGAHPnUaOW7Y'}`);
-      // const {data} = await this.$axios.$get(`/auth/client/${this.oneself.openid}`);
-      this.addToken(data);
-      this.addOneself(() => Loading.service({fullscreen: true}).close());
+      if ((!openid || openid === '') && !sessionStorage.token) {
+        // window.location.href = 'https://mrdaisite.club/wechat/authorize?url=https%3A%2F%2Fmrdaisite.club%2Fwechat%2Fgrant%2Fshop';
+      }
+      const {data} = await this.$axios.$get(`/auth/client/${openid}`);
+      sessionStorage.token = data;
+      this.$router.replace(`${this.$route.path}`); // 清除url上的openid
+      this.addOneself();
+      this.addShop(() => Loading.service({fullscreen: true}).close());
     }
   },
   methods: {
-    ...mapMutations({
-      addToken: 'oneself/addToken',
-    }),
     ...mapActions({
       addOneself: 'oneself/addOneself',
+      addShop: 'shop/addShop',
     }),
     clickDrawerHandler(url) {
       this.changePage(url);

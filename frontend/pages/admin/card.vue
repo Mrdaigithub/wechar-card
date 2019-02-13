@@ -145,16 +145,18 @@
           slot="items"
           slot-scope="props">
           <td class="text-xs-center">{{ props.item.id }}</td>
-          <td class="text-xs-center">{{ props.item['card_name'] }}</td>
+          <td class="text-xs-center">{{ props.item['card_name'] || '暂无' }}</td>
           <td class="text-xs-center">
             <v-img
+              v-if="props.item['card_thumbnail']"
               :src="props.item['card_thumbnail']"
               :lazy-src="props.item['cardThumbnail']"
               width="80px"/>
+            <div v-else>暂无</div>
           </td>
-          <td class="text-xs-center">{{ props.item.remarks ? props.item.remarks : '暂无' }}</td>
+          <td class="text-xs-center">{{ props.item.remarks || '暂无' }}</td>
           <td class="text-xs-center">
-            {{ props.item['end_time_0'] ? props.item['end_time_0'] : `${div(props.item['end_time_1'], 60)}分钟之后过期` }}
+            {{ props.item['end_time_0'] || `${div(props.item['end_time_1'], 60)}分钟之后过期` }}
           </td>
           <td class="text-xs-center">{{ props.item.state ? '启用' : '未启用' }}</td>
           <td class="text-xs-center">{{ `${mul(props.item['probability'], 100)}%` }}</td>
