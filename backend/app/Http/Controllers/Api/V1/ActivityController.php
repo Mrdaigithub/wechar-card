@@ -151,6 +151,7 @@ class ActivityController extends ApiController {
             if ($activityReplyKeyword->get()->isNotEmpty() && $activityReplyKeyword->first()->id != $id) {
                 return $this->badRequest(NULL, ResponseMessage::$message[400019]);
             }
+            $activity->reply_keyword = $request->get("reply_keyword");
         }
         if ($request->has("state")) {
             $activity->state = $request->get("state");
@@ -164,9 +165,9 @@ class ActivityController extends ApiController {
         if ($request->has("card_model_id_list")) {
             $request->card_model_id_list = $request->get("card_model_id_list") ? $request->get("card_model_id_list") : [];
         }
-
+  
         $this->saveModel($activity);
-
+        
         if ($request->has("card_model_id_list")) {
             $activity->cards()->detach();
             $activity->cards()->attach($request->get("card_model_id_list"));

@@ -13,7 +13,7 @@ class ActivityTableSeeder extends Seeder {
         DB::table("activity")->insert([
             "activity_name"        => "活动名1",
             "activity_description" => "活动详情1",
-            "activity_thumbnail"   => "http://mmbiz.qpic.cn/mmbiz_jpg/c5vy0YJlTVVy7sfKKe8EQShvKEYaKPnS2wfphdib01B105eVCbMz2Foqficsz2lVacm8dFoukpCcbWyG2iah7vuLA/0?wx_fmt=jpeg",
+            "activity_thumbnail"   => "https://www.baidu.com/img/xinshouye_f097208390e839e5b5295804227d94e9.png",
             "state"                => TRUE,
             "remarks"              => "备注1",
             "reply_keyword"        => "回复关键词1",
@@ -23,7 +23,7 @@ class ActivityTableSeeder extends Seeder {
         DB::table("activity")->insert([
             "activity_name"        => "活动名2",
             "activity_description" => "活动详情2",
-            "activity_thumbnail"   => "http://120.fc120.org/templets/bb/images640/banner1.jpg",
+            "activity_thumbnail"   => "https://www.baidu.com/img/xinshouye_f097208390e839e5b5295804227d94e9.png",
             "state"                => TRUE,
             "remarks"              => "备注2",
             "reply_keyword"        => "回复关键词2",
