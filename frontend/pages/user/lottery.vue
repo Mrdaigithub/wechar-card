@@ -1,7 +1,21 @@
 <template xmlns:v-swiper="http://www.w3.org/1999/xhtml">
-  <div>
+  <div class="lucky-wrap">
+    <!--<div-->
+    <!--v-swiper:mySwiper="swiperOption"-->
+    <!--v-if="winningLogData.length"-->
+    <!--class="my-swiper">-->
+    <!--<div class="swiper-wrapper">-->
+    <!--<div-->
+    <!--v-for="winningLog in winningLogData"-->
+    <!--:key="winningLog"-->
+    <!--class="swiper-slide">-->
+    <!--<p>{{ winningLog }}</p>-->
+    <!--</div>-->
+    <!--</div>-->
+    <!--</div>-->
+    <p class="lottery-user-num-text text-xs-center white--text">已有1000人参与此活动</p>
+    <div class="lottery-num-text text-xs-center white--text">你还有<span>{{ lotteryNum }}</span>次免费抽奖次数</div>
     <div class="lucky-wheel">
-      <h1 class="lucky-title text-xs-center">{{ activityName }}</h1>
       <div class="wheel-main">
         <div class="wheel-pointer-box">
           <div
@@ -27,26 +41,9 @@
           </div>
         </div>
       </div>
-      <!--<div-->
-      <!--v-swiper:mySwiper="swiperOption"-->
-      <!--v-if="winningLogData.length"-->
-      <!--class="my-swiper">-->
-      <!--<div class="swiper-wrapper">-->
-      <!--<div-->
-      <!--v-for="winningLog in winningLogData"-->
-      <!--:key="winningLog"-->
-      <!--class="swiper-slide">-->
-      <!--<p>{{ winningLog }}</p>-->
-      <!--</div>-->
-      <!--</div>-->
-      <!--</div>-->
     </div>
     <div class="main">
       <div class="main-bg"/>
-      <div class="bg-p"/>
-      <div class="content">
-        <div class="lottery_ticket">本月剩余抽奖次数： {{ lotteryNum }}</div>
-      </div>
       <div class="tip">
         <div class="tip-title">活动规则</div>
         <div class="tip-content"><p>{{ activityDescription }}</p></div>
@@ -367,145 +364,137 @@
 </script>
 
 <style scoped lang="stylus">
-  .lucky-wheel {
-    width: 100%;
-    background rgb(252, 207, 133)
-    background-size: 100%;
-    padding-top: 1.5625rem;
-    padding-bottom: 75px;
+  .lucky-wrap
+    padding-top 70px
+    background url("../../assets/images/luck_bg.jpg") #e41d46 no-repeat center top
+    background-size 100%
+    height 100vh
+    
+    .lottery-num-text
+      span
+        color: #ecff02
+        font-size 16px
+  
+  .lucky-wheel
+    width 100%;
+    padding-top 1.5625rem;
+    padding-bottom 75px;
     box-sizing content-box
     
-    .lucky-title {
-      color: #f36d56;
-      font-size 48px;
-      background-size: 100%;
-      margin-bottom 20px
-      text-shadow 5px 5px 5px #f36d5670
-    }
-  }
-  
-  .wheel-main {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-  }
-  
-  .wheel-bg {
-    width: 18.4375rem;
-    height: 18.4375rem;
-    background: url("../../assets/images/draw_wheel.png") no-repeat center top;
-    background-size: 100%;
-    color: #fff;
-    font-weight: 500;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-content: center;
-    transition: transform 3s ease;
-  }
-  
-  .wheel-pointer-box {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    z-index: 100;
-    transform: translate(-50%, -60%);
-    width: 5.3125rem;
-    height: 5.3125rem;
-  }
-  
-  .wheel-pointer {
-    width: 5.3125rem;
-    height: 5.3125rem;
-    background: url("../../assets/images/draw_btn.png") no-repeat center top;
-    background-size: 100%;
-    transform-origin: center 60%;
-  }
-  
-  .wheel-bg div {
-    text-align: center;
-  }
+    .wheel-main
+      display flex
+      align-items center
+      justify-content center
+      position relative
+      
+      .wheel-bg
+        width 18.4375rem
+        height 18.4375rem
+        background url("../../assets/images/draw_wheel.png") no-repeat center top
+        background-size 100%
+        color #fff
+        font-weight 500
+        display flex
+        flex-direction column
+        justify-content center
+        align-content center
+        transition transform 3s ease
+        
+        div
+          text-align center
+      
+      .wheel-pointer-box
+        position absolute
+        top 50%
+        left 50%
+        z-index 100
+        transform translate(-50%, -60%)
+        width 5.3125rem
+        height 5.3125rem
+        
+        .wheel-pointer
+          width 5.3125rem
+          height 5.3125rem
+          background url("../../assets/images/draw_btn.png") no-repeat center top
+          background-size 100%
+          transform-origin center 60%
+      
+      .prize-list {
+        width: 100%;
+        height: 100%;
+        position: relative;
+      }
   
   .prize-list {
-    width: 100%;
-    height: 100%;
-    position: relative;
-  }
+    .prize-item {
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 2;
+      width: 5.875rem;
+      height: 9rem;
+      
+      &:first-child {
+        top: 0;
+        left: 8.3125rem;
+        transform: rotate(20deg);
+      }
+      
+      &:nth-child(2) {
+        top: 2.8rem;
+        left: 10.8rem;
+        transform: rotate(67deg);
+      }
+      
+      &:nth-child(3) {
+        top: 6.4rem;
+        left: 10.6rem;
+        transform: rotate(-250deg);
+      }
+      
+      &:nth-child(4) {
+        top: 9rem;
+        left: 8.2125rem;
+        transform: rotate(-210deg);
+      }
+      
+      &:nth-child(5) {
+        top: 9.2125rem;
+        left: 4.4rem;
+        transform: rotate(-160deg);
+      }
+      
+      &:nth-child(6) {
+        top: 6.3875rem;
+        left: 1.9rem;
+        transform: rotate(-111deg);
+      }
+      
+      &:nth-child(7) {
+        top: 2.8rem;
+        left: 1.8125rem;
+        transform: rotate(-69deg);
+      }
+      
+      &:nth-child(8) {
+        top: 0;
+        left: 4.5rem;
+        transform: rotate(-20deg);
+      }
+      .prize-pic img {
+        height: 2.5rem;
+      }
   
-  .prize-list .prize-item {
-    position: absolute;
-    top: 0;
-    left: 0;
-    z-index: 2;
-  }
+      .prize-type {
+        font-size: 1rem;
+      }
   
-  .prize-list .prize-item:first-child {
-    top: 0;
-    left: 8.3125rem;
-    transform: rotate(20deg);
+    }
   }
-  
-  .prize-list .prize-item:nth-child(2) {
-    top: 2.8rem;
-    left: 10.8rem;
-    transform: rotate(67deg);
-  }
-  
-  .prize-list .prize-item:nth-child(3) {
-    top: 6.4rem;
-    left: 10.6rem;
-    transform: rotate(-250deg);
-  }
-  
-  .prize-list .prize-item:nth-child(4) {
-    top: 9rem;
-    left: 8.2125rem;
-    transform: rotate(-210deg);
-  }
-  
-  .prize-list .prize-item:nth-child(5) {
-    top: 9.2125rem;
-    left: 4.4rem;
-    transform: rotate(-160deg);
-  }
-  
-  .prize-list .prize-item:nth-child(6) {
-    top: 6.3875rem;
-    left: 1.9rem;
-    transform: rotate(-111deg);
-  }
-  
-  .prize-list .prize-item:nth-child(7) {
-    top: 2.8rem;
-    left: 1.8125rem;
-    transform: rotate(-69deg);
-  }
-  
-  .prize-list .prize-item:nth-child(8) {
-    top: 0;
-    left: 4.5rem;
-    transform: rotate(-20deg);
-  }
-  
-  .prize-item {
-    width: 5.875rem;
-    height: 9rem;
-  }
-  
-  .prize-pic img {
-    height: 2.5rem;
-  }
-  
-  .prize-type {
-    font-size: 1rem;
-  }
-  
   .main {
     position: relative;
     width: 100%;
     min-height: 14.25rem;
-    background: rgb(243, 109, 86);
   }
   
   .main-bg {
@@ -514,14 +503,6 @@
     position: absolute;
     top: -3.4375rem;
     left: 0;
-    background: url("../../assets/images/luck_bg.png") no-repeat center top;
-    background-size: 100%;
-  }
-  
-  .bg-p {
-    width: 100%;
-    height: 2.95rem;
-    background: rgb(252, 207, 133);
   }
   
   .content {
@@ -660,7 +641,6 @@
     margin-top 30px
     overflow hidden
     padding 5px 0
-    background-color #fccf85
     
     .swiper-slide {
       display: flex;
