@@ -1,3 +1,5 @@
+import qs from 'qs';
+
 export const state = () => ({
   oneself: null,
   location: null,
@@ -23,6 +25,12 @@ export const mutations = {
 export const actions = {
   async addOneself({commit}, cb = () => null) {
     const {data} = await this.$axios.$get(`/user/0`);
+    commit('addOneself', data);
+    cb();
+  },
+  async updatePlainUserByOneself({commit}, {arg, cb = () => null}) {
+    const {data} = await this.$axios.$put(`/user/plain_user/0`,
+      qs.stringify(arg));
     commit('addOneself', data);
     cb();
   },

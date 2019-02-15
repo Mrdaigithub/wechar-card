@@ -125,104 +125,109 @@
 </template>
 
 <script>
-import {mapState, mapActions} from 'vuex';
-import qs from 'qs';
-import {Message, Loading} from 'element-ui';
-import rules from '~/utils/rules';
-import CountDownTimer from '~/components/CountDownTimer';
-
-export default {
-  name: 'Person',
-  layout: 'user',
-  components: {
-    CountDownTimer,
-  },
-  data: () => ({
-    formDialog: false,
-    qrCodeDialog: false,
-    rules: rules,
-    valid: true,
-    viewState: true, // 当前查看为有效券或失效券
-    writeOffQrCodeBase64: '',
-    realName: '',
-    phone: '',
-    cardId: null, // 抽到的卡券id
-  }),
-  computed: {
-    ...mapState({
-      oneselfCardList: state => state.oneself.cardList ? state.oneself.cardList : [], // 剩余抽奖次数
-      oneself: state => state.oneself.oneself ? state.oneself.oneself : {}, // 当前用户
-      lotteryNeedsToFillInTheInformation: state => state.systemConfig.systemConfig ?
-        /^true$/i.test(state.systemConfig.systemConfig.filter(
-          item => item['config_name'] === 'lotteryNeedsToFillInTheInformation')[0]['config_value'])
-        : true,// 抽奖填写信息配置
+  import {mapState, mapActions} from 'vuex';
+  import qs from 'qs';
+  import {Message, Loading} from 'element-ui';
+  import rules from '~/utils/rules';
+  import CountDownTimer from '~/components/CountDownTimer';
+  
+  export default {
+    name: 'Person',
+    layout: 'user',
+    components: {
+      CountDownTimer,
+    },
+    data: () => ({
+      formDialog: false,
+      qrCodeDialog: false,
+      rules: rules,
+      valid: true,
+      viewState: true, // 当前查看为有效券或失效券
+      writeOffQrCodeBase64: '',
+      realName: '',
+      phone: '',
+      cardId: null, // 抽到的卡券id
     }),
-  },
-  watch: {
-    qrCodeDialog(val) {
-      if (val) {
-        this.getQrCode(`/qrcode/writeoff?${qs.stringify({
-          real_name: this.realName,
-          phone: this.phone,
-          card_id: this.cardId,
-        })}`);
-      } else {
-        this.realName = '';
-        this.phone = '';
-        this.cardId = null;
-      }
+    computed: {
+      ...mapState({
+        oneselfCardList: state => state.oneself.cardList ? state.oneself.cardList : [], // 剩余抽奖次数
+        oneself: state => state.oneself.oneself ? state.oneself.oneself : {}, // 当前用户
+        lotteryNeedsToFillInTheInformation: state => state.systemConfig.systemConfig ?
+          /^true$/i.test(state.systemConfig.systemConfig.filter(
+            item => item['config_name'] === 'lotteryNeedsToFillInTheInformation')[0]['config_value'])
+          : true,// 抽奖填写信息配置
+      }),
     },
-  },
-  mounted() {
-    Loading.service({fullscreen: true});
-    this.addCardList({arg: this.$route.query.shopid, cb: Loading.service({fullscreen: true}).close()});
-    window.Echo.channel('publicChannel').listen('MessageEvent', async (e) => {
-      if (e.message && this.oneself &&
-        JSON.parse(e.message).signal === 'writeOff' &&
-        this.oneself.id === JSON.parse(e.message)['user_id']) {
-        Loading.service({fullscreen: true});
-        this.addCardList({arg: this.$route.query.shopid, cb: () => Loading.service({fullscreen: true}).close()});
-        Message.success('核销成功');
-        this.formDialog = false;
-        this.qrCodeDialog = false;
-      }
-    });
-  },
-  methods: {
-    ...mapActions({
-      addCardList: 'oneself/addCardList',
-    }),
-    openFormDialog(item) {
-      if (!item.state) return false;
-      this.cardId = item.id;
-      if (!this.lotteryNeedsToFillInTheInformation || (this.oneself['real_name'] && this.oneself['phone'])) {
-        return this.qrCodeDialog = true;
-      }
-      this.formDialog = true;
+    watch: {
+      qrCodeDialog(val) {
+        if (val) {
+          this.getQrCode(`/qrcode/writeoff/${this.cardId}`);
+        } else {
+          this.realName = '';
+          this.phone = '';
+          this.cardId = null;
+        }
+      },
     },
-    async submit() {
-      if (this.$refs.form.validate()) {
-        this.qrCodeDialog = !this.qrCodeDialog;
-      }
-    },
-    closeFormDialog() {
-      this.formDialog = false;
-      this.$refs.form.reset();
-    },
-    async getQrCode(url) {
+    mounted() {
       Loading.service({fullscreen: true});
-      const {data} = await this.$axios.$get(url);
-      this.writeOffQrCodeBase64 = data;
-      Loading.service({fullscreen: true}).close();
+      this.addCardList({arg: this.$route.query.shopid, cb: Loading.service({fullscreen: true}).close()});
+      window.Echo.channel('publicChannel').listen('MessageEvent', async (e) => {
+        if (e.message && this.oneself &&
+          JSON.parse(e.message).signal === 'writeOff' &&
+          this.oneself.id === JSON.parse(e.message)['user_id']) {
+          Loading.service({fullscreen: true});
+          this.addCardList({arg: this.$route.query.shopid, cb: () => Loading.service({fullscreen: true}).close()});
+          Message.success('核销成功');
+          this.formDialog = false;
+          this.qrCodeDialog = false;
+        }
+      });
     },
-    closeQrCodeDialog() {
-      this.qrCodeDialog = false;
-      this.closeFormDialog();
+    methods: {
+      ...mapActions({
+        addCardList: 'oneself/addCardList',
+        addOneself: 'oneself/addOneself',
+        updatePlainUserByOneself: 'oneself/updatePlainUserByOneself',
+      }),
+      openFormDialog(item) {
+        if (!item.state) return false;
+        this.cardId = item.id;
+        if (!this.lotteryNeedsToFillInTheInformation || (this.oneself['real_name'] && this.oneself['phone'])) {
+          return this.qrCodeDialog = true;
+        }
+        this.formDialog = true;
+      },
+      async submit() {
+        if (this.$refs.form.validate()) {
+          this.updatePlainUserByOneself({
+            arg: {
+              real_name: this.realName,
+              phone: this.phone,
+            },
+            cb: () => this.addOneself(),
+          });
+          this.qrCodeDialog = !this.qrCodeDialog;
+        }
+      },
+      closeFormDialog() {
+        this.formDialog = false;
+        this.$refs.form.reset();
+      },
+      async getQrCode(url) {
+        Loading.service({fullscreen: true});
+        const {data} = await this.$axios.$get(url);
+        this.writeOffQrCodeBase64 = data;
+        Loading.service({fullscreen: true}).close();
+      },
+      closeQrCodeDialog() {
+        this.qrCodeDialog = false;
+        this.closeFormDialog();
+      },
+      getCountDownTimerString(date) {
+        return `${date.getFullYear()}-${date.getMonth() +
+        1}-${date.getDate()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
+      },
     },
-    getCountDownTimerString(date) {
-      return `${date.getFullYear()}-${date.getMonth() +
-      1}-${date.getDate()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
-    },
-  },
-};
+  };
 </script>

@@ -18,7 +18,7 @@ Route::namespace("Api\V1")->prefix("v1")->group(function () {
         Route::get("admin/login", "QrCodeController@adminLogin");
         Route::get("add/boss", "QrCodeController@addShopBoss");
         Route::get("shop/{id}/add/employee", "QrCodeController@addShopEmployee");
-        Route::get("writeoff", "QrCodeController@writeOff");
+        Route::get("writeoff/{id}", "QrCodeController@writeOff");
     });
     Route::prefix("auth")->group(function () {
         Route::get("/", "AuthController@list");
