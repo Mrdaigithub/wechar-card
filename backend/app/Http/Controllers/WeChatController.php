@@ -13,7 +13,6 @@ use GuzzleHttp\Client;
 use Illuminate\Http\Request;
 
 class WeChatController extends WebController {
-
     /**
      * 处理微信的请求消息
      *
@@ -106,10 +105,7 @@ class WeChatController extends WebController {
         }
 
         // 通过验证发送消息
-        $this->sendBroad([
-            "signal" => "allowLogin",
-            "openid" => $wechatUser->getId(),
-        ]);
+        $this->sendAdminLoginBroad($wechatUser->getId());
 
         return $this->response(ResponseMessage::$message[200001]);
     }
@@ -117,9 +113,15 @@ class WeChatController extends WebController {
     /**
      * 认证通过发送允许添加商铺老板的消息
      *
+     * @param \Illuminate\Http\Request $request
+     *
      * @return string
      */
-    public function grantAddShopBoss() {
+    public function grantAddShopBoss(Request $request) {
+        if ( ! $request->has("admin_id") || $request->get("admin_id") === "") {
+            return $this->response(ResponseMessage::$message[400000]);
+        }
+
         $app        = app('wechat.official_account');
         $openid     = $this->getOneself()->getId();
         $wechatUser = $app->user->get($openid);
@@ -139,9 +141,7 @@ class WeChatController extends WebController {
         $this->saveModel($user);
 
         // 通过验证发送消息
-        $this->sendBroad([
-            "signal" => "allowAddBoss",
-        ]);
+        $this->sendAdminAddBossBroad($request->get("admin_id"));
 
         return $this->response(ResponseMessage::$message[200002]);
     }

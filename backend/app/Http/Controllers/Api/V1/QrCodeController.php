@@ -3,21 +3,13 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Api\ApiController;
-use App\Http\Requests\GetWriteOffQrCodeRequest;
 use App\Model\Card;
-use App\Model\SystemConfig;
 use App\Utils\ResponseMessage;
-use function PHPSTORM_META\map;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
 class QrCodeController extends ApiController {
-
     private $oneself;
-
-    public function __construct() {
-        $this->oneself = JWTAuth::parseToken()->authenticate();
-    }
 
     /**
      * 获取管理员登录的二维码base64编码
@@ -29,12 +21,12 @@ class QrCodeController extends ApiController {
         $url         = env("DOMAIN") . "/wechat/authorize?url=" . urlencode(env("DOMAIN") . "/wechat/grant/login/admin?expired_time=$expiredTime");
 
         return $this->success(
-          base64_encode(
-            QrCode::encoding('UTF-8')
-                  ->format("png")
-                  ->size(300)
-                  ->generate($url)
-          )
+            base64_encode(
+                QrCode::encoding('UTF-8')
+                    ->format("png")
+                    ->size(300)
+                    ->generate($url)
+            )
         );
     }
 
@@ -42,20 +34,22 @@ class QrCodeController extends ApiController {
      * 获取添加商铺老板的二维码base64编码
      */
     public function addShopBoss() {
+        $this->oneself = JWTAuth::parseToken()->authenticate();
+
         if ($notAdmin = $this->isAdmin($this->oneself)) {
             return $notAdmin;
         }
 
         $expiredTime = strtotime("+ 5 minutes");
-        $url         = env("DOMAIN") . "/wechat/authorize?url=" . urlencode(env("DOMAIN") . "/wechat/grant/add/boss?expired_time=$expiredTime");
+        $url         = env("DOMAIN") . "/wechat/authorize?url=" . urlencode(env("DOMAIN") . "/wechat/grant/add/boss?expired_time=$expiredTime&admin_id=" . $this->oneself->id);
 
         return $this->success(
-          base64_encode(
-            QrCode::encoding('UTF-8')
-                  ->format("png")
-                  ->size(300)
-                  ->generate($url)
-          )
+            base64_encode(
+                QrCode::encoding('UTF-8')
+                    ->format("png")
+                    ->size(300)
+                    ->generate($url)
+            )
         );
     }
 
@@ -67,6 +61,8 @@ class QrCodeController extends ApiController {
      * @return mixed
      */
     public function addShopEmployee($id) {
+        $this->oneself = JWTAuth::parseToken()->authenticate();
+
         if ($notBoss = $this->isBoss($this->oneself)) {
             return $notBoss;
         }
@@ -75,13 +71,14 @@ class QrCodeController extends ApiController {
         $url         = env("DOMAIN") . "/wechat/authorize?url=" . urlencode(env("DOMAIN") . "/wechat/grant/add/employee?expired_time=$expiredTime&shopid=$id");
 
         return $url;
+
         return $this->success(
-          base64_encode(
-            QrCode::encoding('UTF-8')
-                  ->format("png")
-                  ->size(300)
-                  ->generate($url)
-          )
+            base64_encode(
+                QrCode::encoding('UTF-8')
+                    ->format("png")
+                    ->size(300)
+                    ->generate($url)
+            )
         );
     }
 
@@ -93,19 +90,21 @@ class QrCodeController extends ApiController {
      * @return bool|\Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response|mixed
      */
     public function writeOff($id) {
+        $this->oneself = JWTAuth::parseToken()->authenticate();
+
         if ($notPlainUser = $this->isPlainUser($this->oneself)) {
             return $notPlainUser;
         }
 
         $card = Card::find($id);
-        if (!$card){
+        if ( ! $card) {
             return $this->notFound();
         }
         $cardUser = $card->user();
-        if ($cardUser->get()->isEmpty()){
+        if ($cardUser->get()->isEmpty()) {
             return $this->badRequest(NULL, ResponseMessage::$message[500004]);
         }
-        if ($cardUser->first()->id !== $this->oneself->id){
+        if ($cardUser->first()->id !== $this->oneself->id) {
             return ResponseMessage::$message[403000];
         }
 
@@ -113,12 +112,12 @@ class QrCodeController extends ApiController {
         $url         = env("DOMAIN") . "/wechat/authorize?url=" . urlencode(env("DOMAIN") . "/wechat/grant/writeoff?expired_time=$expiredTime&card_id=" . $card->id);
 
         return $this->success(
-          base64_encode(
-            QrCode::encoding('UTF-8')
-                  ->format("png")
-                  ->size(300)
-                  ->generate($url)
-          )
+            base64_encode(
+                QrCode::encoding('UTF-8')
+                    ->format("png")
+                    ->size(300)
+                    ->generate($url)
+            )
         );
     }
 }

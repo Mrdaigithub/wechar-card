@@ -26,8 +26,8 @@
         </v-tab>
       </v-tabs>
     </v-toolbar>
-    <v-tabs-items 
-      v-model="tab" 
+    <v-tabs-items
+      v-model="tab"
       class="pt-200">
       <v-tab-item
         v-for="item in tabNameItems"
@@ -68,7 +68,7 @@
                     </v-card-title>
                     <v-card-text class="pa-0 pt-2">
                       <div class="card-description font-weight-black">{{ item.remarks }}</div>
-                      <div class="grey--text pt-1">活动商家: asdasdas</div>
+                      <div class="grey--text pt-1">活动商家: {{ shopName }}</div>
                       <div class="grey--text">
                         活动时间:
                         {{ !!item.state && item['end_time_0'] ? `${new Date(item['end_time_0']).getFullYear()}-
@@ -90,7 +90,8 @@
                     depressed
                     small
                     color="deep-orange"
-                    class="white--text">点击使用</v-btn>
+                    class="white--text">点击使用
+                  </v-btn>
                   <v-spacer/>
                   {{ item.state ? '待使用' : '已失效' }}
                 </v-card-actions>
@@ -168,7 +169,6 @@
 
 <script>
 import {mapState, mapActions} from 'vuex';
-import qs from 'qs';
 import {Message, Loading} from 'element-ui';
 import rules from '~/utils/rules';
 import CountDownTimer from '~/components/CountDownTimer';
@@ -204,6 +204,7 @@ export default {
         /^true$/i.test(state.systemConfig.systemConfig.filter(
           item => item['config_name'] === 'lotteryNeedsToFillInTheInformation')[0]['config_value'])
         : true,// 抽奖填写信息配置
+      shopName: state => state.shop.shop ? state.shop.shop['shop_name'] : '暂无', // 当前用户
     }),
   },
   watch: {
@@ -219,6 +220,7 @@ export default {
   },
   mounted() {
     Loading.service({fullscreen: true});
+    this.getShopById({arg: this.$route.query.shopid});
     this.addCardList({arg: this.$route.query.shopid, cb: Loading.service({fullscreen: true}).close()});
     window.Echo.channel('publicChannel').listen('MessageEvent', async (e) => {
       if (e.message && this.oneself &&
@@ -237,6 +239,7 @@ export default {
       addCardList: 'oneself/addCardList',
       addOneself: 'oneself/addOneself',
       updatePlainUserByOneself: 'oneself/updatePlainUserByOneself',
+      getShopById: 'shop/getShopById',
     }),
     openFormDialog(item) {
       if (!item.state) return false;

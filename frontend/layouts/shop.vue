@@ -85,13 +85,13 @@ export default {
       sessionStorage.token = data;
       this.$router.replace(`${this.$route.path}`); // 清除url上的openid
       this.addOneself();
-      this.addShop(() => Loading.service({fullscreen: true}).close());
+      this.getShopByBoss(() => Loading.service({fullscreen: true}).close());
     }
   },
   methods: {
     ...mapActions({
       addOneself: 'oneself/addOneself',
-      addShop: 'shop/addShop',
+      getShopByBoss: 'shop/getShopByBoss',
     }),
     clickDrawerHandler(url) {
       this.changePage(url);

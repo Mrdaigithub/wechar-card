@@ -21,3 +21,7 @@ Broadcast::channel('App.User.{id}', function($user, $id) {
 Broadcast::channel('publicChannel', function($user, $id) {
   return TRUE;
 });
+
+Broadcast::channel('adminChannel', function($user, $id) {
+    return TRUE;
+});

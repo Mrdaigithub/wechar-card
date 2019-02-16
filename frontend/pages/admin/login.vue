@@ -39,8 +39,11 @@ export default {
     this.loginQrCodeBase64 = data;
     Loading.service({fullscreen: true}).close();
 
-    window.Echo.channel('publicChannel').listen('MessageEvent', async (e) => {
-      if (e.message && JSON.parse(e.message).signal === 'allowLogin' && JSON.parse(e.message).openid) {
+    window.Echo.channel('adminChannel').listen('AdminLoginEvent', async (e) => {
+      if (e.message &&
+        JSON.parse(e.message).signal === 'allowAdminLogin' &&
+        JSON.parse(e.message).openid &&
+        this.$route.fullPath === '/admin/login') {
         const {data} = await this.$axios.$get(`/auth/client/${JSON.parse(e.message).openid}`);
         sessionStorage.token = data;
         Message.success('登录成功');

@@ -315,6 +315,7 @@ export default {
   }),
   computed: {
     ...mapState({
+      oneselfId: state => state.oneself.oneself ? state.oneself.oneself.id : null,
       shopEmployeeList: state => state.user.shopEmployeeList ? state.user.shopEmployeeList : [],
       shopList: state => state.shop.shopList ? state.shop.shopList : [],
     }),
@@ -330,6 +331,16 @@ export default {
   mounted() {
     this.addShopEmployeeList();
     this.addShopList();
+    window.Echo.channel('adminChannel').listen('AdminAddBossEvent', async (e) => {
+      if (e.message &&
+        JSON.parse(e.message).signal === 'allowAdminAddBoss' &&
+        JSON.parse(e.message)['admin_id'] &&
+        JSON.parse(e.message)['admin_id'].toString() === this.oneselfId.toString()) {
+        Message.success('添加成功');
+        this.addDialog = false;
+        this.addShopEmployeeList();
+      }
+    });
   },
   methods: {
     ...mapActions({
@@ -345,13 +356,6 @@ export default {
       const {data} = await this.$axios.$get(`/qrcode/add/boss`);
       this.addBossQrCodeBase64 = data;
       Loading.service({fullscreen: true}).close();
-      window.Echo.channel('publicChannel').listen('MessageEvent', async (e) => {
-        if (e.message && JSON.parse(e.message).signal === 'allowAddBoss') {
-          Message.success('添加成功');
-          this.addDialog = false;
-          this.addShopEmployeeList();
-        }
-      });
     },
     editItem(item) {
       const _item = JSON.parse(JSON.stringify(item));

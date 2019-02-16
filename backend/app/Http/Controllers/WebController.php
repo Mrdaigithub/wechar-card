@@ -8,6 +8,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\AdminAddBossEvent;
+use App\Events\AdminLoginEvent;
 use App\Events\MessageEvent;
 use App\Utils\ResponseMessage;
 
@@ -52,6 +54,28 @@ class WebController extends Controller {
      */
     protected function sendBroad($data) {
         return broadcast(new MessageEvent(json_encode($data)));
+    }
+
+    /**
+     * 发送管理员登录广播信号
+     *
+     * @param $openid
+     *
+     * @return \Illuminate\Broadcasting\PendingBroadcast
+     */
+    protected function sendAdminLoginBroad($openid) {
+        return broadcast(new AdminLoginEvent($openid));
+    }
+
+    /**
+     * 发送管理员添加老板信号
+     *
+     * @param $adminId
+     *
+     * @return \Illuminate\Broadcasting\PendingBroadcast
+     */
+    protected function sendAdminAddBossBroad($adminId) {
+        return broadcast(new AdminAddBossEvent($adminId));
     }
 
     /**

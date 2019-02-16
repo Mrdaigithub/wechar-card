@@ -6,6 +6,6 @@ export default ({app, store, redirect}) => {
 
   window.Echo = new Echo({
     broadcaster: 'socket.io',
-    host: 'localhost:6001',
+    host: 'https://wzyylm.com:6001',
   });
 }

@@ -61,6 +61,21 @@ class ShopController extends ApiController {
     }
 
     /**
+     * 获取老板的商铺
+     *
+     * @return mixed
+     */
+    public function getShopById($id) {
+        $shop = Shop::find($id);
+
+        if ( ! $shop) {
+            return $this->badRequest(NULL, ResponseMessage::$message[400028]);
+        }
+
+        return $this->success($shop);
+    }
+
+    /**
      * 新建商铺
      *
      * @param \App\Http\Requests\StoreShopRequest $request

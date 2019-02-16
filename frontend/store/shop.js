@@ -32,14 +32,28 @@ export const actions = {
   },
 
   /**
-   * 添加老板所属的商铺
+   * 获取老板所属的商铺
    *
    * @param commit
    * @param cb
    * @returns {Promise<void>}
    */
-  async addShop({commit}, cb = () => null) {
+  async getShopByBoss({commit}, cb = () => null) {
     const {data} = await this.$axios.$get(`/shop/boss`);
+    commit('addShop', data);
+    cb();
+  },
+
+  /**
+   * 添加指定商铺通过id
+   *
+   * @param commit
+   * @param arg
+   * @param cb
+   * @returns {Promise<void>}
+   */
+  async getShopById({commit}, {arg, cb = () => null}) {
+    const {data} = await this.$axios.$get(`/shop/${arg}`);
     commit('addShop', data);
     cb();
   },
