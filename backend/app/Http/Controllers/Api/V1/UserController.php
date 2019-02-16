@@ -8,39 +8,23 @@ use App\Http\Requests\UpdateShopEmployeeRequest;
 use App\Model\Shop;
 use App\Model\User;
 use App\Utils\ResponseMessage;
-use Illuminate\Http\Request;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
 class UserController extends ApiController {
-
-    private $oneself;
-
-    public function __construct() {
-        $this->oneself = JWTAuth::parseToken()->authenticate();
-    }
-
     /**
-     * @return bool|\Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response|mixed
+     * @return mixed
      */
     public function list() {
-        if ($notAdmin = $this->isAdmin($this->oneself)) {
-            return $notAdmin;
-        }
-
         return $this->success(User::all());
     }
 
     /**
      * 获取普通用户列表
      *
-     * @return bool|\Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response|mixed
+     * @return mixed
      */
     public function listPlainUser() {
-        if ($notAdmin = $this->isAdmin($this->oneself)) {
-            return $notAdmin;
-        }
-
-        $plainUserList = User::where("identity", 0)->get()->map(function($item) {
+        $plainUserList = User::where("identity", 0)->get()->map(function ($item) {
             $signInLogs = $item->signInLogs();
             if ($signInLogs->get()->isEmpty()) {
                 $item->sign_in_num = 0;
@@ -60,11 +44,7 @@ class UserController extends ApiController {
      * @return mixed
      */
     public function listShopEmployee() {
-        if ($notAdmin = $this->isAdmin($this->oneself)) {
-            return $notAdmin;
-        }
-
-        $plainUserList = User::where("identity", 1)->orWhere("identity", 2)->get()->map(function($item) {
+        $plainUserList = User::where("identity", 1)->orWhere("identity", 2)->get()->map(function ($item) {
             $shop = $item->shop();
             if ($shop->get()->isEmpty()) {
                 $item->shop_id = NULL;
@@ -86,22 +66,19 @@ class UserController extends ApiController {
      * @return mixed
      */
     public function listShopEmployeeByShopId($id) {
-        if ($notBoss = $this->isBoss($this->oneself)) {
-            return $notBoss;
-        }
-
-        $shop = Shop::find($id);
-        if (!$shop) {
+        $oneself = JWTAuth::parseToken()->authenticate();
+        $shop    = Shop::find($id);
+        if ( ! $shop) {
             return $this->badRequest(NULL, ResponseMessage::$message[400028]);
         }
 
-        $shopId = $this->oneself->shop()->get()->isNotEmpty() ? $this->oneself->shop()->first()->id : NULL;
+        $shopId = $oneself->shop()->get()->isNotEmpty() ? $oneself->shop()->first()->id : NULL;
         if ($shopId !== $shop->id) {
             return $this->forbidden(NULL, ResponseMessage::$message[403000]);
         }
 
         return $this->success(
-            $shop->users()->get()->map(function($item) {
+            $shop->users()->get()->map(function ($item) {
                 return collect($item)->except(["openid", "lottery_num", "real_name", "phone", "remarks"]);
             })
         );
@@ -119,7 +96,7 @@ class UserController extends ApiController {
             return $this->success(JWTAuth::parseToken()->authenticate());
         }
         $user = User::find($id);
-        if (!$user) {
+        if ( ! $user) {
             return $this->notFound(NULL, ResponseMessage::$message[400007]);
         }
 
@@ -127,32 +104,25 @@ class UserController extends ApiController {
     }
 
     /**
-     * Store a newly created resource in storage.
-     *
-     * @param \Illuminate\Http\Request $request
-     */
-    public function save(Request $request) {
-        //
-    }
-
-    /**
      * 更新普通用户信息
      *
      * @param \App\Http\Requests\UpdatePlainUserRequest $request
-     * @param $id
+     * @param                                           $id
      *
      * @return bool|\Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response
      */
     public function updatePlainUser(UpdatePlainUserRequest $request, $id) {
-        if (($notAdmin = $this->isAdmin($this->oneself)) && ((int) $id !== 0)) {
+        $oneself = JWTAuth::parseToken()->authenticate();
+
+        if (($notAdmin = $this->isAdmin($oneself)) && ((int) $id !== 0)) {
             return $notAdmin;
         }
         $user = User::find($id);
-        if ((int)$id===0){
-            $user = $this->oneself;
+        if ((int) $id === 0) {
+            $user = $oneself;
         }
 
-        if (!$user) {
+        if ( ! $user) {
             return $this->notFound();
         }
 
@@ -183,19 +153,15 @@ class UserController extends ApiController {
      * @return \Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response
      */
     public function updateShopEmployee(UpdateShopEmployeeRequest $request, $id) {
-        if ($notAdmin = $this->isAdmin($this->oneself)) {
-            return $notAdmin;
-        }
-
         $user = User::find($id);
 
-        if (!$user) {
+        if ( ! $user) {
             return $this->notFound();
         }
         if ($user->identity != 1 && $user->identity != 2) {
             return $this->badRequest(NULL, ResponseMessage::$message[403000]);
         }
-        if ($request->has("shop_id") && !!Shop::find($request->get("shop_id"))) {
+        if ($request->has("shop_id") && ! ! Shop::find($request->get("shop_id"))) {
             $this->notFound();
         }
 
@@ -233,10 +199,6 @@ class UserController extends ApiController {
      * @return void
      */
     public function removeShopEmployee($id) {
-        if ($notAdmin = $this->isAdmin($this->oneself)) {
-            return $notAdmin;
-        }
-
         User::find($id)->shop()->detach();
         User::destroy($id);
 
@@ -248,15 +210,11 @@ class UserController extends ApiController {
      *
      * @param $id
      *
-     * @return bool|\Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response
+     * @return \Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response
      */
     public function removeShopEmployeeByBoss($id) {
-        if ($notBoss = $this->isBoss($this->oneself)) {
-            return $notBoss;
-        }
-
-        $shops = $this->oneself->shops();
-        if (!$shops->get()->isEmpty()) {
+        $shops = JWTAuth::parseToken()->authenticate()->shops();
+        if ( ! $shops->get()->isEmpty()) {
             return $this->badRequest(NULL, ResponseMessage::$message[400028]);
         }
 

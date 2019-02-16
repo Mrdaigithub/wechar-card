@@ -11,23 +11,12 @@ use App\Utils\ResponseMessage;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
 class ShopController extends ApiController {
-
-    private $oneself;
-
-    public function __construct() {
-        $this->oneself = JWTAuth::parseToken()->authenticate();
-    }
-
     /**
      * 获取所有商铺列表
      *
      * @return mixed
      */
     public function list() {
-        if ($notAdmin = $this->isAdmin($this->oneself)) {
-            return $notAdmin;
-        }
-
         $shopList = Shop::all()->map(function ($item) {
             $shopActivity = $item->activity();
             if ($shopActivity->get()->isEmpty()) {
@@ -48,11 +37,7 @@ class ShopController extends ApiController {
      * @return mixed
      */
     public function getShopByBoss() {
-        if ($notBoss = $this->isBoss($this->oneself)) {
-            return $notBoss;
-        }
-
-        $shops = $this->oneself->shop();
+        $shops = JWTAuth::parseToken()->authenticate()->shop();
         if ($shops->get()->isEmpty()) {
             return $this->badRequest(NULL, ResponseMessage::$message[400028]);
         }
@@ -83,10 +68,6 @@ class ShopController extends ApiController {
      * @return mixed
      */
     public function store(StoreShopRequest $request) {
-        if ($notAdmin = $this->isAdmin($this->oneself)) {
-            return $notAdmin;
-        }
-
         if ($request->has("activity_id") &&
             $request->get("activity_id") &&
             (Activity::find($request->get("activity_id"))->shops()->get()->isEmpty())) {
@@ -124,10 +105,6 @@ class ShopController extends ApiController {
      * @return \Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response
      */
     public function update(UpdateShopRequest $request, $id) {
-        if ($notAdmin = $this->isAdmin($this->oneself)) {
-            return $notAdmin;
-        }
-
         $shop = Shop::find($id);
 
         if ( ! $shop) {
@@ -181,10 +158,6 @@ class ShopController extends ApiController {
      * @return \Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response|void
      */
     public function remove($id) {
-        if ($notAdmin = $this->isAdmin($this->oneself)) {
-            return $notAdmin;
-        }
-
         Shop::find($id)->activity()->detach();
         Shop::destroy($id);
 

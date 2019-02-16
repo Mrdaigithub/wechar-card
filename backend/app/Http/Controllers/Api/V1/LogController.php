@@ -3,32 +3,18 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Api\ApiController;
-use App\Http\Requests\UpdateSystemConfigRequest;
 use App\Model\Shop;
-use App\Model\SystemConfig;
 use App\Model\WinningLog;
 use App\Utils\ResponseMessage;
-use function PHPSTORM_META\map;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
 class LogController extends ApiController {
-
-    private $oneself;
-
-    public function __construct() {
-        $this->oneself = JWTAuth::parseToken()->authenticate();
-    }
-
     /**
      * 获取中奖核销日志列表
      *
      * @return mixed
      */
     public function listWinningWriteOffLog() {
-        if ($notAdmin = $this->isAdmin($this->oneself)) {
-            return $notAdmin;
-        }
-
         return $this->success(
             WinningLog::all()->map(function ($item) {
                 $cards       = $item->card();
@@ -56,16 +42,13 @@ class LogController extends ApiController {
      * @return mixed
      */
     public function listWinningWriteOffLogByShopId($id) {
-        if ($notBoss = $this->isBoss($this->oneself)) {
-            return $notBoss;
-        }
-
+        $oneself = JWTAuth::parseToken()->authenticate();
         $shop = Shop::find($id);
         if ( ! $shop) {
             return $this->badRequest(NULL, ResponseMessage::$message[400028]);
         }
 
-        $shopId = $this->oneself->shop()->get()->isNotEmpty() ? $this->oneself->shop()->first()->id : NULL;
+        $shopId = $oneself->shop()->get()->isNotEmpty() ? $oneself->shop()->first()->id : NULL;
         if ($shopId !== $shop->id) {
             return $this->forbidden(NULL, ResponseMessage::$message[403000]);
         }

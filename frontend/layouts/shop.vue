@@ -82,7 +82,7 @@ export default {
         // window.location.href = 'https://mrdaisite.club/wechat/authorize?url=https%3A%2F%2Fmrdaisite.club%2Fwechat%2Fgrant%2Fshop';
       }
       const {data} = await this.$axios.$get(`/auth/client/${openid}`);
-      sessionStorage.token = data;
+      sessionStorage.setItem('token', data);
       this.$router.replace(`${this.$route.path}`); // 清除url上的openid
       this.addOneself();
       this.getShopByBoss(() => Loading.service({fullscreen: true}).close());

@@ -57,7 +57,7 @@ export default {
       // window.location.href = `https://mrdaisite.club/wechat/authorize?url=%2Fwechat%2Fgrant%2Flottery%2Fuser%3Fshopid%3D${shopId}`;
     }
     const {data} = await this.$axios.$get(`/auth/client/${openid}`);
-    sessionStorage.token = data;
+    sessionStorage.setItem('token', data);
     this.$router.replace(`${this.$route.path}?shopid=${shopId}`); // 清除url上的openid
     this.addLocation(location);
     this.addOneself();

@@ -1,21 +1,26 @@
 import {Message, Loading} from 'element-ui';
+import {DOMAIN} from '../utils/constant';
 
 export default function({$axios, store}) {
   $axios.onRequest(config => {
-    if (sessionStorage.token) {
-      config.headers.common['Authorization'] = `Bearer ${sessionStorage.token}`;
+    if (sessionStorage.getItem('token')) {
+      config.headers.common['Authorization'] =
+        `Bearer ${sessionStorage.getItem('token')}`;
     }
   });
   $axios.onRequestError(error => {
     Message.error(
-      error.response.data.message ? error.response.data.message : '客户端请求错误');
+      error.response && error.response.data.message
+        ? error.response.data.message
+        : '客户端请求错误');
     Loading.service({fullscreen: true}).close();
   });
   $axios.onResponseError(error => {
-    if (error.response.status === 401) {
+    if (error.response && error.response.status === 401) {
       const type = store.$router.history.current.path.split('/').
         filter(e => e && e !== '')[0];
       if (type === 'admin') {
+        sessionStorage.clear();
         store.$router.replace('/admin/login');
       } else if (type === 'user') {
         const shopId = store.$router.history.current.query.shopid;
@@ -23,12 +28,14 @@ export default function({$axios, store}) {
           return Message.error('参数缺失,请退回公众号重新进入');
         }
         // Todo dev
-        // window.location.href = `https://mrdaisite.club/wechat/authorize?url=%2Fwechat%2Fgrant%2Flottery%2Fuser%3Fshopid%3D${shopId}`;
+        sessionStorage.clear();
+        window.location.href = `${DOMAIN}/wechat/authorize?url=%2Fwechat%2Fgrant%2Flottery%2Fuser%3Fshopid%3D${shopId}`;
       } else if (type === 'shop') {
         // Todo dev
-        // window.location.href = 'https://mrdaisite.club/wechat/authorize?url=https%3A%2F%2Fmrdaisite.club%2Fwechat%2Fgrant%2Fshop';
+        sessionStorage.clear();
+        window.location.href = `${DOMAIN}/wechat/authorize?url=https%3A%2F%2Fmrdaisite.club%2Fwechat%2Fgrant%2Fshop`;
       }
-    } else if (error.response.status === 403) {
+    } else if (error.response && error.response.status === 403) {
       const oneself = store.state.oneself.oneself;
       if (!oneself) {
         return Message.error('未认证');
@@ -50,7 +57,9 @@ export default function({$axios, store}) {
       }
     }
     Message.error(
-      error.response.data.message ? error.response.data.message : '未知错误');
+      error.response && error.response.data.message
+        ? error.response.data.message
+        : '未知错误');
     Loading.service({fullscreen: true}).close();
   });
 }

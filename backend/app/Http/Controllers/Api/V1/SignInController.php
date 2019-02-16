@@ -10,16 +10,6 @@ use App\Utils\ResponseMessage;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
 class SignInController extends ApiController {
-
-    private $oneself;
-
-    /**
-     * SignInController constructor.
-     */
-    public function __construct() {
-        $this->oneself = JWTAuth::parseToken()->authenticate();
-    }
-
     /**
      * 清除其他月份的签到记录
      *
@@ -28,10 +18,6 @@ class SignInController extends ApiController {
      * @return \Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response
      */
     private function clearLastMonthSignInLog($signInLogList) {
-        if ($notPlainUser = $this->isPlainUser($this->oneself)) {
-            return $notPlainUser;
-        }
-
         return collect($signInLogList)->filter(function ($item) {
             return date("m", time()) == date("m", strtotime($item));
         })->values()->all();
@@ -45,14 +31,10 @@ class SignInController extends ApiController {
      * @return \Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response|mixed
      */
     public function getSignInLogByUserId($id) {
-        if ($notPlainUser = $this->isPlainUser($this->oneself)) {
-            return $notPlainUser;
-        }
-
         $signInLogs = NULL;
         $user       = NULL;
         if ($id == 0) {
-            $user = $this->oneself;
+            $user = JWTAuth::parseToken()->authenticate();
         } else {
             $user = User::find($id);
             if ( ! $user) {
@@ -77,10 +59,6 @@ class SignInController extends ApiController {
      * @return \Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response|null
      */
     public function UpdateTodaySignInLogByUserId($id) {
-        if ($notPlainUser = $this->isPlainUser($this->oneself)) {
-            return $notPlainUser;
-        }
-
         $user           = NULL;
         $signInLog      = NULL;
         $signInLogArray = [];
@@ -89,7 +67,7 @@ class SignInController extends ApiController {
         $daysCount = (integer) SystemConfig::where("config_name", "howManyDaysHaveYouWonTheLotteryIn15Days")->first()->config_value;
 
         if ($id == 0) {
-            $user = $this->oneself;
+            $user = JWTAuth::parseToken()->authenticate();
         } else {
             $user = User::find($id);
             if ( ! $user) {

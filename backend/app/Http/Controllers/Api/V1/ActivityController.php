@@ -9,27 +9,14 @@ use App\Model\Activity;
 use App\Model\Card;
 use App\Model\Shop;
 use App\Utils\ResponseMessage;
-use Illuminate\Http\Request;
-use Tymon\JWTAuth\Facades\JWTAuth;
 
 class ActivityController extends ApiController {
-
-    private $oneself;
-
-    public function __construct() {
-        $this->oneself = JWTAuth::parseToken()->authenticate();
-    }
-
     /**
      * 获取所有活动列表
      *
      * @return mixed
      */
     public function list() {
-        if ($notAdmin = $this->isAdmin($this->oneself)) {
-            return $notAdmin;
-        }
-
         return $this->success(
             Activity::all()
                 ->map(function ($item) {
@@ -76,10 +63,6 @@ class ActivityController extends ApiController {
      * @return \Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response|mixed
      */
     public function store(StoreActivityRequest $request) {
-        if ($notAdmin = $this->isAdmin($this->oneself)) {
-            return $notAdmin;
-        }
-
         if ($request->has("reply_keyword")
             && Activity::where("reply_keyword", $request->get("reply_keyword"))->get()->isNotEmpty()) {
             return $this->badRequest(NULL, ResponseMessage::$message[400019]);
@@ -121,10 +104,6 @@ class ActivityController extends ApiController {
      * @return \Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response
      */
     public function update(UpdateActivityRequest $request, $id) {
-        if ($notAdmin = $this->isAdmin($this->oneself)) {
-            return $notAdmin;
-        }
-
         $activity = Activity::find($id);
 
         if ( ! $activity) {
@@ -184,10 +163,6 @@ class ActivityController extends ApiController {
      * @return \Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response
      */
     public function remove($id) {
-        if ($notAdmin = $this->isAdmin($this->oneself)) {
-            return $notAdmin;
-        }
-
         $activity = Activity::find($id);
         $activity->shops()->detach();
         $activity->cards()->detach();

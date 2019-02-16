@@ -6,7 +6,6 @@ use App\Http\Controllers\Api\ApiController;
 use App\Http\Requests\UpdateSystemConfigRequest;
 use App\Model\SystemConfig;
 use App\Utils\ResponseMessage;
-use function PHPSTORM_META\map;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
 class SystemConfigController extends ApiController {

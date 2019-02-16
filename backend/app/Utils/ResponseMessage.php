@@ -1,13 +1,6 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: mrdai
- * Date: 2019-02-08
- * Time: 21:12
- */
 
 namespace App\Utils;
-
 
 class ResponseMessage {
     public static $message = [
@@ -50,6 +43,10 @@ class ResponseMessage {
         400028 => "商铺不存在",
 
         401000 => "认证错误",
+        401001 => "token未通过验证",
+        401002 => "token已过期",
+        401003 => "token已被列入黑名单",
+        401004 => "令牌已过期，无法再刷新",
 
         403000 => "无操作权限",
 

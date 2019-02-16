@@ -13,23 +13,12 @@ use App\Utils\ResponseMessage;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
 class CardController extends ApiController {
-
-    private $oneself;
-
-    public function __construct() {
-        $this->oneself = JWTAuth::parseToken()->authenticate();
-    }
-
     /**
      * 获取卡券模版列表
      *
      * @return mixed
      */
     public function list() {
-        if ($notAdmin = $this->isAdmin($this->oneself)) {
-            return $notAdmin;
-        }
-
         $cardList = Card::where("type", 0)
             ->get()
             ->map(function ($item) {
@@ -100,7 +89,7 @@ class CardController extends ApiController {
      * @return \Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response|mixed
      */
     public function getUserCardByShopId($id) {
-        $cardList = $this->oneself->cardList()->get()->map(function ($item) {
+        $cardList = JWTAuth::parseToken()->authenticate()->cardList()->get()->map(function ($item) {
             // 时间1过期卡券失效
             if ($item->state && ! ! $item->end_time_0) {
                 $item->state = strtotime($item->end_time_0) > strtotime(date('Y-m-d h:i:s', time())) ? 1 : 0;
@@ -130,10 +119,7 @@ class CardController extends ApiController {
      * @return \Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response|mixed
      */
     public function getLotteryCardIdByShopId($id, GetLotteryCardByShopIdRequest $request) {
-        if ($notPlainUser = $this->isPlainUser($this->oneself)) {
-            return $notPlainUser;
-        }
-
+        $oneself = JWTAuth::parseToken()->authenticate();
         $location   = $request->get("location");
         $activities = Shop::find($id)->activity();
 
@@ -171,7 +157,7 @@ class CardController extends ApiController {
         if (count($cardModelList) <= 0) {
             return $this->badRequest(NULL, ResponseMessage::$message[400013]);
         }
-        if ($this->oneself["lottery_num"] <= 0) {
+        if ($oneself["lottery_num"] <= 0) {
             return $this->badRequest(NULL, ResponseMessage::$message[400017]);
         }
         if ($cardModelList->count() > 8) {
@@ -212,7 +198,7 @@ class CardController extends ApiController {
             $newCard->parentid       = $cardModel->id;
             $newCard->remarks        = $cardModel->remarks;
             $this->saveModel($newCard);
-            $newCard->user()->attach($this->oneself->id);
+            $newCard->user()->attach($oneself->id);
 
             // 添加中奖记录
             $winningLog           = new WinningLog();
@@ -220,14 +206,14 @@ class CardController extends ApiController {
 
             $this->saveModel($winningLog);
 
-            $winningLog->user()->attach($this->oneself["id"]);
+            $winningLog->user()->attach($oneself["id"]);
             $winningLog->card()->attach($newCard->id);
             $winningLog->activity()->attach($activities->first()->id);
         }
 
         // 用户抽奖次数-1
-        $this->oneself["lottery_num"] -= 1;
-        $this->saveModel($this->oneself);
+        $oneself["lottery_num"] -= 1;
+        $this->saveModel($oneself);
 
         return $this->success([
             "index"   => $res,
@@ -243,10 +229,6 @@ class CardController extends ApiController {
      * @return \Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response
      */
     public function storeCardModel(StoreCardModelRequest $request) {
-        if ($notAdmin = $this->isAdmin($this->oneself)) {
-            return $notAdmin;
-        }
-
         if ( ! $request->has("end_time_0") && ! $request->has("end_time_1")) {
             return $this->badRequest(NULL, ResponseMessage::$message[400018]);
         }
@@ -290,10 +272,6 @@ class CardController extends ApiController {
      * @return \Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response
      */
     public function updateCardModel(UpdateCardModelRequest $request, $id) {
-        if ($notAdmin = $this->isAdmin($this->oneself)) {
-            return $notAdmin;
-        }
-
         $cardModel = Card::find($id);
 
         if ( ! $cardModel) {
@@ -340,10 +318,6 @@ class CardController extends ApiController {
      * @return mixed
      */
     public function removeCardModel($id) {
-        if ($notAdmin = $this->isAdmin($this->oneself)) {
-            return $notAdmin;
-        }
-
         Card::find($id)->activity()->detach();
         Card::destroy($id);
 

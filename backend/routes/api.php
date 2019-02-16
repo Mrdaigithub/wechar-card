@@ -13,64 +13,66 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::namespace("Api\V1")->prefix("v1")->group(function () {
-    Route::prefix("qrcode")->group(function () {
-        Route::get("admin/login", "QrCodeController@adminLogin");
-        Route::get("add/boss", "QrCodeController@addShopBoss");
-        Route::get("shop/{id}/add/employee", "QrCodeController@addShopEmployee");
-        Route::get("writeoff/{id}", "QrCodeController@writeOff");
+Route::namespace("Api\V1")
+    ->prefix("v1")
+    ->group(function () {
+        Route::prefix("auth")->group(function () {
+            Route::get("/", "AuthController@list");
+            Route::get("/client/{openid}", "AuthController@getTokenByOpenid");
+            Route::delete("/", "AuthController@invalidateToken");
+        });
+        Route::prefix("qrcode")->group(function () {
+            Route::get("admin/login", "QrCodeController@adminLogin");
+            Route::get("add/boss", "QrCodeController@addShopBoss")->middleware("token.refresh");
+            Route::get("shop/{id}/add/employee", "QrCodeController@addShopEmployee")->middleware("token.refresh");
+            Route::get("writeoff/{id}", "QrCodeController@writeOff")->middleware("token.refresh");
+        });
+        Route::prefix("user")->group(function () {
+            Route::get("/", "UserController@list")->middleware("token.refresh", "identity.admin");
+            Route::get("/plain_user", "UserController@listPlainUser")->middleware("token.refresh", "identity.admin");
+            Route::get("/shop", "UserController@listShopEmployee")->middleware("token.refresh", "identity.admin");
+            Route::get("/shop/{id}", "UserController@listShopEmployeeByShopId")->middleware("token.refresh", "identity.boss");
+            Route::get("/{id}", "UserController@getUserById")->middleware("token.refresh");
+            Route::post("/", "UserController@save")->middleware("token.refresh");
+            Route::put("/plain_user/{id}", "UserController@updatePlainUser")->middleware("token.refresh");
+            Route::put("/shop/{id}", "UserController@updateShopEmployee")->middleware("token.refresh", "identity.admin");
+            Route::delete("/shop/{id}", "UserController@removeShopEmployee")->middleware("token.refresh", "identity.admin");
+            Route::delete("/shop/employee/{id}", "UserController@removeShopEmployeeByBoss")->middleware("token.refresh", "identity.boss");
+        });
+        Route::prefix("system/config")->group(function () {
+            Route::get("/", "SystemConfigController@list")->middleware("token.refresh");
+            Route::put("/{id}", "SystemConfigController@updateSystemConfig")->middleware("token.refresh", "identity.admin");
+        });
+        Route::prefix("card")->group(function () {
+            Route::get("/", "CardController@list")->middleware("token.refresh", "identity.admin");
+            Route::get("/shop/{id}", "CardController@getCardByShopId")->middleware("token.refresh");
+            Route::get("/user/shop/{id}", "CardController@getUserCardByShopId")->middleware("token.refresh");
+            Route::get("/lottery/shop/{id}", "CardController@getLotteryCardIdByShopId")->middleware("token.refresh", "identity.user");
+            Route::post("/", "CardController@storeCardModel")->middleware("token.refresh", "identity.admin");
+            Route::put("/{id}", "CardController@updateCardModel")->middleware("token.refresh", "identity.admin");
+            Route::delete("/{id}", "CardController@removeCardModel")->middleware("token.refresh", "identity.admin");
+        });
+        Route::prefix("shop")->group(function () {
+            Route::get("/", "ShopController@list")->middleware("token.refresh", "identity.admin");
+            Route::get("/boss", "ShopController@getShopByBoss")->middleware("token.refresh", "identity.boss");
+            Route::get("/{id}", "ShopController@getShopById")->middleware("token.refresh");
+            Route::post("/", "ShopController@store")->middleware("token.refresh", "identity.admin");
+            Route::put("/{id}", "ShopController@update")->middleware("token.refresh", "identity.admin");
+            Route::delete("/{id}", "ShopController@remove")->middleware("token.refresh", "identity.admin");
+        });
+        Route::prefix("activity")->group(function () {
+            Route::get("/", "ActivityController@list")->middleware("token.refresh", "identity.admin");
+            Route::get("/shop/{id}", "ActivityController@getActivityByShopId")->middleware("token.refresh");
+            Route::post("/", "ActivityController@store")->middleware("token.refresh", "identity.admin");
+            Route::put("/{id}", "ActivityController@update")->middleware("token.refresh", "identity.admin");
+            Route::delete("/{id}", "ActivityController@remove")->middleware("token.refresh", "identity.admin");
+        });
+        Route::prefix("signin")->group(function () {
+            Route::get("/user/{id}", "SignInController@getSignInLogByUserId")->middleware("token.refresh", "identity.user");
+            Route::put("/user/{id}", "SignInController@UpdateTodaySignInLogByUserId")->middleware("token.refresh", "identity.user");
+        });
+        Route::prefix("log")->group(function () {
+            Route::get("/winning", "LogController@listWinningWriteOffLog")->middleware("token.refresh", "identity.admin");
+            Route::get("/winning/shop/{id}", "LogController@listWinningWriteOffLogByShopId")->middleware("token.refresh", "identity.boss");
+        });
     });
-    Route::prefix("auth")->group(function () {
-        Route::get("/", "AuthController@list");
-        Route::get("/client/{openid}", "AuthController@getTokenByOpenid");
-        Route::delete("/", "AuthController@invalidateToken");
-    });
-    Route::prefix("user")->group(function () {
-        Route::get("/", "UserController@list");
-        Route::get("/plain_user", "UserController@listPlainUser");
-        Route::get("/shop", "UserController@listShopEmployee");
-        Route::get("/shop/{id}", "UserController@listShopEmployeeByShopId");
-        Route::get("/{id}", "UserController@getUserById");
-        Route::post("/", "UserController@save");
-        Route::put("/plain_user/{id}", "UserController@updatePlainUser");
-        Route::put("/shop/{id}", "UserController@updateShopEmployee");
-        Route::delete("/shop/{id}", "UserController@removeShopEmployee");
-        Route::delete("/shop/employee/{id}", "UserController@removeShopEmployeeByBoss");
-    });
-    Route::prefix("system/config")->group(function () {
-        Route::get("/", "SystemConfigController@list");
-        Route::put("/{id}", "SystemConfigController@updateSystemConfig");
-    });
-    Route::prefix("card")->group(function () {
-        Route::get("/", "CardController@list");
-        Route::get("/shop/{id}", "CardController@getCardByShopId");
-        Route::get("/user/shop/{id}", "CardController@getUserCardByShopId");
-        Route::get("/lottery/shop/{id}", "CardController@getLotteryCardIdByShopId");
-        Route::post("/", "CardController@storeCardModel");
-        Route::put("/{id}", "CardController@updateCardModel");
-        Route::delete("/{id}", "CardController@removeCardModel");
-    });
-    Route::prefix("shop")->group(function () {
-        Route::get("/", "ShopController@list");
-        Route::get("/boss", "ShopController@getShopByBoss");
-        Route::get("/{id}", "ShopController@getShopById");
-        Route::post("/", "ShopController@store");
-        Route::put("/{id}", "ShopController@update");
-        Route::delete("/{id}", "ShopController@remove");
-    });
-    Route::prefix("activity")->group(function () {
-        Route::get("/", "ActivityController@list");
-        Route::get("/shop/{id}", "ActivityController@getActivityByShopId");
-        Route::post("/", "ActivityController@store");
-        Route::put("/{id}", "ActivityController@update");
-        Route::delete("/{id}", "ActivityController@remove");
-    });
-    Route::prefix("signin")->group(function () {
-        Route::get("/user/{id}", "SignInController@getSignInLogByUserId");
-        Route::put("/user/{id}", "SignInController@UpdateTodaySignInLogByUserId");
-    });
-    Route::prefix("log")->group(function () {
-        Route::get("/winning", "LogController@listWinningWriteOffLog");
-        Route::get("/winning/shop/{id}", "LogController@listWinningWriteOffLogByShopId");
-    });
-});

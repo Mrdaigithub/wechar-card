@@ -45,7 +45,7 @@ export default {
         JSON.parse(e.message).openid &&
         this.$route.fullPath === '/admin/login') {
         const {data} = await this.$axios.$get(`/auth/client/${JSON.parse(e.message).openid}`);
-        sessionStorage.token = data;
+        sessionStorage.setItem('token', data);
         Message.success('登录成功');
         this.$router.replace('/admin');
       }
