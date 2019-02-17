@@ -7,6 +7,18 @@ export default function({$axios, store}) {
       config.headers.common['Authorization'] =
         `Bearer ${sessionStorage.getItem('token')}`;
     }
+    // token过期自动更新
+    if (sessionStorage.ttl && new Date().getTime() > sessionStorage.ttl * 1000 -
+      1000 * 30 && store.state.oneself.oneself && !window.tokenLock) {
+      (async () => {
+        window.tokenLock = true;
+        const {data} = await $axios.$get(
+          `/auth/client/${store.state.oneself.oneself.openid}`);
+        sessionStorage.setItem('token', data.token);
+        sessionStorage.setItem('ttl', data.ttl);
+        window.tokenLock = false;
+      })();
+    }
   });
   $axios.onRequestError(error => {
     Message.error(
@@ -28,12 +40,12 @@ export default function({$axios, store}) {
           return Message.error('参数缺失,请退回公众号重新进入');
         }
         // Todo dev
-        sessionStorage.clear();
-        window.location.href = `${DOMAIN}/wechat/authorize?url=%2Fwechat%2Fgrant%2Flottery%2Fuser%3Fshopid%3D${shopId}`;
+        // sessionStorage.clear();
+        // window.location.href = `${DOMAIN}/wechat/authorize?url=%2Fwechat%2Fgrant%2Flottery%2Fuser%3Fshopid%3D${shopId}`;
       } else if (type === 'shop') {
         // Todo dev
-        sessionStorage.clear();
-        window.location.href = `${DOMAIN}/wechat/authorize?url=https%3A%2F%2Fmrdaisite.club%2Fwechat%2Fgrant%2Fshop`;
+        // sessionStorage.clear();
+        // window.location.href = `${DOMAIN}/wechat/authorize?url=https%3A%2F%2Fmrdaisite.club%2Fwechat%2Fgrant%2Fshop`;
       }
     } else if (error.response && error.response.status === 403) {
       const oneself = store.state.oneself.oneself;
@@ -46,10 +58,12 @@ export default function({$axios, store}) {
           return Message.error('参数缺失,请退回公众号重新进入');
         }
         // Todo dev
-        // window.location.href = `https://mrdaisite.club/wechat/authorize?url=%2Fwechat%2Fgrant%2Flottery%2Fuser%3Fshopid%3D${shopId}`;
+        // sessionStorage.clear();
+        // window.location.href = `${DOMAIN}/wechat/authorize?url=%2Fwechat%2Fgrant%2Flottery%2Fuser%3Fshopid%3D${shopId}`;
       } else if (oneself.identity === 1) {
         // Todo dev
-        // window.location.href = 'https://mrdaisite.club/wechat/authorize?url=https%3A%2F%2Fmrdaisite.club%2Fwechat%2Fgrant%2Fshop';
+        // sessionStorage.clear();
+        // window.location.href = `${DOMAIN}/wechat/authorize?url=https%3A%2F%2Fmrdaisite.club%2Fwechat%2Fgrant%2Fshop`;
       } else if (oneself.identity === 3) {
         store.$router.replace('/admin/login');
       } else {

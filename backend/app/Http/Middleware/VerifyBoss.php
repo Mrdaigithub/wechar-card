@@ -24,7 +24,7 @@ class VerifyBoss {
      */
     public function handle($request, Closure $next) {
 
-        if (JWTAuth::parseToken()->authenticate()->identity !== 2) {
+        if (JWTAuth::parseToken()->authenticate()->identity !== 1) {
             return $this->forbidden(NULL, ResponseMessage::$message[403000]);
         }
 

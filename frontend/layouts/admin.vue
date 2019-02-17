@@ -114,11 +114,10 @@ export default {
   },
   async mounted() {
     if (!this.oneself) {
-      Loading.service({fullscreen: true});
-      if (!sessionStorage.token) {
-        this.$router.replace('/admin/login');
+      if (sessionStorage.token) {
+        Loading.service({fullscreen: true});
+        this.addOneself(() => Loading.service({fullscreen: true}).close());
       }
-      this.addOneself(() => Loading.service({fullscreen: true}).close());
     }
   },
   methods: {

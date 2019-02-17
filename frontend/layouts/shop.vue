@@ -61,7 +61,8 @@
 
 <script>
 import {mapState, mapActions} from 'vuex';
-import {Loading, Message} from 'element-ui';
+import {Loading} from 'element-ui';
+import {DOMAIN} from '../utils/constant';
 
 export default {
   data: () => ({
@@ -79,10 +80,13 @@ export default {
       const openid = this.$route.query.openid;
       // Todo in dev
       if ((!openid || openid === '') && !sessionStorage.token) {
-        // window.location.href = 'https://mrdaisite.club/wechat/authorize?url=https%3A%2F%2Fmrdaisite.club%2Fwechat%2Fgrant%2Fshop';
+        // sessionStorage.clear();
+        // window.location.href = `${DOMAIN}/wechat/authorize?url=https%3A%2F%2Fmrdaisite.club%2Fwechat%2Fgrant%2Fshop}`;
+      } else if ((openid || openid !== '') && !sessionStorage.token) {
+        const {data} = await this.$axios.$get(`/auth/client/${openid}`);
+        sessionStorage.setItem('token', data.token);
+        sessionStorage.setItem('ttl', data.ttl);
       }
-      const {data} = await this.$axios.$get(`/auth/client/${openid}`);
-      sessionStorage.setItem('token', data);
       this.$router.replace(`${this.$route.path}`); // 清除url上的openid
       this.addOneself();
       this.getShopByBoss(() => Loading.service({fullscreen: true}).close());

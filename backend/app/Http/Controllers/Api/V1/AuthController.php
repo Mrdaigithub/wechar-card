@@ -19,27 +19,14 @@ class AuthController extends ApiController {
     public function getTokenByOpenid($openid) {
         $users = User::where("openid", $openid);
 
-        if ($users->count() <= 0) {
-            return $this->badRequest(NULL, ResponseMessage::$message[401000]);
+        if ($users->get()->isEmpty()) {
+            return $this->unauthorized(NULL, ResponseMessage::$message[401000]);
         }
 
-        return $this->success(JWTAuth::fromUser($users->first()));
-    }
-
-    /**
-     * 客户通过username, password获取token
-     *
-     * @param $openid
-     *
-     * @return \Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response|mixed
-     */
-    public function getTokenByPassword($openid) {
-        $users = User::where("openid", $openid);
-        if ($users->count() <= 0) {
-            return $this->badRequest(NULL, ResponseMessage::$message[401000]);
-        }
-
-        return $this->success(JWTAuth::fromUser($users->first()));
+        return $this->success([
+            "token" => JWTAuth::fromUser($users->first()),
+            "ttl"   => strtotime("+" . env('JWT_TTL', 60) . " minutes"),
+        ]);
     }
 
     /**

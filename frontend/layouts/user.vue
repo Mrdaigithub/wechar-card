@@ -38,6 +38,7 @@
 <script>
 import {mapMutations, mapActions} from 'vuex';
 import {Loading, Message} from 'element-ui';
+import {DOMAIN} from '../utils/constant';
 
 export default {
   data: () => ({
@@ -49,15 +50,18 @@ export default {
     const shopId = this.$route.query.shopid;
     const location = this.$route.query.location;
 
-    if (!shopId || !location || shopId === '' || location === '') {
-      return Message.error('缺失商铺参数,请退回公众号重新进入');
+    if (!shopId || shopId === '') {
+      return Message.error('缺失参数,请退回公众号重新进入');
     }
     // Todo dev
     if ((!openid || openid === '') && !sessionStorage.token) {
-      // window.location.href = `https://mrdaisite.club/wechat/authorize?url=%2Fwechat%2Fgrant%2Flottery%2Fuser%3Fshopid%3D${shopId}`;
+      // sessionStorage.clear();
+      // window.location.href = `${DOMAIN}/wechat/authorize?url=%2Fwechat%2Fgrant%2Flottery%2Fuser%3Fshopid%3D${shopId}}`;
+    } else if ((openid || openid !== '') && !sessionStorage.token) {
+      const {data} = await this.$axios.$get(`/auth/client/${openid}`);
+      sessionStorage.setItem('token', data.token);
+      sessionStorage.setItem('ttl', data.ttl);
     }
-    const {data} = await this.$axios.$get(`/auth/client/${openid}`);
-    sessionStorage.setItem('token', data);
     this.$router.replace(`${this.$route.path}?shopid=${shopId}`); // 清除url上的openid
     this.addLocation(location);
     this.addOneself();

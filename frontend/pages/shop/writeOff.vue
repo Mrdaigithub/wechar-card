@@ -128,6 +128,11 @@ export default {
       this.addWinningLogListByShopId({arg: val.id, cb: () => Loading.service({fullscreen: true}).close()});
     },
   },
+  mounted() {
+    if (this.shop) {
+      this.addWinningLogListByShopId({arg: this.shop.id, cb: () => Loading.service({fullscreen: true}).close()});
+    }
+  },
   methods: {
     ...mapActions({
       addWinningLogListByShopId: 'log/addWinningLogListByShopId',

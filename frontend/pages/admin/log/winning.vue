@@ -77,20 +77,20 @@
           slot="items"
           slot-scope="props">
           <td class="text-xs-center">{{ props.item.id }}</td>
-          <td class="text-xs-center">{{ props.item.shop_name }}</td>
-          <td class="text-xs-center">{{ props.item.activity_name }}</td>
-          <td class="text-xs-center">{{ props.item.card_name }}</td>
+          <td class="text-xs-center">{{ props.item.shop_name || '暂无' }}</td>
+          <td class="text-xs-center">{{ props.item.activity_name || '暂无' }}</td>
+          <td class="text-xs-center">{{ props.item.card_name || '暂无' }}</td>
           <td class="text-xs-center">
             {{ userList.filter(item=>item.id===props.item['user_id'])[0] ?
             userList.filter(item=>item.id===props.item['user_id'])[0]['username'] : '暂无' }}
           </td>
           <td class="text-xs-center">
             {{ userList.filter(item=>item.id===props.item['user_id'])[0] ?
-            userList.filter(item=>item.id===props.item['user_id'])[0]['real_name'] : '暂无' }}
+            userList.filter(item=>item.id===props.item['user_id'])[0]['real_name'] || '暂无': '暂无' }}
           </td>
           <td class="text-xs-center">
             {{ userList.filter(item=>item.id===props.item['user_id'])[0] ?
-            userList.filter(item=>item.id===props.item['user_id'])[0]['phone'] : '暂无' }}
+            userList.filter(item=>item.id===props.item['user_id'])[0]['phone'] || '暂无' : '暂无' }}
           </td>
           <td class="text-xs-center">
             <v-avatar
