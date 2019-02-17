@@ -47,12 +47,22 @@ class ActivityController extends ApiController {
      * @return \Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response|mixed
      */
     public function getActivityByShopId($id) {
-        $activities = Shop::find($id)->activity();
-        if ($activities->count() <= 0) {
+        $shop = Shop::find($id);
+        if ( ! $shop) {
+            return $this->notFound();
+        }
+        $activities = $shop->activity();
+        if ($activities->get()->isEmpty()) {
             return $this->badRequest(NULL, ResponseMessage::$message[400012]);
         }
 
-        return $this->success($activities->first());
+        $activity = $activities->first();
+        $winningLogs     = $activity->winningLogs();
+        $activity->customer_num = $winningLogs->get()->isNotEmpty() ?
+            $winningLogs->get()->map(function ($item) {
+                return $item->user()->first()->id;
+            })->unique()->values()->count() : 0;;
+        return $this->success($activity);
     }
 
     /**
@@ -144,9 +154,9 @@ class ActivityController extends ApiController {
         if ($request->has("card_model_id_list")) {
             $request->card_model_id_list = $request->get("card_model_id_list") ? $request->get("card_model_id_list") : [];
         }
-  
+
         $this->saveModel($activity);
-        
+
         if ($request->has("card_model_id_list")) {
             $activity->cards()->detach();
             $activity->cards()->attach($request->get("card_model_id_list"));
@@ -169,3 +179,4 @@ class ActivityController extends ApiController {
         Activity::destroy($id);
     }
 }
+

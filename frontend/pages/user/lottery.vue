@@ -1,20 +1,33 @@
 <template xmlns:v-swiper="http://www.w3.org/1999/xhtml">
-  <div class="lucky-wrap">
-    <div
-      v-swiper:mySwiper="swiperOption"
-      v-if="winningLogData.length"
-      class="my-swiper">
-      <div class="swiper-wrapper">
-        <div
-          v-for="winningLog in winningLogData"
-          :key="winningLog"
-          class="swiper-slide">
-          <p>{{ winningLog }}</p>
-        </div>
-      </div>
+  <div class="lucky-wrap text-xs-center">
+    <!--<div-->
+    <!--v-swiper:mySwiper="swiperOption"-->
+    <!--v-if="winningLogData.length"-->
+    <!--class="my-swiper">-->
+    <!--<div class="swiper-wrapper">-->
+    <!--<div-->
+    <!--v-for="winningLog in winningLogData"-->
+    <!--:key="winningLog"-->
+    <!--class="swiper-slide">-->
+    <!--<p>{{ winningLog }}</p>-->
+    <!--</div>-->
+    <!--</div>-->
+    <!--</div>-->
+    <p class="lottery-user-num-text text-xs-center white--text">已有{{ customerNum }}人参与此活动</p>
+    <div class="lottery-num-text text-xs-center white--text">
+      <p v-if="lotteryNum > 0">您还有<span>{{ lotteryNum }}</span>次免费抽奖机会</p>
+      <p v-else>您已用完了所有的抽奖次数</p>
     </div>
-    <p class="lottery-user-num-text text-xs-center white--text">已有1000人参与此活动</p>
-    <div class="lottery-num-text text-xs-center white--text">你还有<span>{{ lotteryNum }}</span>次免费抽奖次数</div>
+    <div class="more-lottery-num-btn-wrap">
+      <v-btn
+        v-if="lotteryNum === 0"
+        outline
+        round
+        class="font-weight-black more-lottery-num-btn"
+        color="white"
+        @click="changePage(`/user/signIn?shopid=${$route.query.shopid}`)">点击获取更多抽奖次数
+      </v-btn>
+    </div>
     <div class="lucky-wheel">
       <div class="wheel-main">
         <div class="wheel-pointer-box">
@@ -42,8 +55,18 @@
         </div>
       </div>
     </div>
-    <div class="rule">
-      <div class="rule-content"><p>{{ activityDescription }}</p></div>
+    <div class="rule text-xs-left">
+      <p class="rule-content">
+        抽奖说明：<br>
+        每人可抽1次，第2次抽奖需要签到{{ howManyDaysHaveYouWonTheLotteryIn15Days }}天。<br><br>
+        活动须知：<br>
+        1、免单奖励使用时间以免单卷上有效期为准，过期
+        无效。<br>
+        2、每次限使用1免单张，此卷不可叠加使用。<br>
+        3、活动过程中凡以恶意手段（包括但不限于作弊、
+        攻击系统等）参与的用户，活动方有权终止其参与活
+        动并取消其领卷/用卷的资格。
+      </p>
     </div>
     <div
       v-show="toast_control"
@@ -136,7 +159,6 @@
 
 <script>
 import {mapState, mapActions} from 'vuex';
-import qs from 'qs';
 import {Message, Loading} from 'element-ui';
 import rules from '~/utils/rules';
 import randomSort from '~/utils/randomSort';
@@ -183,6 +205,11 @@ export default {
     ...mapState({
       location: state => state.oneself.location ? state.oneself.location : '', // 用户所在区域
       oneself: state => state.oneself.oneself ? state.oneself.oneself : {}, // 当前用户
+      howManyDaysHaveYouWonTheLotteryIn15Days: state => state.systemConfig.systemConfig
+        ? state.systemConfig.systemConfig.filter(
+          item => item['config_name'] === 'howManyDaysHaveYouWonTheLotteryIn15Days')[0]['config_value']
+        : 7,
+      customerNum: state => state.shop.activity ? state.shop.activity['customer_num'] + 110 : 0, // 活动参与人数
       lotteryNum: state => state.oneself.oneself ? state.oneself.oneself['lottery_num'] : 0, // 剩余抽奖次数
       lotteryNeedsToFillInTheInformation: state => state.systemConfig.systemConfig ?
         /^true$/i.test(state.systemConfig.systemConfig.filter(
@@ -200,10 +227,8 @@ export default {
         }
         return randomSort(cardList);
       }, // 显示的奖品列表带未中奖
-      cardList1: state => state.card.cardModelList ?
-        state.card.cardModelList.map(item => ({id: item['id'], name: item['card_name'], isPrize: 1})) : [], // 显示的奖品列表带未中奖
-      activityName: state => state.shop.activity ? state.shop.activity['activity_name'] : '', // 剩余抽奖次数
-      activityDescription: state => state.shop.activity ? state.shop.activity['activity_description'] : '', // 剩余抽奖次数
+      cardList1: state => state.card.cardModelList ? state.card.cardModelList.map(
+        item => ({id: item['id'], name: item['card_name'], isPrize: 1})) : [], // 显示的奖品列表带未中奖
     }),
     toastTitle() {
       return this.hasPrize
@@ -258,6 +283,9 @@ export default {
       addOneself: 'oneself/addOneself',
       updatePlainUserByOneself: 'oneself/updatePlainUserByOneself',
     }),
+    changePage(url) {
+      this.$router.push(url);
+    },
     //此方法为处理奖品数据
     initPrizeList(list) {
     },
@@ -362,23 +390,36 @@ export default {
 <style scoped lang="stylus">
   .lucky-wrap
     padding-top 25px
-    background url("../../assets/images/luck_bg.jpg") #e41d46 no-repeat center top
+    background rgb(249, 29, 72)
+    background -moz-linear-gradient(90deg, rgb(249, 29, 72) 20%, rgb(143, 17, 139) 80%)
+    background -webkit-linear-gradient(90deg, rgb(249, 29, 72) 20%, rgb(143, 17, 139) 80%)
+    background -o-linear-gradient(90deg, rgb(249, 29, 72) 20%, rgb(143, 17, 139) 80%)
+    background -ms-linear-gradient(90deg, rgb(249, 29, 72) 20%, rgb(143, 17, 139) 80%)
+    background linear-gradient(180deg, rgb(249, 29, 72) 20%, rgb(143, 17, 139) 80%)
     background-size 100%
-    height 100vh
+    min-height 100vh
 
     .lottery-user-num-text
-      font-size 16px
+      font-size 20px
 
     .lottery-num-text
+      font-size 18px
+
       span
         color: #ecff02
         font-size 18px
         font-weight 700
+    .more-lottery-num-btn-wrap
+      height: 45px
+      .more-lottery-num-btn
+        font-size 20px
+        height: 45px
+        padding-left: 25px;
+        padding-right: 25px;
 
   .lucky-wheel
     width 100%
-    padding-top 30px
-    padding-bottom 15px
+    padding-top 15px
     box-sizing content-box
 
     .wheel-main
@@ -488,18 +529,19 @@ export default {
             font-size 1rem
 
   .rule {
-    position: relative;
-    margin: 1.5rem 0;
-    width: 100%;
+    position relative
+    margin 15px 0
+    width 100%
   }
+
   .rule-content {
-    background-color: rgba(255, 255, 255, .4);
-    padding: 22px 25px;
+    background-color rgba(255, 255, 255, .4)
+    padding 22px 25px
     margin 0 10px
     border-radius 5px
-    font-size: 16px;
-    color: #ffffff;
-    line-height: 1.5;
+    font-size 16px
+    color #ffffff
+    line-height 1.5
 
     p {
       margin 0
