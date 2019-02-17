@@ -8,8 +8,10 @@ export default function({$axios, store}) {
         `Bearer ${sessionStorage.getItem('token')}`;
     }
     // token过期自动更新
-    if (sessionStorage.ttl && new Date().getTime() > sessionStorage.ttl * 1000 -
-      1000 * 30 && store.state.oneself.oneself && !window.tokenLock) {
+    if ((sessionStorage.ttl
+      && new Date().getTime() > sessionStorage.ttl * 1000 - 1000 * 60 * 5)
+      && store.state.oneself.oneself
+      && !window.tokenLock) {
       (async () => {
         window.tokenLock = true;
         const {data} = await $axios.$get(

@@ -192,17 +192,20 @@ class UserController extends ApiController {
     }
 
     /**
-     * 删除指定商铺老板雇员
+     * 删除指定商铺老板雇员 (将商铺老板雇员转至普通用户,并未实际删除)
      *
-     * @param  int $id
+     * @param $id
      *
-     * @return void
+     * @return \Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response
      */
     public function removeShopEmployee($id) {
-        User::find($id)->shop()->detach();
-        User::destroy($id);
-
-        return;
+        $user = User::find($id);
+        if ( ! $user) {
+            return $this->notFound(NULL, ResponseMessage::$message[400007]);
+        }
+        $user->shop()->detach();
+        $user->identity = 0;
+        $this->saveModel($user);
     }
 
     /**
