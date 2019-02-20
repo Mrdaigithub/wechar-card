@@ -32,8 +32,18 @@ module.exports = {
   */
   css: [
     '~/assets/style/app.styl',
-    'swiper/dist/css/swiper.css',
-    'element-ui/lib/theme-chalk/index.css',
+    'swiper/dist/css/swiper.min.css',
+    'element-ui/lib/theme-chalk/icon.css',
+    'element-ui/lib/theme-chalk/form.css',
+    'element-ui/lib/theme-chalk/form-item.css',
+    'element-ui/lib/theme-chalk/input.css',
+    'element-ui/lib/theme-chalk/input-number.css',
+    'element-ui/lib/theme-chalk/switch.css',
+    'element-ui/lib/theme-chalk/select.css',
+    'element-ui/lib/theme-chalk/option.css',
+    'element-ui/lib/theme-chalk/date-picker.css',
+    'element-ui/lib/theme-chalk/loading.css',
+    'element-ui/lib/theme-chalk/message.css',
   ],
 
   /*
@@ -58,9 +68,7 @@ module.exports = {
   ** Axios module configuration
   */
   axios: {
-    // baseURL: 'https://wzyylm.com/api/v1',
     baseURL: 'http://localhost/api/v1',
-    // baseURL: 'https://mrdaisite.club/api/v1',
     // https: true,
     retry: {retries: 3},
     debug: true,
