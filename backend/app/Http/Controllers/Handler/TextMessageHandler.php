@@ -32,9 +32,11 @@ class TextMessageHandler implements EventHandlerInterface {
         $activities = Activity::where("reply_keyword", $content);
         if ($activities->get()->isNotEmpty() && $activities->first()->shops()->get()->isNotEmpty()) {
             $activity = $activities->first();
-            $shop_id  = $activities->first()->shops()->first()->id;
+            $shop     = $activities->first()->shops()->first();
+            $shopId   = $shop->id;
+            $location = $shop->shop_location;
 
-            $url = env("DOMAIN") . "/wechat/authorize?url=" . urlencode(env("DOMAIN") . "/wechat/grant/lottery/user?shopid=$shop_id");
+            $url = env("DOMAIN") . "/wechat/authorize?url=" . urlencode(env("DOMAIN") . "/wechat/grant/lottery/user?shopid=$shopId&shoplocation=$location");
 
             return new News([
                 new NewsItem([

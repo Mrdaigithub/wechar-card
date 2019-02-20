@@ -19,6 +19,7 @@
         echo $app->jssdk->buildConfig(array("getLocation"), FALSE)
         ?>);
     var shopId = null;
+    var shopLocation = null;
     var openid = document.getElementById("openid").innerHTML;
     var url = document.getElementById("url").innerHTML;
     var pass = false;
@@ -58,6 +59,9 @@
     if (!(shopId = getQueryVariable("shopid"))) {
         dialog("url参数错误")
     }
+    if (!(shopLocation = getQueryVariable("shoplocation"))) {
+        dialog("url参数错误")
+    }
 
     wx.ready(function () {
         wx.checkJsApi({
@@ -77,14 +81,11 @@
                         var geocoderUrl = '<?php echo env("DOMAIN") . "/wechat/geocoder"?>';
                         ajax("GET", geocoderUrl + "?location=" + latitude + "," + longitude + "&time=" + new Date().getTime(), function (res) {
                             city = JSON.parse(res).result.addressComponent.city;
-                            var requestShopLocationUrl = '<?php echo env("DOMAIN") . "/wechat/shop/"?>' + shopId + '/location';
-                            ajax("GET", requestShopLocationUrl, function (res) {
-                                if (city !== res) {
-                                    dialog("当前所在区域无法参加活动");
-                                } else {
-                                    window.location.href = `${url}?openid=${openid}&shopid=${shopId}&location=${encodeURIComponent(city)}`;
-                                }
-                            })
+                            if (city !== shopLocation) {
+                                dialog("当前所在区域无法参加活动");
+                            }else {
+                                window.location.href = `${url}?openid=${openid}&shopid=${shopId}&location=${encodeURIComponent(city)}`;
+                            }
                         });
                     },
                     fail: function () {

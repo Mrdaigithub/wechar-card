@@ -6,12 +6,6 @@
       color="red">
       <v-toolbar-title>优惠券</v-toolbar-title>
       <v-spacer/>
-      <!--<v-btn-->
-      <!--flat-->
-      <!--class="white&#45;&#45;text"-->
-      <!--@click="viewState=!viewState">-->
-      <!--{{ viewState ? '失效券' : '有效券' }}-->
-      <!--</v-btn>-->
       <v-tabs
         slot="extension"
         v-model="tab"
@@ -30,8 +24,8 @@
       v-model="tab"
       class="pt-200">
       <v-tab-item
-        v-for="item in tabNameItems"
-        :key="item">
+        v-for="k in tabNameItems"
+        :key="k">
         <v-container
           fluid
           grid-list-lg
@@ -41,11 +35,10 @@
             wrap>
             <v-flex
               v-for="(item, index) in oneselfCardList"
-              v-if="!!item.state === viewState"
+              v-show="(tab === 0 && item.view === 'unused') || (tab === 1 && item.view === 'used') || (tab === 2 && item.view === 'expired')"
               :key="index"
               xs12>
               <v-card
-                :color="item.state ? 'white' : 'grey lighten-1'"
                 @click="openFormDialog(item)">
                 <v-layout row>
                   <v-flex
@@ -54,22 +47,28 @@
                     <v-img
                       :src="item.card_thumbnail"
                       height="125px"
-                      contain
-                    />
+                      contain/>
                   </v-flex>
                   <v-flex
                     xs7
                     class="pa-1">
-                    <v-card-title class="pa-0 pt-2 card-title orange--text font-weight-black">
+                    <v-card-title
+                      :class="`pa-0 pt-2 card-title font-weight-black ${item.state ? 'orange--text' : 'grey--text'}`">
                       <span class="pa-0 pr-1">
-                        <v-icon color="orange">card_giftcard</v-icon>
+                        <v-icon
+                          :color="item.state ? 'orange' : 'grey'">card_giftcard</v-icon>
                       </span>
                       {{ item.card_name }}
                     </v-card-title>
                     <v-card-text class="pa-0 pt-2">
-                      <div class="card-description font-weight-black">{{ item.remarks }}</div>
+                      <div
+                        class="card-description font-weight-black"
+                        style="color: #999;">{{ item.remarks }}
+                      </div>
                       <div class="grey--text pt-1">活动商家: {{ shopName }}</div>
-                      <div class="grey--text">
+                      <div
+                        v-show="!!item.state"
+                        class="grey--text">
                         活动时间:
                         {{ !!item.state && item['end_time_0'] ? `${new Date(item['end_time_0']).getFullYear()}-
                         ${new Date(item['end_time_0']).getMonth()+1}-${new Date(item['end_time_0']).getDate()}到期` :
@@ -78,7 +77,14 @@
                           v-if="item.state && item['end_time_1']"
                           :id="item.id"
                           :end-time="getCountDownTimerString(new Date(new Date(item['created_at']).getTime() + item['end_time_1'] * 1000))"/>
-                        {{ !item.state ? item.endTime : null }}
+                      </div>
+                      <div
+                        v-show="!item.state"
+                        class="grey--text">
+                        活动时间:
+                        {{ !item.state && item['end_time_0'] ? getEndTimeString(item['end_time_0']) : null }}
+                        {{ !item.state && item['end_time_1'] ? getEndTimeString(getCountDownTimerString(new Date(new
+                        Date(item['created_at']).getTime() + item['end_time_1'] * 1000))) : null }}
                       </div>
                     </v-card-text>
                   </v-flex>
@@ -86,6 +92,7 @@
                 <v-divider light/>
                 <v-card-actions class="pa-3">
                   <v-btn
+                    :disabled="item.view === 'used' || item.view === 'expired'"
                     round
                     depressed
                     small
@@ -93,7 +100,7 @@
                     class="white--text">点击使用
                   </v-btn>
                   <v-spacer/>
-                  {{ item.state ? '待使用' : '已失效' }}
+                  <span :class="!item.state ? 'grey--text' : null">{{ tabNameItems[tab] }}</span>
                 </v-card-actions>
               </v-card>
             </v-flex>
@@ -184,15 +191,14 @@ export default {
     qrCodeDialog: false,
     rules: rules,
     valid: true,
-    viewState: true, // 当前查看为有效券或失效券
     writeOffQrCodeBase64: '',
     realName: '',
     phone: '',
     cardId: null, // 抽到的卡券id
 
-    tab: null,
+    tab: 0,
     tabNameItems: [
-      '待使用', '已使用', '已过期',
+      '待使用', '已使用', '已失效',
     ],
     text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
   }),
@@ -278,6 +284,9 @@ export default {
     getCountDownTimerString(date) {
       return `${date.getFullYear()}-${date.getMonth() +
       1}-${date.getDate()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
+    },
+    getEndTimeString(date) {
+      return `${new Date(date).getFullYear()}-${new Date(date).getMonth() + 1}-${new Date(date).getDate()} 已到期`;
     },
   },
 };

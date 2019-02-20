@@ -42,12 +42,12 @@ export default function({$axios, store}) {
           return Message.error('参数缺失,请退回公众号重新进入');
         }
         // Todo dev
-        // sessionStorage.clear();
-        // window.location.href = `${DOMAIN}/wechat/authorize?url=%2Fwechat%2Fgrant%2Flottery%2Fuser%3Fshopid%3D${shopId}`;
+        sessionStorage.clear();
+        window.location.href = `${DOMAIN}/wechat/authorize?url=%2Fwechat%2Fgrant%2Flottery%2Fuser%3Fshopid%3D${shopId}`;
       } else if (type === 'shop') {
         // Todo dev
-        // sessionStorage.clear();
-        // window.location.href = `${DOMAIN}/wechat/authorize?url=https%3A%2F%2Fmrdaisite.club%2Fwechat%2Fgrant%2Fshop`;
+        sessionStorage.clear();
+        window.location.href = `${DOMAIN}/wechat/authorize?url=https%3A%2F%2Fmrdaisite.club%2Fwechat%2Fgrant%2Fshop`;
       }
     } else if (error.response && error.response.status === 403) {
       const oneself = store.state.oneself.oneself;
@@ -60,12 +60,12 @@ export default function({$axios, store}) {
           return Message.error('参数缺失,请退回公众号重新进入');
         }
         // Todo dev
-        // sessionStorage.clear();
-        // window.location.href = `${DOMAIN}/wechat/authorize?url=%2Fwechat%2Fgrant%2Flottery%2Fuser%3Fshopid%3D${shopId}`;
+        sessionStorage.clear();
+        window.location.href = `${DOMAIN}/wechat/authorize?url=%2Fwechat%2Fgrant%2Flottery%2Fuser%3Fshopid%3D${shopId}`;
       } else if (oneself.identity === 1) {
         // Todo dev
-        // sessionStorage.clear();
-        // window.location.href = `${DOMAIN}/wechat/authorize?url=https%3A%2F%2Fmrdaisite.club%2Fwechat%2Fgrant%2Fshop`;
+        sessionStorage.clear();
+        window.location.href = `${DOMAIN}/wechat/authorize?url=https%3A%2F%2Fmrdaisite.club%2Fwechat%2Fgrant%2Fshop`;
       } else if (oneself.identity === 3) {
         store.$router.replace('/admin/login');
       } else {
