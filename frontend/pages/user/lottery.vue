@@ -1,18 +1,18 @@
 <template xmlns:v-swiper="http://www.w3.org/1999/xhtml">
   <div class="lucky-wrap text-xs-center">
-    <!--<div-->
-    <!--v-swiper:mySwiper="swiperOption"-->
-    <!--v-if="winningLogData.length"-->
-    <!--class="my-swiper">-->
-    <!--<div class="swiper-wrapper">-->
-    <!--<div-->
-    <!--v-for="winningLog in winningLogData"-->
-    <!--:key="winningLog"-->
-    <!--class="swiper-slide">-->
-    <!--<p>{{ winningLog }}</p>-->
-    <!--</div>-->
-    <!--</div>-->
-    <!--</div>-->
+    <div
+      v-swiper:mySwiper="swiperOption"
+      v-if="winningLogData.length"
+      class="my-swiper">
+      <div class="swiper-wrapper">
+        <div
+          v-for="winningLog in winningLogData"
+          :key="winningLog"
+          class="swiper-slide">
+          <p>{{ winningLog }}</p>
+        </div>
+      </div>
+    </div>
     <p class="lottery-user-num-text text-xs-center white--text">已有{{ customerNum }}人参与此活动</p>
     <div class="lottery-num-text text-xs-center white--text">
       <p v-if="lotteryNum > 0">您还有<span>{{ lotteryNum }}</span>次免费抽奖机会</p>
@@ -184,11 +184,8 @@ export default {
       slidesPerView: 1,
       centeredSlides: true,
       direction: 'vertical',
-      spaceBetween: 4,
-      autoplay: {
-        delay: 5000,
-        disableOnInteraction: false,
-      },
+      spaceBetween: 5,
+      autoplay: 2000,
       mousewheel: 'disable',
       allowTouchMove: false,
     },
@@ -643,6 +640,7 @@ export default {
     width 80%
     border-radius 5px
     overflow hidden
+    margin: auto;
     margin-bottom 10px
 
     .swiper-slide

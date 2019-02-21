@@ -3,6 +3,11 @@ const pkg = require('./package');
 module.exports = {
   mode: 'universal',
 
+  server: {
+    port: 3000, // default: 3000
+    host: '0.0.0.0', // default: localhost
+  },
+
   /*
   ** Headers of the page
   */
@@ -33,6 +38,7 @@ module.exports = {
   css: [
     '~/assets/style/app.styl',
     'swiper/dist/css/swiper.min.css',
+    'element-ui/lib/theme-chalk/button.css',
     'element-ui/lib/theme-chalk/icon.css',
     'element-ui/lib/theme-chalk/form.css',
     'element-ui/lib/theme-chalk/form-item.css',
@@ -68,8 +74,8 @@ module.exports = {
   ** Axios module configuration
   */
   axios: {
-    baseURL: 'http://localhost/api/v1',
-    // https: true,
+    baseURL: 'https://wzyylm.com/api/v1',
+    https: true,
     retry: {retries: 3},
     debug: true,
   },
