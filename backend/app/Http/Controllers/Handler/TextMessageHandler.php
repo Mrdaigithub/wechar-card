@@ -31,16 +31,17 @@ class TextMessageHandler implements EventHandlerInterface {
         $openid  = $payload["FromUserName"];
         $content = $payload["Content"];
 
-        if (User::where("openid", $openid)->get()->isEmpty()) {
-            $wechat_user = $app->user->get($openid);
-
-            $user               = new User;
-            $user->openid       = $wechat_user["openid"];
-            $user->username     = $wechat_user["nickname"];
-            $user->head_img_url = $wechat_user["headimgurl"];
-            $user->lottery_num  = 1;
-            $user->save();
-        }
+        //
+        // if (User::where("openid", $openid)->get()->isEmpty()) {
+        //     $wechat_user = $app->user->get($openid);
+        //
+        //     $user               = new User;
+        //     $user->openid       = $wechat_user["openid"];
+        //     $user->username     = $wechat_user["nickname"];
+        //     $user->head_img_url = $wechat_user["headimgurl"];
+        //     $user->lottery_num  = 1;
+        //     $user->save();
+        // }
 
         $activities = Activity::where("reply_keyword", $content);
         if ($activities->get()->isNotEmpty() && $activities->first()->shops()->get()->isNotEmpty()) {
@@ -50,6 +51,12 @@ class TextMessageHandler implements EventHandlerInterface {
             $location = $shop->shop_location;
 
             $url = env("DOMAIN") . "/wechat/authorize?url=" . urlencode(env("DOMAIN") . "/wechat/grant/lottery/user?shopid=$shopId&shoplocation=$location");
+
+            $accessToken = $app->access_token;
+            $token = $accessToken->getToken();
+            return json_encode($token["access_token"]);
+
+            return $url;
 
             return new News([
                 new NewsItem([

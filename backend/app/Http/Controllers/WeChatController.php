@@ -11,8 +11,21 @@ use App\Utils\ResponseMessage;
 use EasyWeChat\Kernel\Messages\Message;
 use GuzzleHttp\Client;
 use Illuminate\Http\Request;
+use Overtrue\Socialite\SocialiteManager as Socialite;
 
 class WeChatController extends WebController {
+    public function test() {
+        $socialite = (new Socialite([
+            'wechat' => [
+                'client_id'     => "wx817b9b82f208b933",
+                'client_secret' => "7972ea0cc2c3229f86734cd8cbf34ce0",
+                'redirect'      => "https://mrdaisite.club/wechat/grant/lottery/user?shopid=1",
+            ],
+        ]))->driver("wechat")->scopes(["snsapi_base"])->redirect();
+
+        return $socialite;
+    }
+
     /**
      * 处理微信的请求消息
      *
@@ -52,6 +65,14 @@ class WeChatController extends WebController {
      * @return bool|\Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Contracts\View\Factory|\Illuminate\Http\Response|\Illuminate\View\View|mixed
      */
     public function grantLotteryUser() {
+        $socialite = (new Socialite([
+            'wechat' => [
+                'client_id'     => "wx817b9b82f208b933",
+                'client_secret' => "7972ea0cc2c3229f86734cd8cbf34ce0",
+                'redirect'      => "https://mrdaisite.club/wechat/grant/lottery/user?shopid=1",
+            ],
+        ]))->driver("wechat")->user();
+        return json_encode($socialite);
         $wechatUser = $this->getOneself();
         $users      = User::where("openid", $wechatUser->getId());
         if ($users->get()->isEmpty()) {

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "1e237005a69533c44e6cdadab5e2a817",
+    "content-hash": "594b164967768f11c0cd1f9b29339210",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -1606,16 +1606,16 @@
         },
         {
             "name": "overtrue/socialite",
-            "version": "2.0.5",
+            "version": "2.0.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/overtrue/socialite.git",
-                "reference": "02a18ba1e1d950ca64861b27bc51b4fe1cd54783"
+                "reference": "1b3bc250204df1e9edab44bbcbf856cc526fccb3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/overtrue/socialite/zipball/02a18ba1e1d950ca64861b27bc51b4fe1cd54783",
-                "reference": "02a18ba1e1d950ca64861b27bc51b4fe1cd54783",
+                "url": "https://api.github.com/repos/overtrue/socialite/zipball/1b3bc250204df1e9edab44bbcbf856cc526fccb3",
+                "reference": "1b3bc250204df1e9edab44bbcbf856cc526fccb3",
                 "shasum": ""
             },
             "require": {
@@ -1652,7 +1652,7 @@
                 "wechat",
                 "weibo"
             ],
-            "time": "2019-01-29T09:13:21+00:00"
+            "time": "2019-02-15T08:08:22+00:00"
         },
         {
             "name": "overtrue/wechat",
