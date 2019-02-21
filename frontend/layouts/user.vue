@@ -56,7 +56,7 @@ export default {
     // Todo dev
     if ((!openid || openid === '') && !sessionStorage.token) {
       sessionStorage.clear();
-      window.location.href = `${DOMAIN}/wechat/authorize?url=%2Fwechat%2Fgrant%2Flottery%2Fuser%3Fshopid%3D${shopId}}`;
+      window.location.href = `${DOMAIN}/wechat/authorize?url=${encodeURIComponent(DOMAIN)}%2Fwechat%2Fgrant%2Flottery%2Fuser%3Fshopid%3D${shopId}}`;
     } else if ((openid || openid !== '') && !sessionStorage.token) {
       const {data} = await this.$axios.$get(`/auth/client/${openid}`);
       sessionStorage.setItem('token', data.token);

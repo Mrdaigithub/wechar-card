@@ -1,8 +1,8 @@
 {
-  "name": "wechat_card_frontend",
+  "name": "wechat-card",
   "version": "1.0.0",
-  "description": "wechat_card_frontend",
-  "author": "Mrdai",
+  "description": "wechat-card",
+  "author": "Emtropy",
   "private": true,
   "scripts": {
     "dev": "nuxt",

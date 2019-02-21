@@ -27,7 +27,20 @@ class TextMessageHandler implements EventHandlerInterface {
             return "local";
         }
 
+        $app     = app('wechat.official_account');
+        $openid  = $payload["FromUserName"];
         $content = $payload["Content"];
+
+        if (User::where("openid", $openid)->get()->isEmpty()) {
+            $wechat_user = $app->user->get($openid);
+
+            $user               = new User;
+            $user->openid       = $wechat_user["openid"];
+            $user->username     = $wechat_user["nickname"];
+            $user->head_img_url = $wechat_user["headimgurl"];
+            $user->lottery_num  = 1;
+            $user->save();
+        }
 
         $activities = Activity::where("reply_keyword", $content);
         if ($activities->get()->isNotEmpty() && $activities->first()->shops()->get()->isNotEmpty()) {
@@ -47,7 +60,7 @@ class TextMessageHandler implements EventHandlerInterface {
                 ]),
             ]);
         } else {
-            return "未找到此活动";
+            return "";
         }
     }
 }
