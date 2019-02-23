@@ -93,7 +93,9 @@ class UserController extends ApiController {
      */
     public function getUserById($id) {
         if ($id == 0) {
-            return $this->success(JWTAuth::parseToken()->authenticate());
+            $user = JWTAuth::parseToken()->authenticate();
+
+            return $user ? $this->success($user) : $this->unauthorized();
         }
         $user = User::find($id);
         if ( ! $user) {

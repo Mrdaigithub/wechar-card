@@ -78,11 +78,7 @@ export default {
     if (!this.oneself) {
       Loading.service({fullscreen: true});
       const openid = this.$route.query.openid;
-      // Todo in dev
-      if ((!openid || openid === '') && !sessionStorage.token) {
-        sessionStorage.clear();
-        window.location.href = `${DOMAIN}/wechat/authorize?url=${encodeURIComponent(DOMAIN)}%2Fwechat%2Fgrant%2Fshop}`;
-      } else if ((openid || openid !== '') && !sessionStorage.token) {
+      if ((openid || openid !== '') && !sessionStorage.token) {
         const {data} = await this.$axios.$get(`/auth/client/${openid}`);
         sessionStorage.setItem('token', data.token);
         sessionStorage.setItem('ttl', data.ttl);
