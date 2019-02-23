@@ -58,9 +58,6 @@ class LogController extends ApiController {
             return $this->badRequest(NULL, ResponseMessage::$message[400003]);
         }
         $shopActivityWinningLog = $shopActivity->first()->winningLogs();
-        if ($shopActivityWinningLog->get()->isEmpty()) {
-            return $this->badRequest(NULL, ResponseMessage::$message[400003]);
-        }
 
         return $this->success(
             $shopActivityWinningLog->get()->map(function ($item) {
