@@ -28,8 +28,6 @@ Route::prefix('/wechat')->group(function () {
     Route::get("/grant/add/boss", "WeChatController@grantAddShopBoss");
     Route::get("/grant/add/employee", "WeChatController@grantAddShopEmployee");
     Route::get("/grant/writeoff", "WeChatController@grantWriteOff");
-    Route::get('/token', 'WeChatController@getAccessToken');
-    Route::get('/jssdk/config', 'WeChatController@getJsSdkConfig');
     Route::get('/geocoder', 'WeChatController@geocoder');
     Route::get('/shop/{id}/location', 'WeChatController@getCityByShopId');
 });

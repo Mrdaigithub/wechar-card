@@ -13,9 +13,6 @@ use EasyWeChat\Kernel\Messages\Message;
 use Illuminate\Http\Request;
 
 class WeChatController extends WebController {
-    public function test() {
-    }
-
     /**
      * 处理微信的请求消息
      *
@@ -319,28 +316,6 @@ class WeChatController extends WebController {
         ]);
 
         return $this->response(ResponseMessage::$message[200003]);
-    }
-
-    /**
-     * 获取Access token
-     *
-     * @return mixed
-     */
-    public function getAccessToken() {
-        $app = app('wechat.official_account');
-
-        return $app->access_token->getToken();
-    }
-
-    /**
-     * 获取js sdk 配置
-     *
-     * @return mixed
-     */
-    public function getJsSdkConfig() {
-        $app = app('wechat.official_account');
-
-        return $app->jssdk->buildConfig(['getLocation'], TRUE);
     }
 
     /**
