@@ -6,7 +6,9 @@ use App\Helpers\Api\ApiResponse;
 use App\Utils\ResponseMessage;
 use Exception;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Http\Response;
 use Illuminate\Validation\ValidationException;
+use Overtrue\Socialite\AuthorizeFailedException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Tymon\JWTAuth\Exceptions\JWTException;
@@ -62,6 +64,10 @@ class Handler extends ExceptionHandler {
     }
 
     public function handle($request, Exception $e) {
+        // 处理wechat oath2 认证异常
+        if ($e instanceof AuthorizeFailedException) {
+            return response(ResponseMessage::$message[401005], Response::HTTP_UNAUTHORIZED);
+        }
         // 处理jwt token 过期异常
         if ($e instanceof TokenExpiredException) {
             return $this->unauthorized(NULL, ResponseMessage::$message[401002]);

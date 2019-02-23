@@ -3,25 +3,31 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Laravel</title>
+    <title>wechat-card</title>
 </head>
 <body>
 <div style="text-align: center">Loading...</div>
 <div id="openid" style="display: none">{{$openid}}</div>
 <div id="url" style="display: none">{{$url}}</div>
+<div id="shopLocation" style="display: none">{{$shopLocation}}</div>
 <script src="https://res.wx.qq.com/open/js/jweixin-1.4.0.js"></script>
 <script>
     /**
      * 校验用户的地理位置通过并跳转至抽奖页面
      */
     wx.config(<?php
-        $app = app('wechat.official_account');
-        echo $app->jssdk->buildConfig(array("getLocation"), FALSE)
+        use EasyWeChat\Factory;
+        $app = Factory::officialAccount([
+            'app_id'        => env("WECHAT_OFFICIAL_ACCOUNT_APPID_1", ""),
+            'secret'        => env("WECHAT_OFFICIAL_ACCOUNT_SECRET_1", ""),
+            'response_type' => 'array',
+        ]);
+        echo $app->jssdk->buildConfig(array("getLocation"), FALSE);
         ?>);
     var shopId = null;
-    var shopLocation = null;
     var openid = document.getElementById("openid").innerHTML;
     var url = document.getElementById("url").innerHTML;
+    var shopLocation = document.getElementById("shopLocation").innerHTML;
     var pass = false;
 
     function getQueryVariable(variable) {
@@ -59,9 +65,6 @@
     if (!(shopId = getQueryVariable("shopid"))) {
         dialog("url参数错误")
     }
-    if (!(shopLocation = getQueryVariable("shoplocation"))) {
-        dialog("url参数错误")
-    }
 
     wx.ready(function () {
         wx.checkJsApi({
@@ -83,8 +86,9 @@
                             city = JSON.parse(res).result.addressComponent.city;
                             if (city !== shopLocation) {
                                 dialog("当前所在区域无法参加活动");
-                            }else {
-                                window.location.href = `${url}?openid=${openid}&shopid=${shopId}&location=${encodeURIComponent(city)}`;
+                            } else {
+                                dialog(`${url}?openid=${openid}&shopid=${shopId}&location=${encodeURIComponent(city)}`);
+                                // window.location.href = `${url}?openid=${openid}&shopid=${shopId}&location=${encodeURIComponent(city)}`;
                             }
                         });
                     },

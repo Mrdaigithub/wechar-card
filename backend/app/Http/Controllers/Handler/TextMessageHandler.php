@@ -27,36 +27,15 @@ class TextMessageHandler implements EventHandlerInterface {
             return "local";
         }
 
-        $app     = app('wechat.official_account');
-        $openid  = $payload["FromUserName"];
         $content = $payload["Content"];
-
-        //
-        // if (User::where("openid", $openid)->get()->isEmpty()) {
-        //     $wechat_user = $app->user->get($openid);
-        //
-        //     $user               = new User;
-        //     $user->openid       = $wechat_user["openid"];
-        //     $user->username     = $wechat_user["nickname"];
-        //     $user->head_img_url = $wechat_user["headimgurl"];
-        //     $user->lottery_num  = 1;
-        //     $user->save();
-        // }
 
         $activities = Activity::where("reply_keyword", $content);
         if ($activities->get()->isNotEmpty() && $activities->first()->shops()->get()->isNotEmpty()) {
             $activity = $activities->first();
             $shop     = $activities->first()->shops()->first();
             $shopId   = $shop->id;
-            $location = $shop->shop_location;
 
-            $url = env("DOMAIN") . "/wechat/authorize?url=" . urlencode(env("DOMAIN") . "/wechat/grant/lottery/user?shopid=$shopId&shoplocation=$location");
-
-            $accessToken = $app->access_token;
-            $token = $accessToken->getToken();
-            return json_encode($token["access_token"]);
-
-            return $url;
+            $url = env("DOMAIN") . "/wechat/authorize?url=" . urlencode(env("DOMAIN") . "/wechat/grant/lottery/user?shopid=$shopId");
 
             return new News([
                 new NewsItem([

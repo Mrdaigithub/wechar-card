@@ -2,6 +2,7 @@ const pkg = require('./package');
 
 module.exports = {
   mode: 'universal',
+  debug: false,
 
   server: {
     port: 3000, // default: 3000
@@ -77,7 +78,7 @@ module.exports = {
     baseURL: 'https://wzyylm.com/api/v1',
     https: true,
     retry: {retries: 3},
-    debug: true,
+    debug: false,
   },
 
   /*

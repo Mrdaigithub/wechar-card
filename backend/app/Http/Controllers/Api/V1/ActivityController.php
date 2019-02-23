@@ -49,19 +49,20 @@ class ActivityController extends ApiController {
     public function getActivityByShopId($id) {
         $shop = Shop::find($id);
         if ( ! $shop) {
-            return $this->notFound();
+            return $this->badRequest(ResponseMessage::$message[400028]);
         }
         $activities = $shop->activity();
         if ($activities->get()->isEmpty()) {
             return $this->badRequest(NULL, ResponseMessage::$message[400012]);
         }
 
-        $activity = $activities->first();
-        $winningLogs     = $activity->winningLogs();
+        $activity               = $activities->first();
+        $winningLogs            = $activity->winningLogs();
         $activity->customer_num = $winningLogs->get()->isNotEmpty() ?
             $winningLogs->get()->map(function ($item) {
-                return $item->user()->first()->id;
-            })->unique()->values()->count() : 0;;
+                return $item->user()->first() ? $item->user()->first()->id : NULL;
+            })->unique()->values()->count() : 0;
+
         return $this->success($activity);
     }
 

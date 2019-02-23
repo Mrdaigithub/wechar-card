@@ -134,6 +134,7 @@
 
 <script>
 import {mapState, mapActions} from 'vuex';
+import {Loading} from 'element-ui';
 
 export default {
   name: 'AdminLogWinning',
@@ -199,10 +200,11 @@ export default {
     },
   },
   mounted() {
+    Loading.service({fullscreen: true});
     this.addWinningLogList();
     this.addUserList();
     this.addShopEmployeeList();
-    this.addShopList();
+    this.addShopList(Loading.service({fullscreen: true}).close());
   },
   methods: {
     ...mapActions({

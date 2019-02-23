@@ -21,24 +21,8 @@ class EventMessageHandler extends Controller implements EventHandlerInterface {
      * @return string
      */
     public function handle($payload = NULL) {
-        $app    = app('wechat.official_account');
-        $openid = $payload["FromUserName"];
-
         if ($payload['Event'] == "subscribe") {
-            if (User::where("openid", $openid)->get()->isEmpty()) {
-                $wechat_user = $app->user->get($openid);
-
-                $user               = new User;
-                $user->openid       = $wechat_user["openid"];
-                $user->username     = $wechat_user["nickname"];
-                $user->head_img_url = $wechat_user["headimgurl"];
-                $user->lottery_num  = 1;
-                $user->save();
-
-                return "欢迎首次关注";
-            }
-
-            return "欢迎回来";
+            return "欢迎关注";
         }
     }
 }

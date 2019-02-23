@@ -329,8 +329,10 @@ export default {
     },
   },
   mounted() {
+    Loading.service({fullscreen: true});
     this.addShopEmployeeList();
     this.addShopList();
+    this.addShopList(Loading.service({fullscreen: true}).close());
     window.Echo.channel('adminChannel').listen('AdminAddBossEvent', async (e) => {
       if (e.message &&
         JSON.parse(e.message).signal === 'allowAdminAddBoss' &&
@@ -352,7 +354,6 @@ export default {
     },
     async addItem() {
       Loading.service({fullscreen: true});
-      this.addDialog = true;
       const {data} = await this.$axios.$get(`/qrcode/add/boss`);
       this.addBossQrCodeBase64 = data;
       Loading.service({fullscreen: true}).close();

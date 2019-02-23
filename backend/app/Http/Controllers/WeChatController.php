@@ -8,22 +8,12 @@ use App\Model\Card;
 use App\Model\Shop;
 use App\Model\User;
 use App\Utils\ResponseMessage;
+use EasyWeChat\Factory;
 use EasyWeChat\Kernel\Messages\Message;
-use GuzzleHttp\Client;
 use Illuminate\Http\Request;
-use Overtrue\Socialite\SocialiteManager as Socialite;
 
 class WeChatController extends WebController {
     public function test() {
-        $socialite = (new Socialite([
-            'wechat' => [
-                'client_id'     => "wx817b9b82f208b933",
-                'client_secret' => "7972ea0cc2c3229f86734cd8cbf34ce0",
-                'redirect'      => "https://mrdaisite.club/wechat/grant/lottery/user?shopid=1",
-            ],
-        ]))->driver("wechat")->scopes(["snsapi_base"])->redirect();
-
-        return $socialite;
     }
 
     /**
@@ -51,41 +41,49 @@ class WeChatController extends WebController {
         if ( ! $request->exists("url")) {
             return $this->response(ResponseMessage::$message[400000]);
         }
-        $url = $request->get("url");
 
-        $app      = app('wechat.official_account');
-        $response = $app->oauth->scopes(['snsapi_base'])->redirect($url);
+        $app = $this->getOfficialAccount1();
 
-        return $response;
+        return $app->oauth->scopes(["snsapi_userinfo"])->redirect($request->get("url"));
     }
 
     /**
      * 普通用户认证跳转到地理位置验证界面通过则跳转到抽奖界面
      *
+     * @param \Illuminate\Http\Request $request
+     *
      * @return bool|\Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Contracts\View\Factory|\Illuminate\Http\Response|\Illuminate\View\View|mixed
      */
-    public function grantLotteryUser() {
-        $socialite = (new Socialite([
-            'wechat' => [
-                'client_id'     => "wx817b9b82f208b933",
-                'client_secret' => "7972ea0cc2c3229f86734cd8cbf34ce0",
-                'redirect'      => "https://mrdaisite.club/wechat/grant/lottery/user?shopid=1",
-            ],
-        ]))->driver("wechat")->user();
-        return json_encode($socialite);
+    public function grantLotteryUser(Request $request) {
+        if ( ! $request->exists("shopid")) {
+            return $this->response(ResponseMessage::$message[400000]);
+        }
+        $shop = Shop::find($request->get("shopid"));
+        if ( ! $shop) {
+            return $this->response(ResponseMessage::$message[400028]);
+        }
+
         $wechatUser = $this->getOneself();
         $users      = User::where("openid", $wechatUser->getId());
         if ($users->get()->isEmpty()) {
-            return $this->response(ResponseMessage::$message[400007]);
-        }
+            $user               = new User;
+            $user->openid       = $wechatUser->getId();
+            $user->username     = $wechatUser->getNickname();
+            $user->head_img_url = $wechatUser->getAvatar();
+            $user->lottery_num  = 1;
 
-        if ($res = $this->isPlainUser($users->first())) {
-            return $res;
+            $user->save();
+        } else {
+            $user = $users->first();
+            if ($res = $this->isPlainUser($user)) {
+                return $res;
+            }
         }
 
         return view("redirectUserLottery", [
-            "openid" => $wechatUser->getId(),
-            "url"    => env("FRONT_DOMAIN") . "/user/lottery",
+            "openid"       => $user->openid,
+            "url"          => env("FRONT_DOMAIN") . "/user/lottery",
+            "shopLocation" => $shop->shop_location,
         ]);
     }
 
@@ -143,20 +141,18 @@ class WeChatController extends WebController {
             return $this->response(ResponseMessage::$message[400000]);
         }
 
-        $app        = app('wechat.official_account');
-        $openid     = $this->getOneself()->getId();
-        $wechatUser = $app->user->get($openid);
+        $wechatUser = $this->getOneself();
 
         // 用户认证
-        $user = User::where("openid", $wechatUser["openid"]);
+        $user = User::where("openid", $wechatUser->getId());
         if ($user->get()->isNotEmpty()) {
             $user           = $user->first();
             $user->identity = 1;
         } else {
             $user               = new User;
-            $user->openid       = $wechatUser["openid"];
-            $user->username     = $wechatUser["nickname"];
-            $user->head_img_url = $wechatUser["headimgurl"];
+            $user->openid       = $wechatUser->getId();
+            $user->username     = $wechatUser->getNickname();
+            $user->head_img_url = $wechatUser->getAvatar();
             $user->identity     = 1;
         }
         $this->saveModel($user);
@@ -324,10 +320,8 @@ class WeChatController extends WebController {
         if ( ! $location) {
             return $this->response(ResponseMessage::$message[400000]);
         }
-        $client = new Client();
-        $res    = $client->get("http://api.map.baidu.com/geocoder/v2/?location=$location&output=json&pois=1&ak=" . env("AK"));
 
-        return $res;
+        return $this->sendGetRequest("http://api.map.baidu.com/geocoder/v2/?location=$location&output=json&pois=1&ak=" . env("AK"));
     }
 
     /**

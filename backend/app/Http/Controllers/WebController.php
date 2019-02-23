@@ -12,6 +12,9 @@ use App\Events\AdminAddBossEvent;
 use App\Events\AdminLoginEvent;
 use App\Events\MessageEvent;
 use App\Utils\ResponseMessage;
+use EasyWeChat\Factory;
+use GuzzleHttp\Client;
+use Overtrue\Socialite\SocialiteManager as Socialite;
 
 class WebController extends Controller {
     /**
@@ -40,7 +43,7 @@ class WebController extends Controller {
      * @return mixed
      */
     protected function getOneself() {
-        $app = app('wechat.official_account');
+        $app = $this->getOfficialAccount1();
 
         return $app->oauth->user();
     }
@@ -136,5 +139,41 @@ class WebController extends Controller {
         }
 
         return FALSE;
+    }
+
+    /**
+     * 获取微信用户信息通过openid
+     *
+     * @param $openid
+     * @param $token
+     *
+     * @return \Psr\Http\Message\ResponseInterface
+     */
+    protected function getWechatUserByOpenid($openid, $token) {
+        return json_decode($this->sendGetRequest("https://api.weixin.qq.com/sns/userinfo?access_token=$token&openid=$openid&lang=zh_CN"));
+    }
+
+    /**
+     * 获取服务号实例
+     *
+     * @return \EasyWeChat\OfficialAccount\Application
+     */
+    protected function getOfficialAccount1() {
+        return Factory::officialAccount([
+            'app_id'        => env("WECHAT_OFFICIAL_ACCOUNT_APPID_1", ""),
+            'secret'        => env("WECHAT_OFFICIAL_ACCOUNT_SECRET_1", ""),
+            'response_type' => 'array',
+        ]);
+    }
+
+    /**
+     * 发起GET请求
+     *
+     * @param $url
+     *
+     * @return string
+     */
+    protected function sendGetRequest($url) {
+        return (string) (new Client())->get($url)->getBody();
     }
 }
