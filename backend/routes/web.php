@@ -20,8 +20,9 @@ Route::get('/', function () {
 Route::prefix('/wechat')->group(function () {
     Route::any('/', 'WeChatController@serve');
     Route::any('/test', 'WeChatController@test');
-    Route::get("/authorize", "WeChatController@wechatAuthorize");
-    Route::get("/grant/lottery/user", "WeChatController@grantLotteryUser");
+    Route::get("/authorize", "WeChatController@wechatBaseAuthorize");
+    Route::get("/grant/lottery/user/openid", "WeChatController@grantLotteryUserOpenid");
+    Route::get("/grant/lottery/user/info", "WeChatController@grantLotteryUserInfo");
     Route::get("/grant/shop", "WeChatController@grantToShop");
     Route::get("/grant/login/admin", "WeChatController@grantLoginAdmin");
     Route::get("/grant/add/boss", "WeChatController@grantAddShopBoss");

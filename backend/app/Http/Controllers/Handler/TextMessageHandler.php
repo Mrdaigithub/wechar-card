@@ -35,7 +35,9 @@ class TextMessageHandler implements EventHandlerInterface {
             $shop     = $activities->first()->shops()->first();
             $shopId   = $shop->id;
 
-            $url = env("DOMAIN") . "/wechat/authorize?url=" . urlencode(env("DOMAIN") . "/wechat/grant/lottery/user?shopid=$shopId");
+            $url = env("DOMAIN") . "/wechat/authorize?url="
+                . urlencode(env("DOMAIN")
+                    . "/wechat/grant/lottery/user/openid?shopid=$shopId");
 
             return new News([
                 new NewsItem([

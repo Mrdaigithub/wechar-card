@@ -31,30 +31,65 @@ class WeChatController extends WebController {
     }
 
     /**
-     * 微信授权获取用户信息,跳转指定页面
+     * 微信授权获取用户openid,跳转指定页面
      *
      * @param \Illuminate\Http\Request $request
      *
      * @return string
      */
-    public function wechatAuthorize(Request $request) {
+    public function wechatBaseAuthorize(Request $request) {
         if ( ! $request->exists("url")) {
             return $this->response(ResponseMessage::$message[400000]);
         }
 
         $app = $this->getOfficialAccount1();
 
-        return $app->oauth->scopes(["snsapi_userinfo"])->redirect($request->get("url"));
+        return $app->oauth->scopes(["snsapi_base"])->redirect($request->get("url"));
     }
 
     /**
-     * 普通用户认证跳转到地理位置验证界面通过则跳转到抽奖界面
+     * 普通用户认证openid跳转到地理位置验证界面通过则跳转到抽奖界面
      *
      * @param \Illuminate\Http\Request $request
      *
      * @return bool|\Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Contracts\View\Factory|\Illuminate\Http\Response|\Illuminate\View\View|mixed
      */
-    public function grantLotteryUser(Request $request) {
+    public function grantLotteryUserOpenid(Request $request) {
+        if ( ! $request->exists("shopid")) {
+            return $this->response(ResponseMessage::$message[400000]);
+        }
+        $shop = Shop::find($request->get("shopid"));
+        if ( ! $shop) {
+            return $this->response(ResponseMessage::$message[400028]);
+        }
+
+        $users = User::where("openid", $this->getOneself()->getId());
+        if ($users->get()->isEmpty()) {
+            return $this->getOfficialAccount1()->oauth
+                ->scopes(["snsapi_userinfo"])
+                ->redirect(env("DOMAIN") .
+                    "/wechat/grant/lottery/user/info?shopid=" . $request->get("shopid"));
+        }
+        $user = $users->first();
+        if ($res = $this->isPlainUser($user)) {
+            return $res;
+        }
+
+        return view("redirectUserLottery", [
+            "openid"       => $user->openid,
+            "url"          => env("FRONT_DOMAIN") . "/user/lottery",
+            "shopLocation" => $shop->shop_location,
+        ]);
+    }
+
+    /**
+     * 普通用户认证openid跳转到地理位置验证界面通过则跳转到抽奖界面
+     *
+     * @param \Illuminate\Http\Request $request
+     *
+     * @return bool|\Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Contracts\View\Factory|\Illuminate\Http\Response|\Illuminate\View\View|mixed
+     */
+    public function grantLotteryUserInfo(Request $request) {
         if ( ! $request->exists("shopid")) {
             return $this->response(ResponseMessage::$message[400000]);
         }
