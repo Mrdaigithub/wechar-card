@@ -8,7 +8,6 @@ use App\Model\Card;
 use App\Model\Shop;
 use App\Model\User;
 use App\Utils\ResponseMessage;
-use EasyWeChat\Factory;
 use EasyWeChat\Kernel\Messages\Message;
 use Illuminate\Http\Request;
 

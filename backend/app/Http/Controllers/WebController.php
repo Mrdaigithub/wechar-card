@@ -142,18 +142,6 @@ class WebController extends Controller {
     }
 
     /**
-     * 获取微信用户信息通过openid
-     *
-     * @param $openid
-     * @param $token
-     *
-     * @return \Psr\Http\Message\ResponseInterface
-     */
-    protected function getWechatUserByOpenid($openid, $token) {
-        return json_decode($this->sendGetRequest("https://api.weixin.qq.com/sns/userinfo?access_token=$token&openid=$openid&lang=zh_CN"));
-    }
-
-    /**
      * 获取服务号实例
      *
      * @return \EasyWeChat\OfficialAccount\Application
