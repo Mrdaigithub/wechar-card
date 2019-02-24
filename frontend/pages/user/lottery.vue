@@ -291,8 +291,8 @@ export default {
       this.rotating();
     },
     async rotating() {
-      Loading.service({fullscreen: true});
       if (!this.click_flag) return;
+      Loading.service({fullscreen: true});
       const {data} = await this.$axios.$get(
         `/card/lottery/shop/${this.$route.query.shopid}?location=${this.location}`);
       Loading.service({fullscreen: true}).close();

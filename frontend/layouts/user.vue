@@ -36,14 +36,23 @@
 </template>
 
 <script>
-import {mapMutations, mapActions} from 'vuex';
+import {mapState, mapMutations, mapActions} from 'vuex';
 import {Loading, Message} from 'element-ui';
-import {DOMAIN} from '../utils/constant';
 
 export default {
   data: () => ({
-    bottomNav: '',
+    bottomNav: 'lottery',
   }),
+  computed: {
+    ...mapState({
+      bottomTab: state => state.assist.bottomTab ? state.assist.bottomTab : 'lottery',
+    }),
+  },
+  watch: {
+    bottomTab(val) {
+      this.bottomNav = val;
+    },
+  },
   async created() {
     Loading.service({fullscreen: true});
     const openid = this.$route.query.openid;

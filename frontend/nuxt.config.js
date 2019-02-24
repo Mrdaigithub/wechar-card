@@ -100,4 +100,8 @@ module.exports = {
       }
     },
   },
+
+  router: {
+    middleware: 'tabActivity',
+  },
 };
