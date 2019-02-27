@@ -115,7 +115,7 @@ class CardController extends ApiController {
             } elseif ($item->state
                 && ! ! $item->end_time_1
                 && strtotime(date('Y-m-d H:i:s', strtotime("+" . $item["end_time_1"] . " seconds", date(strtotime($item["created_at"])))))
-                < strtotime(date('Y-m-d h:i:s', time()))) {
+                > strtotime(date('Y-m-d h:i:s', time()))) {
                 // 时间2过期卡券失效
                 $item->state = 0;
                 $item->view  = "expired";

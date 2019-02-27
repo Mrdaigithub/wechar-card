@@ -276,7 +276,7 @@ export default {
     ],
     rules: {
       real_name: [
-        {min: 3, max: 20, message: '长度在 3 到 20 个字符', trigger: 'change'},
+        {min: 1, max: 20, message: '长度在 1 到 20 个字符', trigger: 'change'},
         {type: 'string', pattern: /^(\w|[\u4e00-\u9fa5])+$/, message: '请不要包含特殊字符', trigger: 'change'},
       ],
       phone: [

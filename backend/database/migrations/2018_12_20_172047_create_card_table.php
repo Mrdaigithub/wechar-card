@@ -16,7 +16,7 @@ class CreateCardTable extends Migration {
       $table->bigIncrements('id')->unique();
       $table->string('card_name');
       $table->string("card_thumbnail")
-            ->default("https://randomuser.me/api/portraits/men/85.jpg")
+            ->default("http://www.nz120.com/uploads/allimg/190227/1-1Z22G0414A34.jpg")
             ->comment("卡券的缩略图");
       $table->timestamp('end_time_0')->nullable()->comment("指定时间的失效时间");
       $table->unsignedInteger('end_time_1')->nullable()

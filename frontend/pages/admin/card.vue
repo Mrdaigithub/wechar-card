@@ -47,7 +47,7 @@
                       xs12
                       sm6>
                       <el-form-item
-                        label="备注"
+                        label="详细名称"
                         prop="remarks">
                         <el-input
                           v-model="editedItem.remarks"/>
@@ -237,7 +237,7 @@ export default {
       {text: 'ID', align: 'center', sortable: true, value: 'id'},
       {text: '卡券名称', align: 'center', value: 'card_name'},
       {text: '卡券缩略图', align: 'center', value: 'card_thumbnail'},
-      {text: '备注', align: 'center', value: 'remarks'},
+      {text: '详细名称', align: 'center', value: 'remarks'},
       {text: '有效期截止', align: 'center', value: 'end_time_0'},
       {text: '启用状态', align: 'center', value: 'state'},
       {text: '中奖率', align: 'center', value: 'probability'},

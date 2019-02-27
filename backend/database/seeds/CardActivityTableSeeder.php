@@ -16,10 +16,5 @@ class CardActivityTableSeeder extends Seeder {
     DB::table("card_activity")->insert(["card_id" => 3, "activity_id" => 1]);
     DB::table("card_activity")->insert(["card_id" => 4, "activity_id" => 1]);
     DB::table("card_activity")->insert(["card_id" => 5, "activity_id" => 1]);
-    DB::table("card_activity")->insert(["card_id" => 6, "activity_id" => 2]);
-    DB::table("card_activity")->insert(["card_id" => 7, "activity_id" => 2]);
-    DB::table("card_activity")->insert(["card_id" => 8, "activity_id" => 2]);
-    DB::table("card_activity")->insert(["card_id" => 9, "activity_id" => 2]);
-    DB::table("card_activity")->insert(["card_id" => 10, "activity_id" => 2]);
   }
 }
