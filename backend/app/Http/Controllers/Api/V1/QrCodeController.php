@@ -5,11 +5,32 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\Api\ApiController;
 use App\Model\Card;
 use App\Utils\ResponseMessage;
+use Illuminate\Support\Facades\Storage;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
 class QrCodeController extends ApiController {
     private $oneself;
+
+    /**
+     * 生成二维码附带logo
+     *
+     * @param $text
+     *
+     * @return mixed
+     */
+    private function getQrCode($text) {
+        $qrCode = QrCode::encoding('UTF-8')
+            ->format("png")
+            ->size(300)
+            ->margin(0);
+
+        if (Storage::exists('qrlogo.jpg')) {
+            $qrCode = $qrCode->merge(Storage::path('qrlogo.jpg'), .2, TRUE);
+        }
+
+        return $qrCode->generate($text);
+    }
 
     /**
      * 获取管理员登录的二维码base64编码
@@ -20,14 +41,7 @@ class QrCodeController extends ApiController {
         $expiredTime = strtotime("+ 5 minutes");
         $url         = env("DOMAIN") . "/wechat/authorize?url=" . urlencode(env("DOMAIN") . "/wechat/grant/login/admin?expired_time=$expiredTime");
 
-        return $this->success(
-            base64_encode(
-                QrCode::encoding('UTF-8')
-                    ->format("png")
-                    ->size(300)
-                    ->generate($url)
-            )
-        );
+        return $this->success(base64_encode($this->getQrCode($url)));
     }
 
     /**
@@ -43,14 +57,7 @@ class QrCodeController extends ApiController {
         $expiredTime = strtotime("+ 5 minutes");
         $url         = env("DOMAIN") . "/wechat/authorize?url=" . urlencode(env("DOMAIN") . "/wechat/grant/add/boss?expired_time=$expiredTime&admin_id=" . $this->oneself->id);
 
-        return $this->success(
-            base64_encode(
-                QrCode::encoding('UTF-8')
-                    ->format("png")
-                    ->size(300)
-                    ->generate($url)
-            )
-        );
+        return $this->success(base64_encode($this->getQrCode($url)));
     }
 
     /**
@@ -111,13 +118,6 @@ class QrCodeController extends ApiController {
         $expiredTime = strtotime("+ 5 minutes");
         $url         = env("DOMAIN") . "/wechat/authorize?url=" . urlencode(env("DOMAIN") . "/wechat/grant/writeoff?expired_time=$expiredTime&card_id=" . $card->id);
 
-        return $this->success(
-            base64_encode(
-                QrCode::encoding('UTF-8')
-                    ->format("png")
-                    ->size(300)
-                    ->generate($url)
-            )
-        );
+        return $this->success(base64_encode($this->getQrCode($url)));
     }
 }

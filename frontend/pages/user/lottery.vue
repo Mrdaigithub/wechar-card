@@ -20,7 +20,6 @@
     </div>
     <div class="more-lottery-num-btn-wrap">
       <v-btn
-        v-if="lotteryNum === 0"
         outline
         round
         class="font-weight-black more-lottery-num-btn"
@@ -71,23 +70,20 @@
     <div
       v-show="toast_control"
       class="toast">
-      <div class="toast-container">
-        <v-img
-          :src="toastPicture"
-          class="toast-picture"/>
+      <div
+        class="toast-container"
+        @click="writeForm">
+        <img
+          :src="hasPrize ? totalDialogBg1 : totalDialogBg2"
+          alt="">
         <div
-          class="close"
-          @click="closeToast()"/>
-        <div
-          class="toast-title"
-          v-html="toastTitle"/>
-        <div class="toast-btn">
-          <div
-            class="toast-cancel"
-            @click="writeForm">{{ !!hasPrize? '点击领取':'再接再厉' }}
-          </div>
+          v-if="hasPrize"
+          class="toast-body white--text text-xs-center">
+          <h3>{{ cardModelList[index].name }}</h3>
+          <p>{{ cardModelList[index]['remarks'] }}</p>
         </div>
-      </div>
+      </div
+      >
     </div>
     <div
       v-show="toast_control"
@@ -135,23 +131,29 @@
     </v-dialog>
     <v-dialog
       v-model="qrCodeDialog"
-      persistent
       max-width="300px">
-      <v-card>
-        <v-card-title>
-          <span>{{ `请将二维码交予老板核销 ${cardModelList[index].name || null}` }}</span>
-          <v-spacer/>
-        </v-card-title>
+      <v-card class="qrcode-dialog-body">
+        <h3 class="text-xs-center ma-0">
+          <span
+            :style="{background: 'url(' + prizeIcon + ') no-repeat left center', backgroundSize: 'contain'}">
+            {{ cardModelList[index].name }}
+          </span>
+        </h3>
+        <p class="text-xs-center ma-0 sub-title">{{ cardModelList[index].remarks }}</p>
         <v-img
           v-if="writeOffQrCodeBase64"
           :src="`data:image/png;base64,${writeOffQrCodeBase64}`"/>
-        <v-card-actions>
-          <v-btn
-            color="primary"
-            flat
-            @click="closeQrCodeDialog">完成
-          </v-btn>
-        </v-card-actions>
+        <p class="text-xs-center ma-0 des">请让商家扫码核销优惠卷</p>
+        <p
+          v-if="!!currentCard"
+          class="text-xs-center ma-0 time">
+          {{ currentCard['end_time_0'] ? `有效期: ${currentCard['end_time_0']}`
+          : null }}
+          <CountDownTimer
+            v-if="currentCard['end_time_1']"
+            :id="currentCard.id"
+            :end-time="getCountDownTimerString(new Date(new Date(currentCard['created_at']).getTime() + currentCard['end_time_1'] * 1000))"/>
+        </p>
       </v-card>
     </v-dialog>
   </div>
@@ -160,15 +162,25 @@
 <script>
 import {mapState, mapActions} from 'vuex';
 import {Message, Loading} from 'element-ui';
+import CountDownTimer from '~/components/CountDownTimer';
 import rules from '~/utils/rules';
 import randomSort from '~/utils/randomSort';
 import rangeRandom from '~/utils/rangeRandom';
 import phoneNumberHeaders from '~/utils/phoneNumberHeaders';
+import totalDialogBg1 from '~/assets/images/total-dialog-bg-1.jpg';
+import totalDialogBg2 from '~/assets/images/total-dialog-bg-2.jpg';
+import prizeIcon from '~/assets/images/prize-icon.png';
 
 export default {
   name: 'Lottery',
   layout: 'user',
+  components: {
+    CountDownTimer,
+  },
   data: () => ({
+    totalDialogBg1,
+    totalDialogBg2,
+    prizeIcon,
     toast_control: false, //抽奖结果弹出框控制器
     hasPrize: false, //是否中奖
     start_rotating_degree: 0, //初始旋转角度
@@ -196,7 +208,7 @@ export default {
     writeOffQrCodeBase64: '',
     realName: '',
     phone: '',
-    cardId: null, // 抽到的卡券id
+    currentCard: null, // 抽到的卡券id
   }),
   computed: {
     ...mapState({
@@ -204,8 +216,7 @@ export default {
       oneself: state => state.oneself.oneself ? state.oneself.oneself : {}, // 当前用户
       howManyDaysHaveYouWonTheLotteryIn15Days: state => state.systemConfig.systemConfig
         ? state.systemConfig.systemConfig.filter(
-          item => item['config_name'] === 'howManyDaysHaveYouWonTheLotteryIn15Days')[0]['config_value']
-        : 7,
+          item => item['config_name'] === 'howManyDaysHaveYouWonTheLotteryIn15Days')[0]['config_value'] : 7,
       customerNum: state => state.shop.activity ? state.shop.activity['customer_num'] + 110 : 0, // 活动参与人数
       lotteryNum: state => state.oneself.oneself ? state.oneself.oneself['lottery_num'] : 0, // 剩余抽奖次数
       lotteryNeedsToFillInTheInformation: state => state.systemConfig.systemConfig ?
@@ -214,7 +225,8 @@ export default {
         : true,// 抽奖填写信息配置
       cardModelList: state => {
         const cardList = state.card.cardModelList ?
-          state.card.cardModelList.map(item => ({id: item['id'], name: item['card_name'], isPrize: 1})) : [];
+          state.card.cardModelList.map(
+            item => ({id: item['id'], name: item['card_name'], remarks: item['remarks'], isPrize: 1})) : [];
         if (cardList.length > 8) {
           cardList.splice(8, cardList.length - 8);
         } else {
@@ -227,15 +239,6 @@ export default {
       cardList1: state => state.card.cardModelList ? state.card.cardModelList.map(
         item => ({id: item['id'], name: item['card_name'], isPrize: 1})) : [], // 显示的奖品列表带未中奖
     }),
-    toastTitle() {
-      return this.hasPrize
-        ? `恭喜您，获得${this.cardModelList[this.index].name}<br>请进入个人中心兑换奖励` : '未中奖';
-    },
-    toastPicture() {
-      return this.hasPrize
-        ? require('../../assets/images/congratulation.png')
-        : require('../../assets/images/sorry.png');
-    },
     winningLogData() {
       if (!this.cardList1.length) {
         return [];
@@ -253,11 +256,11 @@ export default {
   watch: {
     qrCodeDialog(val) {
       if (val) {
-        this.getQrCode(`/qrcode/writeoff/${this.cardId}`);
+        this.getQrCode(`/qrcode/writeoff/${this.currentCard.id}`);
       } else {
         this.realName = '';
         this.phone = '';
-        this.cardId = null;
+        this.currentCard = null;
       }
     },
   },
@@ -287,7 +290,7 @@ export default {
     initPrizeList(list) {
     },
     rotateHandle() {
-      this.cardId = null;
+      this.currentCard = null;
       this.rotating();
     },
     async rotating() {
@@ -297,7 +300,7 @@ export default {
         `/card/lottery/shop/${this.$route.query.shopid}?location=${this.location}`);
       Loading.service({fullscreen: true}).close();
       if (data.index) {
-        this.cardId = data['card_id'];
+        this.currentCard = data['card'];
         this.cardModelList.forEach((item, index) => {
           if (item['id'] === data.index) {
             this.index = index;
@@ -367,18 +370,18 @@ export default {
           cb: () => this.addOneself(),
         });
         this.qrCodeDialog = !this.qrCodeDialog;
+        this.$refs.form.reset();
       }
-    },
-    closeQrCodeDialog() {
-      this.qrCodeDialog = false;
-      this.formDialog = false;
-      this.$refs.form.reset();
     },
     async getQrCode(url) {
       Loading.service({fullscreen: true});
       const {data} = await this.$axios.$get(url);
       Loading.service({fullscreen: true}).close();
       this.writeOffQrCodeBase64 = data;
+    },
+    getCountDownTimerString(date) {
+      return `${date.getFullYear()}-${date.getMonth() +
+      1}-${date.getDate()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
     },
   },
 };
@@ -397,20 +400,23 @@ export default {
     min-height 100vh
 
     .lottery-user-num-text
-      font-size 20px
+      font-size 18px
 
     .lottery-num-text
-      font-size 18px
+      font-size 16px
 
       span
         color: #ecff02
         font-size 18px
         font-weight 700
+
     .more-lottery-num-btn-wrap
-      height: 45px
+      height: 40px
+      margin-bottom: 15px;
+
       .more-lottery-num-btn
-        font-size 20px
-        height: 45px
+        font-size 16px
+        height: 40px
         padding-left: 25px;
         padding-right: 25px;
 
@@ -536,7 +542,7 @@ export default {
     padding 22px 25px
     margin 0 10px
     border-radius 5px
-    font-size 16px
+    font-size 14px
     color #ffffff
     line-height 1.5
 
@@ -556,82 +562,38 @@ export default {
   }
 
   .toast {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    z-index: 20000;
-    transform: translate(-50%, -50%);
-    width: 15.4375rem;
-    background: #fff;
-    border-radius: 0.3125rem;
-    padding: 0.3125rem;
-    background-color: rgb(252, 244, 224);
+    position: fixed
+    top: 50%
+    left: 50%
+    z-index: 20000
+    transform: translate(-50%, -50%)
+    background-size contain
+    border-radius: 0.3125rem
+    padding: 0.3125rem
+    width 90%
   }
 
   .toast-container {
     position: relative;
-    width: 100%;
-    height: 100%;
-    border: 1px dotted #fccc6e;
-  }
 
-  .toast-picture {
-    position: absolute;
-    top: -6.5rem;
-    left: -1.5rem;
-    width: 18.75rem;
-    height: 8.5625rem;
-  }
+    img {
+      width 100%
+    }
 
-  .toast-title {
-    padding: 2.8125rem 0;
-    font-size: 18px;
-    color: #fc7939;
-    text-align: center;
-  }
+    .toast-body {
+      width 100%
+      position: absolute
+      top: 110px
+      left: 0
+      font-size: 18px
+      box-sizing border-box
 
-  .toast-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 0.9375rem;
-  }
-
-  .toast-btn div {
-    background-image: -moz-linear-gradient(
-      -18deg,
-      rgb(242, 148, 85) 0%,
-      rgb(252, 124, 88) 51%,
-      rgb(252, 124, 88) 99%
-    );
-    background-image: -ms-linear-gradient(
-      -18deg,
-      rgb(242, 148, 85) 0%,
-      rgb(252, 124, 88) 51%,
-      rgb(252, 124, 88) 99%
-    );
-    background-image: -webkit-linear-gradient(
-      -18deg,
-      rgb(242, 148, 85) 0%,
-      rgb(252, 124, 88) 51%,
-      rgb(252, 124, 88) 99%
-    );
-    box-shadow: 0px 4px 0px 0px rgba(174, 34, 5, 0.7);
-    border-radius: 1.875rem;
-    text-align: center;
-    line-height: 1.875rem;
-    color #fff
-    padding 2px 15px
-  }
-
-  .close {
-    position: absolute;
-    top: -0.9375rem;
-    right: -0.9375rem;
-    width: 2rem;
-    height: 2rem;
-    background: url("../../assets/images/close_store.png") no-repeat center top;
-    background-size: 100%;
+      h3 {
+        font-size: 22px
+        color: #eeff18
+        margin-bottom: 25px
+      }
+    }
   }
 
   .my-swiper
@@ -651,7 +613,27 @@ export default {
       p
         display inline-block
         text-align center
-        font-size 18px
+        font-size 16px
         color #ffffff
         margin 0
+
+  .qrcode-dialog-body {
+    h3 {
+      span {
+        color: #f4ac3a
+        font-size: 24px
+        padding-left 26px
+      }
+      padding: 20px 0 10px 0
+    }
+
+    .sub-title {
+      font-size: 20px;
+    }
+
+    .des, .time {
+      font-size: 18px;
+      padding-bottom: 15px;
+    }
+  }
 </style>

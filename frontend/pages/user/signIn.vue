@@ -38,6 +38,12 @@
           no-title
           multiple/>
       </v-flex>
+      <v-flex
+        :style="{marginTop:'50px'}"
+        xs12
+        class="ma-3"
+        text-xs-left>签到{{ howManyDaysHaveYouWonTheLotteryIn15Days }}天增加一次抽奖次数
+      </v-flex>
     </v-layout>
   </div>
 </template>
@@ -54,6 +60,9 @@ export default {
     ...mapState({
       signInLogList: state => state.oneself.signInLogList ? state.oneself.signInLogList : [],
       oneself: state => state.oneself.oneself ? state.oneself.oneself : {},
+      howManyDaysHaveYouWonTheLotteryIn15Days: state => state.systemConfig.systemConfig
+        ? state.systemConfig.systemConfig.filter(
+          item => item['config_name'] === 'howManyDaysHaveYouWonTheLotteryIn15Days')[0]['config_value'] : 7,
     }),
   },
   mounted() {

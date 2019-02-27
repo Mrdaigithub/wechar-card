@@ -109,7 +109,7 @@ class CardController extends ApiController {
                 && strtotime($item->end_time_0) < strtotime(date('Y-m-d h:i:s', time()))) {
                 // 时间1过期卡券失效
                 $item->state = 0;
-                $item->view = "expired";
+                $item->view  = "expired";
 
                 return $item;
             } elseif ($item->state
@@ -118,7 +118,7 @@ class CardController extends ApiController {
                 < strtotime(date('Y-m-d h:i:s', time()))) {
                 // 时间2过期卡券失效
                 $item->state = 0;
-                $item->view = "expired";
+                $item->view  = "expired";
 
                 return $item;
             }
@@ -247,8 +247,8 @@ class CardController extends ApiController {
         $this->saveModel($oneself);
 
         return $this->success([
-            "index"   => $res,
-            "card_id" => $newCard ? $newCard->id : NULL,
+            "index" => $res,
+            "card"  => $newCard ? $newCard : NULL,
         ]);
     }
 
