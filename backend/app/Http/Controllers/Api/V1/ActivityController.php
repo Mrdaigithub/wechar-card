@@ -31,7 +31,7 @@ class ActivityController extends ApiController {
                         }) : NULL;
                     $item->customer_num       = $winningLogs->get()->isNotEmpty() ?
                         $winningLogs->get()->map(function ($item) {
-                            return $item->user()->first()->id;
+                            return $item->user()->first();
                         })->unique()->values()->count() : 0;
 
                     return $item;
