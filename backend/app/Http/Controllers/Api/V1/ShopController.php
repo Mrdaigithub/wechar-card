@@ -68,16 +68,15 @@ class ShopController extends ApiController {
      * @return mixed
      */
     public function store(StoreShopRequest $request) {
-        if ($request->has("activity_id") &&
-            $request->get("activity_id") &&
-            (Activity::find($request->get("activity_id"))->shops()->get()->isEmpty())) {
+        if ($request->has("activity_id") && $request->get("activity_id")
+            && (Activity::find($request->get("activity_id"))->shops()->get()->isNotEmpty())) {
             return $this->badRequest(NULL, ResponseMessage::$message[400011]);
         }
 
         $shop                = new Shop();
         $shop->shop_name     = $request->get("shop_name");
         $shop->shop_location = $request->get("shop_location");
-        if ($request->has("started_at")) {
+        if ($request->has("started_at") && ! ! $request->get("started_at")) {
             $shop->started_at = date("Y-m-d h:i:s",
                 strtotime($request->get("started_at")));
         }

@@ -33,7 +33,7 @@ class StoreShopRequest extends FormRequest {
                 "string",
                 "regex:/^([\x{4e00}-\x{9fa5}])+$/u",
             ],
-            "started_at"    => "date",
+            "started_at"    => "nullable|date",
             "activity_id"   => "nullable|numeric",
             "remarks"       => ["nullable", "regex:/^(\w|[\x{4e00}-\x{9fa5}])+$/u"],
             "state"         => "boolean",
