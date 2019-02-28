@@ -24,7 +24,7 @@ class GetLotteryCardByShopIdRequest extends FormRequest {
     public function rules() {
         return [
             "location" => ["required", "string", "regex:/^([\x{4e00}-\x{9fa5}])+$/u"],
-            "address"  => ["required", "string", "regex:/^([\x{4e00}-\x{9fa5}])+$/u"],
+            "address"  => "required|string",
         ];
     }
 
@@ -35,7 +35,6 @@ class GetLotteryCardByShopIdRequest extends FormRequest {
             "location.regex"    => ResponseMessage::$message[400022],
             "address.required"  => ResponseMessage::$message[400020],
             "address.string"    => ResponseMessage::$message[400021],
-            "address.regex"     => ResponseMessage::$message[400022],
         ];
     }
 }
