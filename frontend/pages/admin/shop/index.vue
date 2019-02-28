@@ -48,7 +48,7 @@
                       xs12
                       sm6>
                       <el-form-item
-                        label="商家地址"
+                        label="商家城市"
                         prop="shop_location">
                         <el-select
                           v-model="editedItem.shop_location"
@@ -60,6 +60,16 @@
                             :label="item"
                             :value="item"/>
                         </el-select>
+                      </el-form-item>
+                    </v-flex>
+                    <v-flex
+                      xs12
+                      sm6>
+                      <el-form-item
+                        label="商家地址"
+                        prop="shop_address">
+                        <el-input
+                          v-model="editedItem.shop_address"/>
                       </el-form-item>
                     </v-flex>
                     <v-flex
@@ -155,6 +165,7 @@
           <td class="text-xs-center">{{ props.item.id }}</td>
           <td class="text-xs-center">{{ props.item.shop_name || '暂无' }}</td>
           <td class="text-xs-center">{{ props.item.shop_location || '暂无' }}</td>
+          <td class="text-xs-center">{{ props.item.shop_address || '暂无' }}</td>
           <td class="text-xs-center">{{ props.item.started_at || '暂无' }}</td>
           <td class="text-xs-center">{{ props.item.state ? '合作中' : '合作结束' }}</td>
           <td class="text-xs-center">{{ props.item.remarks || '暂无' }}</td>
@@ -230,7 +241,8 @@ export default {
     headers: [
       {text: 'ID', align: 'center', sortable: true, value: 'id'},
       {text: '商家名称', align: 'center', value: 'shop_name'},
-      {text: '商家地址', align: 'center', value: 'shop_location'},
+      {text: '商家城市', align: 'center', value: 'shop_location'},
+      {text: '商家地址', align: 'center', value: 'shop_address'},
       {text: '开始合作时间', align: 'center', value: 'started_atTime'},
       {text: '商家状态', align: 'center', value: 'state'},
       {text: '备注', align: 'center', value: 'remarks'},
@@ -244,6 +256,9 @@ export default {
         {pattern: /^(\w|[\u4e00-\u9fa5])+$/, message: '请不要包含特殊字符', trigger: 'change'},
       ],
       shop_location: [
+        {required: true, message: '请选择商家所在城市', trigger: 'change'},
+      ],
+      shop_address: [
         {required: true, message: '请选择商家所在地址', trigger: 'change'},
       ],
       remarks: [
@@ -254,6 +269,7 @@ export default {
     editedItem: {
       shop_name: '',
       shop_location: '',
+      shop_address: '',
       started_at: '',
       activity_id: null,
       state: false,
@@ -262,6 +278,7 @@ export default {
     defaultItem: {
       shop_name: '',
       shop_location: '',
+      shop_address: '',
       started_at: '',
       startTime: '',
       activity_id: null,
@@ -330,6 +347,7 @@ export default {
           const _editedItem = {};
           _editedItem.shop_name = this.editedItem.shop_name;
           _editedItem.shop_location = this.editedItem.shop_location;
+          _editedItem.shop_address = this.editedItem.shop_address;
           _editedItem.remarks = this.editedItem.remarks;
           _editedItem.started_at = this.editedItem.started_at;
           _editedItem.state = this.editedItem.state ? 1 : 0;

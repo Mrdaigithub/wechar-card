@@ -31,6 +31,10 @@ class UpdateShopRequest extends FormRequest {
                 "string",
                 "regex:/^([\x{4e00}-\x{9fa5}])+$/u",
             ],
+            "shop_address"  => [
+                "required",
+                "string",
+            ],
             "started_at"    => "nullable|date",
             "activity_id"   => "nullable|numeric",
             "remarks"       => ["nullable", "regex:/^(\w|[\x{4e00}-\x{9fa5}])+$/u"],
@@ -40,14 +44,16 @@ class UpdateShopRequest extends FormRequest {
 
     public function messages() {
         return [
-            "shop_name.string"     => ResponseMessage::$message[400002],
-            "shop_name.regex"      => ResponseMessage::$message[400006],
-            "shop_location.string" => ResponseMessage::$message[400002],
-            "shop_location.regex"  => ResponseMessage::$message[400006],
-            "started_at.date"      => ResponseMessage::$message[400006],
-            "activity_id.numeric"  => ResponseMessage::$message[400002],
-            "remarks.regex"        => ResponseMessage::$message[400006],
-            "state.boolean"        => ResponseMessage::$message[400002],
+            "shop_name.string"      => ResponseMessage::$message[400002],
+            "shop_name.regex"       => ResponseMessage::$message[400006],
+            "shop_location.string"  => ResponseMessage::$message[400002],
+            "shop_location.regex"   => ResponseMessage::$message[400006],
+            "shop_address.required" => ResponseMessage::$message[400000],
+            "shop_address.string"   => ResponseMessage::$message[400002],
+            "started_at.date"       => ResponseMessage::$message[400006],
+            "activity_id.numeric"   => ResponseMessage::$message[400002],
+            "remarks.regex"         => ResponseMessage::$message[400006],
+            "state.boolean"         => ResponseMessage::$message[400002],
         ];
     }
 }

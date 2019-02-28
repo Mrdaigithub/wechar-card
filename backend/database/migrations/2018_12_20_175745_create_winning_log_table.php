@@ -13,7 +13,8 @@ class CreateWinningLogTable extends Migration {
     public function up() {
         Schema::create('winning_log', function (Blueprint $table) {
             $table->bigIncrements('id')->unique();
-            $table->string('location')->comment("用户中奖位置");
+            $table->string('location')->comment("用户中奖城市");
+            $table->string('address')->nullable()->comment("用户中奖位置");
             $table->boolean('write_off_state')->default(FALSE)->comment("核销状态");
             $table->dateTime('write_off_date')->nullable()->comment("核销时间");
             $table->string('remarks')->nullable()->comment("备注");

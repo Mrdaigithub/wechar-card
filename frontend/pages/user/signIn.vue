@@ -1,8 +1,10 @@
 <template>
   <div>
-    <v-card>
-      <v-toolbar color="red">
-        <v-toolbar-title class="white--text">每日签到</v-toolbar-title>
+    <v-card elevation="2">
+      <v-toolbar
+        color="white"
+        flat>
+        <v-toolbar-title>每日签到</v-toolbar-title>
       </v-toolbar>
     </v-card>
     <v-layout

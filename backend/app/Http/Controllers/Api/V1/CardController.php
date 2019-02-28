@@ -112,11 +112,10 @@ class CardController extends ApiController {
                 $item->view  = "expired";
 
                 return $item;
-            }
-            if ($item->state
+            } elseif ($item->state
                 && ! ! $item->end_time_1
-                && strtotime(date('Y-m-d H:i:s', strtotime("+" . $item["end_time_1"] . " seconds", date(strtotime($item["created_at"])))))
-                < strtotime(date('Y-m-d h:i:s', time()))) {
+                && (time()
+                    > strtotime(date('Y-m-d H:i:s', strtotime("+" . $item["end_time_1"] . " seconds", date(strtotime($item["created_at"]))))))) {
                 // 时间2过期卡券失效
                 $item->state = 0;
                 $item->view  = "expired";
@@ -152,6 +151,7 @@ class CardController extends ApiController {
     public function getLotteryCardIdByShopId($id, GetLotteryCardByShopIdRequest $request) {
         $oneself    = JWTAuth::parseToken()->authenticate();
         $location   = $request->get("location");
+        $address    = $request->get("address");
         $activities = Shop::find($id)->activity();
 
         if ($activities->get()->isEmpty()) {
@@ -234,6 +234,7 @@ class CardController extends ApiController {
             // 添加中奖记录
             $winningLog           = new WinningLog();
             $winningLog->location = $location;
+            $winningLog->address  = $address;
 
             $this->saveModel($winningLog);
 

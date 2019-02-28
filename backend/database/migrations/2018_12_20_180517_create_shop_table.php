@@ -16,7 +16,8 @@ class CreateShopTable extends Migration {
             function (Blueprint $table) {
                 $table->bigIncrements('id')->unique();
                 $table->string('shop_name')->comment("商家名");
-                $table->string('shop_location')->comment("商家地址");
+                $table->string('shop_location')->comment("商家城市");
+                $table->string('shop_address')->nullable()->comment("商家地址");
                 $table->timestamp('started_at')
                     ->default(date('Y-m-d h:i:s', time()))
                     ->comment("合作时间");

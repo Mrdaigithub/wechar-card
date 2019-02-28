@@ -145,25 +145,32 @@
     </v-dialog>
     <v-dialog
       v-model="qrCodeDialog"
-      persistent
-      max-width="300px">
-      <v-card>
-        <v-card-title>
-          <span>请将二维码交予老板核销</span>
-          <v-spacer/>
-        </v-card-title>
-        <v-content style="height: 300px">
+      max-width="400px">
+      <v-card
+        v-if="currentCard"
+        class="qrcode-dialog-body">
+        <div style="background-color:#fff;border-radius: 10px">
+          <h3 class="text-xs-center ma-0">
+            <span
+              :style="{background: 'url(' + prizeIcon + ') no-repeat left center', backgroundSize: 'contain'}">
+              {{ currentCard['card_name'] }}
+            </span>
+          </h3>
+          <p class="text-xs-center ma-0 sub-title">{{ currentCard.remarks }}</p>
           <v-img
             v-if="writeOffQrCodeBase64"
             :src="`data:image/png;base64,${writeOffQrCodeBase64}`"/>
-        </v-content>
-        <v-card-actions>
-          <v-btn
-            color="primary"
-            flat
-            @click="closeQrCodeDialog">完成
-          </v-btn>
-        </v-card-actions>
+          <p class="text-xs-center ma-0 des">请让商家扫码核销优惠卷</p>
+          <p
+            class="text-xs-center ma-0 time">
+            {{ currentCard['end_time_0']
+            ? `有效期:${currentCard['end_time_0']}` : null }}
+            <CountDownTimer
+              v-if="currentCard['end_time_1']"
+              :id="cardId"
+              :end-time="getCountDownTimerString(new Date(new Date(currentCard['created_at']).getTime() + currentCard['end_time_1'] * 1000))"/>
+          </p>
+        </div>
       </v-card>
     </v-dialog>
   </div>
@@ -208,6 +215,10 @@ export default {
         : true,// 抽奖填写信息配置
       shopName: state => state.shop.shop ? state.shop.shop['shop_name'] : '暂无', // 当前用户
     }),
+    currentCard() {
+      if (!this.cardId) return null;
+      return this.oneselfCardList.filter(item => item.id === this.cardId)[0];
+    },
   },
   watch: {
     qrCodeDialog(val) {
@@ -217,6 +228,7 @@ export default {
         this.realName = '';
         this.phone = '';
         this.cardId = null;
+        this.closeFormDialog();
       }
     },
   },
@@ -273,10 +285,6 @@ export default {
       this.writeOffQrCodeBase64 = data;
       Loading.service({fullscreen: true}).close();
     },
-    closeQrCodeDialog() {
-      this.qrCodeDialog = false;
-      this.closeFormDialog();
-    },
     getCountDownTimerString(date) {
       return `${date.getFullYear()}-${date.getMonth() +
       1}-${date.getDate()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
@@ -312,4 +320,27 @@ export default {
 
   .pt-200
     padding-top 120px
+
+  .qrcode-dialog-body {
+    background-color: #fde1b1
+    padding: 17px
+
+    h3 {
+      span {
+        color: #f4ac3a
+        font-size: 24px
+        padding-left 26px
+      }
+      padding: 20px 0 10px 0
+    }
+
+    .sub-title {
+      font-size: 20px;
+    }
+
+    .des, .time {
+      font-size: 18px;
+      padding-bottom: 15px;
+    }
+  }
 </style>

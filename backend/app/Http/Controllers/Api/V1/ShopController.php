@@ -76,6 +76,7 @@ class ShopController extends ApiController {
         $shop                = new Shop();
         $shop->shop_name     = $request->get("shop_name");
         $shop->shop_location = $request->get("shop_location");
+        $shop->shop_address  = $request->get("shop_address");
         if ($request->has("started_at") && ! ! $request->get("started_at")) {
             $shop->started_at = date("Y-m-d h:i:s",
                 strtotime($request->get("started_at")));
@@ -125,6 +126,9 @@ class ShopController extends ApiController {
         }
         if ($request->has("shop_location")) {
             $shop->shop_location = $request->get("shop_location");
+        }
+        if ($request->has("shop_address")) {
+            $shop->shop_address = $request->get("shop_address");
         }
         if ($request->has("started_at")) {
             $shop->started_at = date("Y-m-d h:i:s",

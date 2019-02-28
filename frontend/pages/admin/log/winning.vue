@@ -103,8 +103,9 @@
               <div v-else>暂无</div>
             </v-avatar>
           </td>
-          <td class="text-xs-center">{{ props.item.location }}</td>
-          <td class="text-xs-center">{{ props.item['created_at'] }}</td>
+          <td class="text-xs-center">{{ props.item.location || '暂无' }}</td>
+          <td class="text-xs-center">{{ props.item.address || '暂无' }}</td>
+          <td class="text-xs-center">{{ props.item['created_at'] || '暂无' }}</td>
           <td class="text-xs-center">
             {{ shopEmployeeList.filter(item=>item.id===props.item['write_offer_id'])[0] ?
             shopEmployeeList.filter(item=>item.id===props.item['write_offer_id'])[0]['username'] : '暂无' }}
@@ -163,7 +164,8 @@ export default {
       {text: '真实姓名', align: 'center', value: 'real_name'},
       {text: '手机号', align: 'center', value: 'phone'},
       {text: '用户头像', align: 'center', value: 'head_img_url'},
-      {text: '用户位置', align: 'center', value: 'location'},
+      {text: '所在城市', align: 'center', value: 'location'},
+      {text: '所在地址', align: 'center', value: 'address'},
       {text: '中奖时间', align: 'center', value: 'created_at'},
       {text: '核销人员', align: 'center', value: 'write_offer_name'},
       {text: '核销状态', align: 'center', value: 'write_off'},

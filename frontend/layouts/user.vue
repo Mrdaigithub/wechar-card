@@ -58,6 +58,7 @@ export default {
     const openid = this.$route.query.openid;
     const shopId = this.$route.query.shopid;
     const location = this.$route.query.location;
+    const address = this.$route.query.address;
 
     if (!shopId || shopId === '') {
       return Message.error('缺失参数,请退回公众号重新进入');
@@ -69,6 +70,7 @@ export default {
     }
     this.$router.replace(`${this.$route.path}?shopid=${shopId}`); // 清除url上的openid
     this.addLocation(location);
+    this.addAddress(address);
     this.addOneself();
     this.addSystemConfig();
     this.addCard({arg: shopId});
@@ -81,6 +83,7 @@ export default {
     },
     ...mapMutations({
       addLocation: 'oneself/addLocation',
+      addAddress: 'oneself/addAddress',
     }),
     ...mapActions({
       addOneself: 'oneself/addOneself',

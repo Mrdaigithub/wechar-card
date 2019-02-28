@@ -3,6 +3,7 @@ import qs from 'qs';
 export const state = () => ({
   oneself: null,
   location: null,
+  address: null,
   signInLogList: null,
   cardList: null,
 });
@@ -13,6 +14,9 @@ export const mutations = {
   },
   addLocation(state, location) {
     state.location = location;
+  },
+  addAddress(state, address) {
+    state.address = address;
   },
   addSignInLogList(state, signInLogList) {
     state.signInLogList = signInLogList;
