@@ -2,20 +2,18 @@
   <div>
     <v-toolbar
       fixed
-      class="white--text"
-      color="red">
+      flat
+      color="white">
       <v-toolbar-title>优惠券</v-toolbar-title>
       <v-spacer/>
       <v-tabs
         slot="extension"
         v-model="tab"
-        color="red"
         grow>
-        <v-tabs-slider color="yellow"/>
+        <v-tabs-slider color="#ff823e"/>
         <v-tab
           v-for="item in tabNameItems"
-          :key="item"
-          class="white--text">
+          :key="item">
           {{ item }}
         </v-tab>
       </v-tabs>
@@ -39,6 +37,7 @@
               :key="index"
               xs12>
               <v-card
+                elevation="0"
                 @click="openFormDialog(item)">
                 <v-layout row>
                   <v-flex
@@ -52,24 +51,32 @@
                   <v-flex
                     xs7
                     class="pa-1">
-                    <v-card-title
-                      :class="`pa-0 pt-2 card-title font-weight-black ${item.state ? 'orange--text' : 'grey--text'}`">
-                      <span class="pa-0 pr-1">
-                        <v-icon
-                          :color="item.state ? 'orange' : 'grey'">card_giftcard</v-icon>
+                    <v-card-title class="pa-0 pt-2 card-title">
+                      <span
+                        :class="`font-weight-black ${item.state ? null : 'grey--text'}`"
+                        :style="{background: 'url(' + prizeIcon + ') no-repeat left center', backgroundSize: 'contain'}">
+                        {{ item.card_name }}
                       </span>
-                      {{ item.card_name }}
+                      <v-spacer/>
+                      <v-btn
+                        :disabled="!item.state"
+                        :class="`${ item.state ? 'white--text btn' : null}`"
+                        round
+                        depressed
+                        small>点击使用
+                      </v-btn>
                     </v-card-title>
-                    <v-card-text class="pa-0 pt-2">
+                    <v-card-text class="pa-0">
                       <div
-                        class="card-description font-weight-black"
-                        style="color: #999;">{{ item.remarks }}
+                        :class="`card-description ${item.state ? null : 'grey--text'}`">{{ item.remarks }}
                       </div>
-                      <div class="grey--text pt-1">活动商家: {{ shopName }}</div>
+                      <div
+                        :class="`card-shop pt-1 ${item.state ? null : 'grey--text'}`">活动商家: {{ shopName }}
+                      </div>
                       <div
                         v-show="!!item.state"
-                        class="grey--text">
-                        活动时间:
+                        class="`card_time ${item.state ? null : 'grey--text'`">
+                        有效期:
                         {{ !!item.state && item['end_time_0'] ? `${new Date(item['end_time_0']).getFullYear()}-
                         ${new Date(item['end_time_0']).getMonth()+1}-${new Date(item['end_time_0']).getDate()}到期` :
                         null }}
@@ -90,18 +97,6 @@
                   </v-flex>
                 </v-layout>
                 <v-divider light/>
-                <v-card-actions class="pa-3">
-                  <v-btn
-                    :disabled="item.view === 'used' || item.view === 'expired'"
-                    round
-                    depressed
-                    small
-                    color="deep-orange"
-                    class="white--text">点击使用
-                  </v-btn>
-                  <v-spacer/>
-                  <span :class="!item.state ? 'grey--text' : null">{{ tabNameItems[tab] }}</span>
-                </v-card-actions>
               </v-card>
             </v-flex>
           </v-layout>
@@ -179,6 +174,7 @@ import {mapState, mapActions} from 'vuex';
 import {Message, Loading} from 'element-ui';
 import rules from '~/utils/rules';
 import CountDownTimer from '~/components/CountDownTimer';
+import prizeIcon from '~/assets/images/prize-icon.png';
 
 export default {
   name: 'Person',
@@ -187,6 +183,7 @@ export default {
     CountDownTimer,
   },
   data: () => ({
+    prizeIcon,
     formDialog: false,
     qrCodeDialog: false,
     rules: rules,
@@ -200,7 +197,6 @@ export default {
     tabNameItems: [
       '待使用', '已使用', '已失效',
     ],
-    text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
   }),
   computed: {
     ...mapState({
@@ -294,10 +290,25 @@ export default {
 
 <style scoped lang="stylus">
   .card-title
-    font-size 18px
+    span
+      font-size 18px
+      padding-left: 26px
+      color: #f4ac3a
+
+    .btn
+      background: rgb(244, 172, 58);
+      background: -webkit-linear-gradient(0deg, rgb(244, 172, 58) 10%, rgb(255, 65, 53) 63%);
+      background: linear-gradient(90deg, rgb(244, 172, 58) 10%, rgb(255, 65, 53) 63%);
+
 
   .card-description
     font-size 18px
+    color: #1f1f1f
+
+  .card-shop, .card-time {
+    color: #585858
+    font-size: 16px
+  }
 
   .pt-200
     padding-top 120px

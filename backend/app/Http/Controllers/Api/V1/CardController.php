@@ -112,10 +112,11 @@ class CardController extends ApiController {
                 $item->view  = "expired";
 
                 return $item;
-            } elseif ($item->state
+            }
+            if ($item->state
                 && ! ! $item->end_time_1
                 && strtotime(date('Y-m-d H:i:s', strtotime("+" . $item["end_time_1"] . " seconds", date(strtotime($item["created_at"])))))
-                > strtotime(date('Y-m-d h:i:s', time()))) {
+                < strtotime(date('Y-m-d h:i:s', time()))) {
                 // 时间2过期卡券失效
                 $item->state = 0;
                 $item->view  = "expired";
@@ -125,8 +126,7 @@ class CardController extends ApiController {
             // 如果卡券模板被禁用下级卡券全部失效(优先级最高,要放最下面)
             if ( ! Card::find($item->parentid)->state) {
                 $item->state = 0;
-
-                $item->view = "expired";
+                $item->view  = "expired";
 
                 return $item;
             }

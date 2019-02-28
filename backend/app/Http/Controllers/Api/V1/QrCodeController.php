@@ -55,7 +55,7 @@ class QrCodeController extends ApiController {
         }
 
         $expiredTime = strtotime("+ 5 minutes");
-        $url         = env("DOMAIN") . "/wechat/authorize?url=" . urlencode(env("DOMAIN") . "/wechat/grant/add/boss?expired_time=$expiredTime&admin_id=" . $this->oneself->id);
+        $url         = env("DOMAIN") . "/wechat/authorize?url=" . urlencode(env("DOMAIN") . "/wechat/grant/add/boss/openid?expired_time=$expiredTime&admin_id=" . $this->oneself->id);
 
         return $this->success(base64_encode($this->getQrCode($url)));
     }

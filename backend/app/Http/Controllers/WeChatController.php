@@ -79,7 +79,7 @@ class WeChatController extends WebController {
     }
 
     /**
-     * 普通用户认证openid跳转到地理位置验证界面通过则跳转到抽奖界面
+     * 如普通用户不存在则获取信息并创建,跳转到地理位置验证界面通过则跳转到抽奖界面
      *
      * @param \Illuminate\Http\Request $request
      *
@@ -161,13 +161,47 @@ class WeChatController extends WebController {
     }
 
     /**
-     * 认证通过发送允许添加商铺老板的消息
+     * 认证openid通过发送允许添加商铺老板的消息
      *
      * @param \Illuminate\Http\Request $request
      *
      * @return string
      */
-    public function grantAddShopBoss(Request $request) {
+    public function grantAddShopBossOpenid(Request $request) {
+        if ( ! $request->has("admin_id") || $request->get("admin_id") === "") {
+            return $this->response(ResponseMessage::$message[400000]);
+        }
+
+        $wechatUser = $this->getOneself();
+
+        // 用户认证
+        $users = User::where("openid", $wechatUser->getId());
+
+        if ($users->get()->isEmpty()) {
+            return $this->getOfficialAccount1()->oauth
+                ->scopes(["snsapi_userinfo"])
+                ->redirect(env("DOMAIN") .
+                    "/wechat/grant/add/boss/info?admin_id=" . $request->get("admin_id"));
+        }
+        $user           = $users->first();
+        $user->identity = 1;
+
+        $this->saveModel($user);
+
+        // 通过验证发送消息
+        $this->sendAdminAddBossBroad($request->get("admin_id"));
+
+        return $this->response(ResponseMessage::$message[200002]);
+    }
+
+    /**
+     * 如普通用户不存在则获取信息并创建,再通过发送允许添加商铺老板的消息
+     *
+     * @param \Illuminate\Http\Request $request
+     *
+     * @return string
+     */
+    public function grantAddShopBossUserInfo(Request $request) {
         if ( ! $request->has("admin_id") || $request->get("admin_id") === "") {
             return $this->response(ResponseMessage::$message[400000]);
         }
@@ -176,6 +210,7 @@ class WeChatController extends WebController {
 
         // 用户认证
         $user = User::where("openid", $wechatUser->getId());
+
         if ($user->get()->isNotEmpty()) {
             $user           = $user->first();
             $user->identity = 1;
@@ -186,6 +221,7 @@ class WeChatController extends WebController {
             $user->head_img_url = $wechatUser->getAvatar();
             $user->identity     = 1;
         }
+
         $this->saveModel($user);
 
         // 通过验证发送消息

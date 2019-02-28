@@ -147,8 +147,7 @@
         <p
           v-if="!!currentCard"
           class="text-xs-center ma-0 time">
-          {{ currentCard['end_time_0'] ? `有效期: ${currentCard['end_time_0']}`
-          : null }}
+          {{ currentCard['end_time_0'] ? `有效期: ${currentCard['end_time_0']}` : null }}
           <CountDownTimer
             v-if="currentCard['end_time_1']"
             :id="currentCard.id"
