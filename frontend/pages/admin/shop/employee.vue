@@ -165,7 +165,8 @@
         :headers="headers"
         :items="shopEmployeeList"
         :search="search"
-        :rows-per-page-items="[ 5, 10, 30]"
+        :pagination.sync="pagination"
+        :rows-per-page-items="[10]"
         rows-per-page-text="每页行数"
         class="elevation-1">
         <template
@@ -274,6 +275,7 @@ export default {
       {text: '备注', align: 'center', value: 'remarks'},
       {text: '操作', align: 'center', value: 'action', sortable: false},
     ],
+    pagination: {'sortBy': 'id', 'descending': true, 'rowsPerPage': -1},
     rules: {
       real_name: [
         {min: 1, max: 20, message: '长度在 1 到 20 个字符', trigger: 'change'},

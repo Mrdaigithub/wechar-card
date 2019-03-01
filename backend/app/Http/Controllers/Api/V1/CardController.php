@@ -20,6 +20,7 @@ class CardController extends ApiController {
      */
     public function list() {
         $cardList = Card::where("type", 0)
+            ->orderBy("id")
             ->get()
             ->map(function ($item) {
                 $cardActivity = $item->activity();

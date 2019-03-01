@@ -141,7 +141,8 @@
         :headers="headers"
         :items="activityList"
         :search="search"
-        :rows-per-page-items="[ 5, 10, 30]"
+        :pagination.sync="pagination"
+        :rows-per-page-items="[10]"
         rows-per-page-text="每页行数"
         class="elevation-1">
         <template
@@ -251,6 +252,7 @@ export default {
       {text: '使用的商铺', align: 'center', value: 'shop'},
       {text: '操作', align: 'center', value: 'action', sortable: false},
     ],
+    pagination: {'sortBy': 'id', 'descending': true, 'rowsPerPage': -1},
     rules: {
       activity_name: [
         {required: true, message: '请输入活动名称', trigger: 'blur'},

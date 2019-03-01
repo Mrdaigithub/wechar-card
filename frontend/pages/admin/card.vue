@@ -139,7 +139,9 @@
         :items="cardModelList"
         :search="search"
         :filter="tableFilter"
-        :rows-per-page-items="[ 5, 10, 30]"
+        :pagination.sync="pagination"
+        :rows-per-page-items="[10]"
+        sort-desc="true"
         rows-per-page-text="每页行数">
         <template
           slot="items"
@@ -234,7 +236,7 @@ export default {
     ],
     dialog: false,
     headers: [
-      {text: 'ID', align: 'center', sortable: true, value: 'id'},
+      {text: 'ID', align: 'center', value: 'id'},
       {text: '卡券名称', align: 'center', value: 'card_name'},
       {text: '卡券缩略图', align: 'center', value: 'card_thumbnail'},
       {text: '详细名称', align: 'center', value: 'remarks'},
@@ -244,6 +246,7 @@ export default {
       {text: '活动', align: 'center', value: 'activity_id_list'},
       {text: '操作', align: 'center', value: 'action', sortable: false},
     ],
+    pagination: {'sortBy': 'id', 'descending': true, 'rowsPerPage': -1},
     rules: {
       card_name: [
         {required: true, message: '请输入卡券名称', trigger: 'blur'},

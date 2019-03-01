@@ -61,7 +61,7 @@
         活动须知：<br>
         1、免单奖励使用时间以免单卷上有效期为准，过期
         无效。<br>
-        2、每次限使用1免单张，此卷不可叠加使用。<br>
+        2、每次限使用1张，此卷不可叠加使用。<br>
         3、活动过程中凡以恶意手段（包括但不限于作弊、
         攻击系统等）参与的用户，活动方有权终止其参与活
         动并取消其领卷/用卷的资格。
@@ -97,7 +97,7 @@
         v-model="valid"
         lazy-validation>
         <v-card>
-          <v-card-title>请输入你的信息以领取卡券</v-card-title>
+          <v-card-title>请输入你的信息领取奖励</v-card-title>
           <v-card-text>
             <v-text-field
               :rules="rules.nameRules"
@@ -123,7 +123,7 @@
               :disabled="!valid"
               flat
               class="red--text"
-              @click="submit">赢取奖励
+              @click="submit">领取奖励
             </v-btn>
           </v-card-actions>
         </v-card>
@@ -164,6 +164,7 @@
 import {mapState, mapActions} from 'vuex';
 import {Message, Loading} from 'element-ui';
 import CountDownTimer from '~/components/CountDownTimer';
+import surnameList from '~/utils/surnameList';
 import rules from '~/utils/rules';
 import randomSort from '~/utils/randomSort';
 import rangeRandom from '~/utils/rangeRandom';
@@ -179,6 +180,7 @@ export default {
     CountDownTimer,
   },
   data: () => ({
+    surnameList,
     totalDialogBg1,
     totalDialogBg2,
     prizeIcon,
@@ -242,15 +244,13 @@ export default {
         item => ({id: item['id'], name: item['card_name'], isPrize: 1})) : [], // 显示的奖品列表带未中奖
     }),
     winningLogData() {
-      if (!this.cardList1.length) {
+      if (!this.cardList1.length && !!surnameList.length) {
         return [];
       }
       const num = 10;
       const res = [];
       for (let i = 0; i < num; i++) {
-        res.push(`恭喜${phoneNumberHeaders[rangeRandom(0, phoneNumberHeaders.length)]}
-        ***${rangeRandom(0, 8)}${rangeRandom(0, 8)}${rangeRandom(0, 8)}抽中了${this.cardList1[rangeRandom(0,
-          this.cardList1.length)]['name']}`);
+        res.push(`中奖信息: 恭喜${surnameList[Math.floor(Math.random() * surnameList.length)]}...抽到免单券`);
       }
       return res;
     },
@@ -263,6 +263,7 @@ export default {
         this.realName = '';
         this.phone = '';
         this.currentCard = null;
+        this.closeFormDialog();
       }
     },
   },
@@ -374,6 +375,10 @@ export default {
         this.qrCodeDialog = !this.qrCodeDialog;
         this.$refs.form.reset();
       }
+    },
+    closeFormDialog() {
+      this.formDialog = false;
+      this.$refs.form.reset();
     },
     async getQrCode(url) {
       Loading.service({fullscreen: true});
@@ -615,7 +620,7 @@ export default {
       p
         display inline-block
         text-align center
-        font-size 16px
+        font-size 14px
         color #ffffff
         margin 0
 

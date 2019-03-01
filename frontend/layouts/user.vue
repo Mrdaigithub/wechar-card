@@ -46,11 +46,16 @@ export default {
   computed: {
     ...mapState({
       bottomTab: state => state.assist.bottomTab ? state.assist.bottomTab : 'lottery',
+      shopName: state => state.shop.shop ? state.shop.shop['shop_name'] : '暂无', // 当前用户
     }),
   },
   watch: {
     bottomTab(val) {
       this.bottomNav = val;
+    },
+    shopName(val) {
+      if (!val) return;
+      document.title = `${this.shopName}免单抽奖`;
     },
   },
   async created() {
@@ -69,6 +74,7 @@ export default {
       sessionStorage.setItem('ttl', data.ttl);
     }
     this.$router.replace(`${this.$route.path}?shopid=${shopId}`); // 清除url上的openid
+    this.getShopById({arg: shopId});
     this.addLocation(location);
     this.addAddress(address);
     this.addOneself();
@@ -90,6 +96,7 @@ export default {
       addSystemConfig: 'systemConfig/addSystemConfig',
       addCard: 'card/addCardModelListByShopId',
       addShopActivity: 'shop/addShopActivity',
+      getShopById: 'shop/getShopById',
     }),
   },
 };

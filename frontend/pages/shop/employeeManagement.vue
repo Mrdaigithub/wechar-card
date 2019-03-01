@@ -116,7 +116,7 @@
         :headers="headers"
         :items="shopEmployeeList"
         :search="search"
-        :rows-per-page-items="[ 5, 10, 30]"
+        :rows-per-page-items="[10]"
         rows-per-page-text="每页行数"
         class="elevation-1">
         <template

@@ -13,12 +13,26 @@
           inset
           vertical/>
         <v-spacer/>
+        <div>
+          <v-btn
+            fab
+            small
+            dark
+            @click="reset">
+            <v-icon>refresh</v-icon>
+          </v-btn>
+        </div>
         <v-dialog
           v-model="dialog"
           max-width="1200px">
+          <v-btn
+            slot="activator"
+            color="primary"
+            dark>筛选数据
+          </v-btn>
           <v-card>
             <v-card-title>
-              <span class="headline">{{ formTitle }}</span>
+              <span class="headline">筛选数据</span>
             </v-card-title>
             <v-card-text>
               <v-container grid-list-md>
@@ -33,10 +47,32 @@
                       xs12
                       sm6>
                       <el-form-item
-                        label="备注"
-                        prop="remarks">
-                        <el-input
-                          v-model="editedItem.remarks"/>
+                        label="商铺"
+                        prop="shop">
+                        <el-select
+                          v-model="editedItem.shop"
+                          class="w100"
+                          filterable>
+                          <el-option
+                            v-for="item in shopList"
+                            :key="item.id"
+                            :label="item.shop_name"
+                            :value="item.id"/>
+                        </el-select>
+                      </el-form-item>
+                    </v-flex>
+                    <v-flex
+                      xs12
+                      sm6>
+                      <el-form-item
+                        label="时间范围"
+                        prop="dateRange">
+                        <el-date-picker
+                          v-model="editedItem.dateRange"
+                          type="datetimerange"
+                          range-separator="至"
+                          start-placeholder="开始日期"
+                          end-placeholder="结束日期"/>
                       </el-form-item>
                     </v-flex>
                   </v-layout>
@@ -53,7 +89,7 @@
                 :disabled="!valid"
                 color="red"
                 flat
-                @click="save">保存
+                @click="save">确定
               </v-btn>
             </v-card-actions>
           </v-card>
@@ -69,10 +105,10 @@
       </v-content>
       <v-data-table
         :headers="headers"
-        :items="winningLogList"
+        :items="filterData(winningLogList)"
         :search="search"
-        :rows-per-page-items="[ 5, 10, 30]"
-        rows-per-page-text="每页行数">
+        :pagination.sync="pagination"
+        :rows-per-page-items="[10]">
         <template
           slot="items"
           slot-scope="props">
@@ -171,19 +207,25 @@ export default {
       {text: '核销状态', align: 'center', value: 'write_off'},
       {text: '核销时间', align: 'center', value: 'write_off_date'},
     ],
+    pagination: {'sortBy': 'id', 'descending': true, 'rowsPerPage': -1},
     rules: {
-      remarks: [
-        {type: 'string', pattern: /^(\w|[\u4e00-\u9fa5])+$/, message: '请不要包含特殊字符', trigger: 'change'},
+      shop: [
+        {required: true, message: '请选择商铺', trigger: 'blur'},
+      ],
+      dateRange: [
+        {required: true, message: '请选择时间范围', trigger: 'blur'},
       ],
     },
-    editedIndex: -1,
     editedItem: {
-      remarks: '',
+      shop: null,
+      dateRange: [],
     },
     defaultItem: {
-      remarks: '',
+      shop: null,
+      dateRange: [],
     },
     search: '',
+    filterState: false, // 是否处在筛选状态
   }),
   computed: {
     ...mapState({
@@ -192,9 +234,6 @@ export default {
       shopEmployeeList: state => state.user.shopEmployeeList ? state.user.shopEmployeeList : [],
       shopList: state => state.shop.shopList ? state.shop.shopList : [],
     }),
-    formTitle() {
-      return this.editedIndex === -1 ? '添加中奖核销记录' : '修改中奖核销记录';
-    },
   },
   watch: {
     dialog(val) {
@@ -216,30 +255,37 @@ export default {
       addShopList: 'shop/addShopList',
     }),
     editItem(item) {
-      this.editedIndex = this.winningLogList.indexOf(item);
       this.editedItem = Object.assign({}, item);
       this.dialog = true;
     },
     close() {
       this.dialog = false;
-      setTimeout(() => {
+      if (!this.filterState) {
         this.editedItem = Object.assign({}, this.defaultItem);
-        this.editedIndex = -1;
         this.$refs.editedItem.resetFields();
         this.valid = true;
-      }, 100);
+      }
     },
     save() {
       this.$refs.editedItem.validate((valid) => {
         if (valid) {
-          if (this.editedIndex > -1) {
-            Object.assign(this.winningLogList[this.editedIndex], this.editedItem);
-          } else {
-            this.winningLogList.push(JSON.parse(JSON.stringify(this.editedItem)));
-          }
+          this.filterState = true;
           this.close();
         }
       });
+    },
+    filterData(data) {
+      if (!this.filterState) return data;
+      const shopName = this.shopList.filter(item => item.id === this.editedItem.shop)[0]['shop_name'];
+      return this.winningLogList.filter(item =>
+        (item['shop_name'] === shopName)
+        && (item['write_off_state'])
+        && (new Date(item['write_off_date']).getTime() >= this.editedItem.dateRange[0].getTime())
+        && (new Date(item['write_off_date']).getTime() <= this.editedItem.dateRange[1].getTime()));
+    },
+    reset() {
+      this.filterState = false;
+      this.close();
     },
   },
 };

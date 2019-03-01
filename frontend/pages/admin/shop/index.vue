@@ -156,7 +156,8 @@
         :headers="headers"
         :items="shopList"
         :search="search"
-        :rows-per-page-items="[ 5, 10, 30]"
+        :pagination.sync="pagination"
+        :rows-per-page-items="[10]"
         rows-per-page-text="每页行数"
         class="elevation-1">
         <template
@@ -223,7 +224,7 @@ export default {
   name: 'AdminShop',
   layout: 'admin',
   data: () => ({
-    cityList: cityList,
+    cityList,
     valid: true,
     breadcrumbList: [
       {
@@ -249,6 +250,7 @@ export default {
       {text: '参与活动', align: 'center', value: 'activity.activity_name'},
       {text: '操作', align: 'center', value: 'action', sortable: false},
     ],
+    pagination: {'sortBy': 'id', 'descending': true, 'rowsPerPage': -1},
     rules: {
       shop_name: [
         {required: true, message: '请输入商家名称', trigger: 'blur'},

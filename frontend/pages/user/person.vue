@@ -112,7 +112,7 @@
         v-model="valid"
         lazy-validation>
         <v-card>
-          <v-card-title>请输入你的信息以领取卡券</v-card-title>
+          <v-card-title>请输入你的信息领取奖励</v-card-title>
           <v-card-text>
             <v-text-field
               :rules="rules.nameRules"
@@ -137,7 +137,7 @@
               :disabled="!valid"
               flat
               class="red--text"
-              @click="submit">赢取奖励
+              @click="submit">领取奖励
             </v-btn>
           </v-card-actions>
         </v-card>

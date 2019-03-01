@@ -26,31 +26,13 @@
         :headers="headers"
         :items="winningLogList"
         :search="search"
-        :rows-per-page-items="[ 5, 10, 30]"
+        :pagination.sync="pagination"
+        :rows-per-page-items="[10]"
         rows-per-page-text="每页行数">
         <template
           slot="items"
           slot-scope="props">
-          <td class="text-xs-center">{{ props.item.id }}</td>
-          <td class="text-xs-center">{{ props.item.shop_name || '暂无' }}</td>
-          <td class="text-xs-center">{{ props.item.activity_name || '暂无' }}</td>
           <td class="text-xs-center">{{ props.item.card_name || '暂无' }}</td>
-          <td class="text-xs-center">{{ props.item.username || '暂无' }}</td>
-          <td class="text-xs-center">{{ props.item['real_name'] || '暂无' }}</td>
-          <td class="text-xs-center">{{ props.item['phone'] || '暂无' }}</td>
-          <td class="text-xs-center">
-            <v-avatar
-              v-if="props.item['head_img_url']"
-              slot="activator"
-              size="48px">
-              <v-img
-                :src="props.item['head_img_url']"
-                :lazy-src="props.item['head_img_url']"
-                alt="Avatar"/>
-            </v-avatar>
-            <div v-else>暂无</div>
-          </td>
-          <td class="text-xs-center">{{ props.item.location }}</td>
           <td class="text-xs-center">{{ props.item['created_at'] }}</td>
           <td class="text-xs-center">{{ props.item['write_offer_name'] || '暂无' }}</td>
           <td class="text-xs-center">{{ props.item['write_off_state'] ? '已核销' : '未核销' }}</td>
@@ -97,20 +79,13 @@ export default {
       },
     ],
     headers: [
-      {text: 'ID', align: 'center', sortable: true, value: 'id'},
-      {text: '商家名称', align: 'center', value: 'shop_name'},
-      {text: '活动名称', align: 'center', value: 'activity_name'},
       {text: '卡卷名称', align: 'center', value: 'card_name'},
-      {text: '用户名', align: 'center', value: 'username'},
-      {text: '真实姓名', align: 'center', value: 'real_name'},
-      {text: '手机号', align: 'center', value: 'phone'},
-      {text: '用户头像', align: 'center', value: 'head_img_url'},
-      {text: '用户位置', align: 'center', value: 'location'},
       {text: '中奖时间', align: 'center', value: 'created_at'},
       {text: '核销人员', align: 'center', value: 'write_offer_name'},
       {text: '核销状态', align: 'center', value: 'write_off'},
       {text: '核销时间', align: 'center', value: 'write_off_date'},
     ],
+    pagination: {'sortBy': 'id', 'descending': true, 'rowsPerPage': -1},
     search: '',
   }),
   computed: {

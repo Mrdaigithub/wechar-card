@@ -113,6 +113,7 @@ export default {
     }),
   },
   async mounted() {
+    document.title = '管理员后台';
     if (!this.oneself) {
       if (sessionStorage.token) {
         Loading.service({fullscreen: true});

@@ -29,6 +29,12 @@
       <v-flex
         :style="{marginTop:'50px'}"
         xs12
+        class="ma-3 text-xs-center"
+        text-xs-left>签到{{ howManyDaysHaveYouWonTheLotteryIn15Days }}天增加一次抽奖次数
+      </v-flex>
+      <v-flex
+        :style="{marginTop:'50px'}"
+        xs12
         text-xs-center>
         <v-date-picker
           v-model="signInLogList"
@@ -39,12 +45,6 @@
           disabled
           no-title
           multiple/>
-      </v-flex>
-      <v-flex
-        :style="{marginTop:'50px'}"
-        xs12
-        class="ma-3"
-        text-xs-left>签到{{ howManyDaysHaveYouWonTheLotteryIn15Days }}天增加一次抽奖次数
       </v-flex>
     </v-layout>
   </div>

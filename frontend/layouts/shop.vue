@@ -62,7 +62,6 @@
 <script>
 import {mapState, mapActions} from 'vuex';
 import {Loading} from 'element-ui';
-import {DOMAIN} from '../utils/constant';
 
 export default {
   data: () => ({
@@ -75,6 +74,7 @@ export default {
     }),
   },
   async mounted() {
+    document.title = '商家后台';
     if (!this.oneself) {
       Loading.service({fullscreen: true});
       const openid = this.$route.query.openid;
