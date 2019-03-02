@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>wechat-card</title>
+    <title>正在加载</title>
     <style>
         body, div {
             margin: 0;

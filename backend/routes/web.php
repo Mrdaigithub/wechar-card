@@ -14,12 +14,11 @@
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return view('welcome');
+    return "ok";
 });
 
 Route::prefix('/wechat')->group(function () {
     Route::any('/', 'WeChatController@serve');
-    Route::any('/test', 'WeChatController@test');
     Route::get("/authorize", "WeChatController@wechatBaseAuthorize");
     Route::get("/grant/lottery/user/openid", "WeChatController@grantLotteryUserOpenid");
     Route::get("/grant/lottery/user/info", "WeChatController@grantLotteryUserInfo");
