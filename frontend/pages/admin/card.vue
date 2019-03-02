@@ -246,7 +246,7 @@ export default {
       {text: '活动', align: 'center', value: 'activity_id_list'},
       {text: '操作', align: 'center', value: 'action', sortable: false},
     ],
-    pagination: {'sortBy': 'id', 'descending': true, 'rowsPerPage': -1},
+    pagination: {'sortBy': 'id', 'descending': true, 'rowsPerPage': 10},
     rules: {
       card_name: [
         {required: true, message: '请输入卡券名称', trigger: 'blur'},

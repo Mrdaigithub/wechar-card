@@ -22,7 +22,7 @@ class LogController extends ApiController {
                 $activities  = $item->activity();
                 $writeOffers = $item->writeOffer();
 
-                $item->card_name      = $cards->get()->isNotEmpty() ? $cards->first()->card_name : NULL;
+                $item->card_name      = $cards->get()->isNotEmpty() ? $cards->first()->remarks : NULL;
                 $item->activity_name  = $activities->get()->isNotEmpty() ? $activities->first()->activity_name : NULL;
                 $item->user_id        = $users->get()->isNotEmpty() ? $users->first()->id : NULL;
                 $item->shop_name      = $activities->get()->isNotEmpty() && $activities->first()->shops()->get()->isNotEmpty() ?

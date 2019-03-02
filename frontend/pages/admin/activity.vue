@@ -252,7 +252,7 @@ export default {
       {text: '使用的商铺', align: 'center', value: 'shop'},
       {text: '操作', align: 'center', value: 'action', sortable: false},
     ],
-    pagination: {'sortBy': 'id', 'descending': true, 'rowsPerPage': -1},
+    pagination: {'sortBy': 'id', 'descending': true, 'rowsPerPage': 10},
     rules: {
       activity_name: [
         {required: true, message: '请输入活动名称', trigger: 'blur'},

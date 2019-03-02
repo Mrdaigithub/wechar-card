@@ -250,7 +250,7 @@ export default {
       {text: '参与活动', align: 'center', value: 'activity.activity_name'},
       {text: '操作', align: 'center', value: 'action', sortable: false},
     ],
-    pagination: {'sortBy': 'id', 'descending': true, 'rowsPerPage': -1},
+    pagination: {'sortBy': 'id', 'descending': true, 'rowsPerPage': 10},
     rules: {
       shop_name: [
         {required: true, message: '请输入商家名称', trigger: 'blur'},

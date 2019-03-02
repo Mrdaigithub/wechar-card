@@ -207,7 +207,7 @@ export default {
       {text: '核销状态', align: 'center', value: 'write_off'},
       {text: '核销时间', align: 'center', value: 'write_off_date'},
     ],
-    pagination: {'sortBy': 'id', 'descending': true, 'rowsPerPage': -1},
+    pagination: {'sortBy': 'id', 'descending': true, 'rowsPerPage': 10},
     rules: {
       shop: [
         {required: true, message: '请选择商铺', trigger: 'blur'},
