@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Laravel</title>
+    <title>正在加载</title>
 </head>
 <body>
 <div style="text-align: center">Loading...</div>

@@ -36,7 +36,6 @@ class QrCodeController extends ApiController {
      * 获取管理员登录的二维码base64编码
      *
      * @return mixed
-     * @throws \Exception
      */
     public function adminLogin() {
         $expiredTime = strtotime("+ 5 minutes");
