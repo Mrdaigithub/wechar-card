@@ -36,12 +36,17 @@ class QrCodeController extends ApiController {
      * 获取管理员登录的二维码base64编码
      *
      * @return mixed
+     * @throws \Exception
      */
     public function adminLogin() {
         $expiredTime = strtotime("+ 5 minutes");
-        $url         = env("DOMAIN") . "/wechat/authorize?url=" . urlencode(env("DOMAIN") . "/wechat/grant/login/admin?expired_time=$expiredTime");
+        $identifier  = str_random(32);
+        $url         = env("DOMAIN") . "/wechat/authorize?url=" . urlencode(env("DOMAIN") . "/wechat/grant/login/admin?expired_time=$expiredTime&identifier=$identifier");
 
-        return $this->success(base64_encode($this->getQrCode($url)));
+        return $this->success([
+            "qrcode"     => base64_encode($this->getQrCode($url)),
+            "identifier" => $identifier,
+        ]);
     }
 
     /**

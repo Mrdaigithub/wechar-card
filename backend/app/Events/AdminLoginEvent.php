@@ -20,11 +20,13 @@ class AdminLoginEvent implements ShouldBroadcast {
      * Create a new event instance.
      *
      * @param string $message
+     * @param        $identifier
      */
-    public function __construct($message) {
+    public function __construct($message, $identifier) {
         $this->message = json_encode([
-            "signal" => "allowAdminLogin",
-            "openid" => $message,
+            "signal"     => "allowAdminLogin",
+            "openid"     => $message,
+            "identifier" => $identifier,
         ]);
     }
 

@@ -64,10 +64,12 @@ class WebController extends Controller {
      *
      * @param $openid
      *
+     * @param $identifier
+     *
      * @return \Illuminate\Broadcasting\PendingBroadcast
      */
-    protected function sendAdminLoginBroad($openid) {
-        return broadcast(new AdminLoginEvent($openid));
+    protected function sendAdminLoginBroad($openid, $identifier) {
+        return broadcast(new AdminLoginEvent($openid, $identifier));
     }
 
     /**

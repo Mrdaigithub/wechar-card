@@ -32,18 +32,21 @@ export default {
   layout: 'empty',
   data: () => ({
     loginQrCodeBase64: '',
+    identifier: '',
   }),
   async mounted() {
     Loading.service({fullscreen: true});
     const {data} = await this.$axios.$get(`/qrcode/admin/login`);
-    this.loginQrCodeBase64 = data;
+    this.loginQrCodeBase64 = data.qrcode;
+    this.identifier = data.identifier;
     Loading.service({fullscreen: true}).close();
 
     window.Echo.channel('adminChannel').listen('AdminLoginEvent', async (e) => {
-      if (e.message &&
-        JSON.parse(e.message).signal === 'allowAdminLogin' &&
-        JSON.parse(e.message).openid &&
-        this.$route.name === 'admin-login') {
+      if (e.message
+        && JSON.parse(e.message).signal === 'allowAdminLogin'
+        && JSON.parse(e.message).openid
+        && JSON.parse(e.message).identifier === this.identifier
+        && this.$route.name === 'admin-login') {
         const {data} = await this.$axios.$get(`/auth/client/${JSON.parse(e.message).openid}`);
         sessionStorage.setItem('token', data.token);
         sessionStorage.setItem('ttl', data.ttl);

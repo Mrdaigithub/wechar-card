@@ -142,9 +142,14 @@ class WeChatController extends WebController {
     /**
      * 认证通过发送允许登录管理界面的消息
      *
+     * @param \Illuminate\Http\Request $request
+     *
      * @return string
      */
-    public function grantLoginAdmin() {
+    public function grantLoginAdmin(Request $request) {
+        if ( ! $request->exists("identifier")) {
+            return $this->response(ResponseMessage::$message[400000]);
+        }
         $wechatUser = $this->getOneself();
 
         $userList = User::where("openid", $wechatUser->getId())->get();
@@ -155,7 +160,7 @@ class WeChatController extends WebController {
         }
 
         // 通过验证发送消息
-        $this->sendAdminLoginBroad($wechatUser->getId());
+        $this->sendAdminLoginBroad($wechatUser->getId(), $request->get("identifier"));
 
         return $this->response(ResponseMessage::$message[200001]);
     }
