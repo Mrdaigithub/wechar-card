@@ -90,9 +90,22 @@ class CardController extends ApiController {
      * @return \Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response|mixed
      */
     public function getUserCardByShopId($id) {
-        $cardList = JWTAuth::parseToken()->authenticate()->cardList()->get()->map(function ($item) {
+        $shop = Shop::find($id);
+        if ( ! $shop) {
+            return $this->notFound(NULL, ResponseMessage::$message[400028]);
+        }
+        $cardList = JWTAuth::parseToken()->authenticate()->cardList()->get()->map(function ($item) use ($id) {
             $cardWinningLogs = $item->winningLog();
             if ($cardWinningLogs->get()->isEmpty()) {
+                return NULL;
+            }
+
+            $activity = $cardWinningLogs->first()->activity();
+            if ($activity->get()->isEmpty()) {
+                return NULL;
+            }
+            $shops = $activity->first()->shops();
+            if ($shops->get()->isEmpty() || ($shops->first()->id !== (int) $id)) {
                 return NULL;
             }
 
@@ -135,7 +148,7 @@ class CardController extends ApiController {
             $item->view = "unused";
 
             return $item;
-        });
+        })->filter()->values();
 
         return $this->success($cardList);
     }
@@ -231,6 +244,7 @@ class CardController extends ApiController {
             $newCard->remarks        = $cardModel->remarks;
             $this->saveModel($newCard);
             $newCard->user()->attach($oneself->id);
+            $newCard->activity()->attach($activities->first()->id);
 
             // 添加中奖记录
             $winningLog           = new WinningLog();

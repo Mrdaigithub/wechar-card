@@ -304,7 +304,7 @@ class WeChatController extends WebController {
         }
 
         // 是否为本店的人员
-        $cardModelActivity = Card::find($card->parentid)->activity();
+        $cardModelActivity = $card->activity();
         if ($cardModelActivity->get()->isEmpty()) {
             return $this->response(ResponseMessage::$message[500005]);
         }
