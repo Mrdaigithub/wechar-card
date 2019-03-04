@@ -209,10 +209,7 @@ export default {
     ...mapState({
       oneselfCardList: state => state.oneself.cardList ? state.oneself.cardList : [], // 剩余抽奖次数
       oneself: state => state.oneself.oneself ? state.oneself.oneself : {}, // 当前用户
-      lotteryNeedsToFillInTheInformation: state => state.systemConfig.systemConfig ?
-        /^true$/i.test(state.systemConfig.systemConfig.filter(
-          item => item['config_name'] === 'lotteryNeedsToFillInTheInformation')[0]['config_value'])
-        : true,// 抽奖填写信息配置
+      lotteryNeedsToFillInTheInformation: state => state.shop.activity ? state.shop.activity['info_state'] : true,// 抽奖填写信息配置
       shopName: state => state.shop.shop ? state.shop.shop['shop_name'] : '暂无', // 当前用户
     }),
     currentCard() {

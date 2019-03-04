@@ -12,15 +12,6 @@
             label-position="right">
             <v-layout wrap>
               <v-flex
-                v-if="systemConfigList.filter(item=>item['config_name']==='lotteryNeedsToFillInTheInformation').length > 0"
-                xs12
-                sm6>
-                <el-form-item
-                  :label="systemConfigList.filter(item=>item['config_name']==='lotteryNeedsToFillInTheInformation')[0]['config_description']">
-                  <el-switch v-model="lotteryNeedsToFillInTheInformationValue"/>
-                </el-form-item>
-              </v-flex>
-              <v-flex
                 v-if="systemConfigList.filter(item=>item['config_name']==='howManyDaysHaveYouWonTheLotteryIn15Days').length > 0"
                 xs12
                 sm6>
@@ -72,7 +63,6 @@ export default {
         href: '/admin/system/config',
       },
     ],
-    lotteryNeedsToFillInTheInformationValue: false,
     howManyDaysHaveYouWonTheLotteryIn15DaysValue: 0,
   }),
   computed: {
@@ -85,8 +75,6 @@ export default {
       if (!systemConfigList) {
         return;
       }
-      this.lotteryNeedsToFillInTheInformationValue = /true/i.test(systemConfigList.filter(
-        item => item['config_name'] === 'lotteryNeedsToFillInTheInformation')[0]['config_value']);
       this.howManyDaysHaveYouWonTheLotteryIn15DaysValue = parseInt(systemConfigList.filter(
         item => item['config_name'] === 'howManyDaysHaveYouWonTheLotteryIn15Days')[0]['config_value']);
     },
@@ -103,10 +91,7 @@ export default {
       Loading.service({fullscreen: true});
       for (let item of this.systemConfigList) {
         let _item = JSON.parse(JSON.stringify(item));
-        if (_item['config_name'] === 'lotteryNeedsToFillInTheInformation') {
-          _item['config_value'] = this.lotteryNeedsToFillInTheInformationValue.toString();
-          const {data} = await this.$axios.$put(`/system/config/${item['id']}`, qs.stringify(_item));
-        } else if (_item['config_name'] === 'howManyDaysHaveYouWonTheLotteryIn15Days') {
+        if (_item['config_name'] === 'howManyDaysHaveYouWonTheLotteryIn15Days') {
           _item['config_value'] = this.howManyDaysHaveYouWonTheLotteryIn15DaysValue.toString();
           const {data} = await this.$axios.$put(`/system/config/${item['id']}`, qs.stringify(_item));
         }

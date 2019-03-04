@@ -19,6 +19,7 @@ class CreateActivityTable extends Migration {
                 $table->string("activity_description")->nullable()->comment("活动详情");
                 $table->string("activity_thumbnail")->default("http://www.nz120.com/uploads/allimg/190227/1-1Z22G0414A34.jpg")->comment("活动的缩略图");
                 $table->boolean("state")->default(FALSE)->comment("状态 0.停用 1.启用");
+                $table->boolean("info_state")->default(TRUE)->comment("需要填写信息 0.不需要 1.需要");
                 $table->string('remarks')->nullable()->comment("备注");
                 $table->string('reply_keyword')->unique()->comment("回复关键词");
                 $table->timestamps();

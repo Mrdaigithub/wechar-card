@@ -29,6 +29,7 @@ class UpdateActivityRequest extends FormRequest {
             "reply_keyword"        => ["required", "string", "regex:/^(\w|[\x{4e00}-\x{9fa5}])+$/u"],
             "remarks"              => ["nullable", "regex:/^(\w|[\x{4e00}-\x{9fa5}])+$/u"],
             "state"                => "boolean",
+            "info_state"           => "boolean",
             "card_model_id_list"   => "nullable|array",
         ];
     }
@@ -46,6 +47,7 @@ class UpdateActivityRequest extends FormRequest {
             "reply_keyword.regex"        => ResponseMessage::$message[400005],
             "remarks.regex"              => ResponseMessage::$message[400005],
             "state.boolean"              => ResponseMessage::$message[400002],
+            "info_state.boolean"         => ResponseMessage::$message[400002],
             "card_model_id_list.array"   => ResponseMessage::$message[400002],
         ];
     }

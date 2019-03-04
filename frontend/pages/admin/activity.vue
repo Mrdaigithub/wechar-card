@@ -109,6 +109,13 @@
                         <el-switch v-model="editedItem.state"/>
                       </el-form-item>
                     </v-flex>
+                    <v-flex
+                      xs12
+                      sm6>
+                      <el-form-item label="填写信息">
+                        <el-switch v-model="editedItem.info_state"/>
+                      </el-form-item>
+                    </v-flex>
                   </v-layout>
                 </el-form>
               </v-container>
@@ -160,6 +167,7 @@
           </td>
           <td class="text-xs-center">{{ props.item.reply_keyword || '暂无' }}</td>
           <td class="text-xs-center">{{ props.item.state ? '使用中' : '使用结束' }}</td>
+          <td class="text-xs-center">{{ props.item['info_state'] ? '需填写' : '不需填写' }}</td>
           <td class="text-xs-center">{{ props.item['customer_num'] || 0 }}</td>
           <td class="text-xs-center">{{ props.item.remarks || '暂无' }}</td>
           <td class="text-xs-center">{{ props.item['created_at'] || '暂无' }}</td>
@@ -245,6 +253,7 @@ export default {
       {text: '活动缩略图', align: 'center', value: 'activity_thumbnail'},
       {text: '回复关键词', align: 'center', value: 'reply_keyword'},
       {text: '活动状态', align: 'center', value: 'state'},
+      {text: '填写信息', align: 'center', value: 'info_state'},
       {text: '参与人数', align: 'center', value: 'customer_num'},
       {text: '备注', align: 'center', value: 'remarks'},
       {text: '添加时间', align: 'center', value: 'created_at'},
@@ -282,6 +291,7 @@ export default {
       reply_keyword: '',
       remarks: '',
       state: false,
+      info_state: true,
       shop_id: null,
       card_model_id_list: [],
     },
@@ -292,6 +302,7 @@ export default {
       reply_keyword: '',
       remarks: '',
       state: false,
+      info_state: true,
       shop_id: null,
       card_model_id_list: [],
     },
@@ -333,6 +344,7 @@ export default {
     editItem(item) {
       const _item = JSON.parse(JSON.stringify(item));
       _item.state = _item.state === 1;
+      _item.info_state = _item.info_state === 1;
       _item['card_model_id_list'] = _item['card_model_id_list'] || [];
       this.editedIndex = this.activityList.indexOf(item);
       this.editedItem = Object.assign({}, _item);
@@ -369,6 +381,7 @@ export default {
           _editedItem.reply_keyword = this.editedItem.reply_keyword;
           _editedItem.remarks = this.editedItem.remarks;
           _editedItem.state = this.editedItem.state ? 1 : 0;
+          _editedItem.info_state = this.editedItem.info_state ? 1 : 0;
           _editedItem.card_model_id_list = this.editedItem.card_model_id_list.length
             ? this.editedItem.card_model_id_list
             : null;

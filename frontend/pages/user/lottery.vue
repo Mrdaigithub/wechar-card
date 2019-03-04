@@ -223,10 +223,7 @@ export default {
           item => item['config_name'] === 'howManyDaysHaveYouWonTheLotteryIn15Days')[0]['config_value'] : 7,
       customerNum: state => state.shop.activity ? state.shop.activity['customer_num'] + 110 : 0, // 活动参与人数
       lotteryNum: state => state.oneself.oneself ? state.oneself.oneself['lottery_num'] : 0, // 剩余抽奖次数
-      lotteryNeedsToFillInTheInformation: state => state.systemConfig.systemConfig ?
-        /^true$/i.test(state.systemConfig.systemConfig.filter(
-          item => item['config_name'] === 'lotteryNeedsToFillInTheInformation')[0]['config_value'])
-        : true,// 抽奖填写信息配置
+      lotteryNeedsToFillInTheInformation: state => state.shop.activity ? state.shop.activity['info_state'] : true,// 抽奖填写信息配置
       cardModelList: state => {
         const cardList = state.card.cardModelList ?
           state.card.cardModelList.map(

@@ -27,8 +27,8 @@ class ActivityController extends ApiController {
                     $item->shop_id            = $activityShops->get()->isNotEmpty() ? $activityShops->first()->id : NULL;
                     $item->card_model_id_list = $card_model_list->get()->isNotEmpty() ?
                         $card_model_list->get()->map(function ($item) {
-                            return $item->id;
-                        }) : NULL;
+                            return $item->type === 0 ? $item->id : NULL;
+                        })->filter()->values() : NULL;
                     $item->customer_num       = $winningLogs->get()->isNotEmpty() ?
                         $winningLogs->get()->map(function ($item) {
                             return $item->user()->first();
@@ -96,6 +96,9 @@ class ActivityController extends ApiController {
         if ($request->has("state")) {
             $activity->state = $request->get("state");
         }
+        if ($request->has("info_state")) {
+            $activity->info_state = $request->get("info_state");
+        }
 
         $this->saveModel($activity);
 
@@ -146,6 +149,9 @@ class ActivityController extends ApiController {
         if ($request->has("state")) {
             $activity->state = $request->get("state");
         }
+        if ($request->has("info_state")) {
+            $activity->info_state = $request->get("info_state");
+        }
         if ($request->has("customer_num")) {
             $activity->customer_num = $request->get("customer_num") ? $request->get("customer_num") : 0;
         }
@@ -180,4 +186,3 @@ class ActivityController extends ApiController {
         Activity::destroy($id);
     }
 }
-
