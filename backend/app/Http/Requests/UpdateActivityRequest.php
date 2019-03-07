@@ -23,11 +23,11 @@ class UpdateActivityRequest extends FormRequest {
      */
     public function rules() {
         return [
-            "activity_name"        => ["required", "string", "regex:/^(\w|[\x{4e00}-\x{9fa5}])+$/u"],
-            "activity_description" => ["nullable", "regex:/^(\w|[\x{4e00}-\x{9fa5}])+$/u"],
+            "activity_name"        => ["required", "string", "regex:/^(\w|[\x{4e00}-\x{9fa5}]|\/)+$/u"],
+            "activity_description" => ["nullable", "regex:/^(\w|[\x{4e00}-\x{9fa5}]|\/)+$/u"],
             "activity_thumbnail"   => "string|url",
-            "reply_keyword"        => ["required", "string", "regex:/^(\w|[\x{4e00}-\x{9fa5}])+$/u"],
-            "remarks"              => ["nullable", "regex:/^(\w|[\x{4e00}-\x{9fa5}])+$/u"],
+            "reply_keyword"        => ["required", "string", "regex:/^(\w|[\x{4e00}-\x{9fa5}]|\/)+$/u"],
+            "remarks"              => ["nullable", "regex:/^(\w|[\x{4e00}-\x{9fa5}]|\/)+$/u"],
             "state"                => "boolean",
             "info_state"           => "boolean",
             "card_model_id_list"   => "nullable|array",

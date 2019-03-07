@@ -255,7 +255,7 @@ export default {
       shop_name: [
         {required: true, message: '请输入商家名称', trigger: 'blur'},
         {min: 3, max: 20, message: '长度在 3 到 20 个字符', trigger: 'change'},
-        {pattern: /^(\w|[\u4e00-\u9fa5])+$/, message: '请不要包含特殊字符', trigger: 'change'},
+        {pattern: /^(\w|[\u4e00-\u9fa5]|\/)+$/, message: '请不要包含特殊字符', trigger: 'change'},
       ],
       shop_location: [
         {required: true, message: '请选择商家所在城市', trigger: 'change'},
@@ -264,7 +264,7 @@ export default {
         {required: true, message: '请选择商家所在地址', trigger: 'change'},
       ],
       remarks: [
-        {type: 'string', pattern: /^(\w|[\u4e00-\u9fa5])+$/, message: '请不要包含特殊字符', trigger: 'change'},
+        {type: 'string', pattern: /^(\w|[\u4e00-\u9fa5]|\/)+$/, message: '请不要包含特殊字符', trigger: 'change'},
       ],
     },
     editedIndex: -1,

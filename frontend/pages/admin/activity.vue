@@ -266,10 +266,10 @@ export default {
       activity_name: [
         {required: true, message: '请输入活动名称', trigger: 'blur'},
         {min: 3, max: 20, message: '长度在 3 到 20 个字符', trigger: 'change'},
-        {pattern: /^(\w|[\u4e00-\u9fa5])+$/, message: '请不要包含特殊字符', trigger: 'change'},
+        {pattern: /^(\w|[\u4e00-\u9fa5]|\/)+$/, message: '请不要包含特殊字符', trigger: 'change'},
       ],
       activity_description: [
-        {type: 'string', pattern: /^(\w|[\u4e00-\u9fa5])+$/, message: '请不要包含特殊字符', trigger: 'change'},
+        {type: 'string', pattern: /^(\w|[\u4e00-\u9fa5]|\/)+$/, message: '请不要包含特殊字符', trigger: 'change'},
       ],
       activity_thumbnail: [
         {type: 'url', message: '活动缩略图URL链接格式错误', trigger: 'change'},
@@ -277,10 +277,10 @@ export default {
       reply_keyword: [
         {required: true, message: '请输入活动回复关键词', trigger: 'blur'},
         {min: 1, max: 20, message: '长度在 1 到 20 个字符', trigger: 'change'},
-        {pattern: /^(\w|[\u4e00-\u9fa5])+$/, message: '请不要包含特殊字符', trigger: 'change'},
+        {pattern: /^(\w|[\u4e00-\u9fa5]|\/)+$/, message: '请不要包含特殊字符', trigger: 'change'},
       ],
       remarks: [
-        {type: 'string', pattern: /^(\w|[\u4e00-\u9fa5])+$/, message: '请不要包含特殊字符', trigger: 'change'},
+        {type: 'string', pattern: /^(\w|[\u4e00-\u9fa5]|\/)+$/, message: '请不要包含特殊字符', trigger: 'change'},
       ],
     },
     editedIndex: -1,

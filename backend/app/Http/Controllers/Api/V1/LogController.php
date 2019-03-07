@@ -43,7 +43,7 @@ class LogController extends ApiController {
      */
     public function listWinningWriteOffLogByShopId($id) {
         $oneself = JWTAuth::parseToken()->authenticate();
-        $shop = Shop::find($id);
+        $shop    = Shop::find($id);
         if ( ! $shop) {
             return $this->badRequest(NULL, ResponseMessage::$message[400028]);
         }
@@ -61,22 +61,25 @@ class LogController extends ApiController {
 
         return $this->success(
             $shopActivityWinningLog->get()->map(function ($item) {
+                if ($item->write_off_state === 0) {
+                    return NULL;
+                }
                 $cards       = $item->card();
                 $user        = $item->user()->get()->isNotEmpty() ? $item->user()->first() : NULL;
                 $activities  = $item->activity();
                 $writeOffers = $item->writeOffer();
 
-                $item->card_name      = $cards->get()->isNotEmpty() ? $cards->first()->remarks : NULL;
-                $item->activity_name  = $activities->get()->isNotEmpty() ? $activities->first()->activity_name : NULL;
-                $item->username       = $user ? $user->username : NULL;
-                $item->real_name      = $user ? $user->real_name : NULL;
-                $item->head_img_url   = $user ? $user->head_img_url : NULL;
-                $item->shop_name      = $activities->get()->isNotEmpty() && $activities->first()->shops()->get()->isNotEmpty() ?
+                $item->card_name        = $cards->get()->isNotEmpty() ? $cards->first()->remarks : NULL;
+                $item->activity_name    = $activities->get()->isNotEmpty() ? $activities->first()->activity_name : NULL;
+                $item->username         = $user ? $user->username : NULL;
+                $item->real_name        = $user ? $user->real_name : NULL;
+                $item->head_img_url     = $user ? $user->head_img_url : NULL;
+                $item->shop_name        = $activities->get()->isNotEmpty() && $activities->first()->shops()->get()->isNotEmpty() ?
                     $activities->first()->shops()->first()->shop_name : NULL;
                 $item->write_offer_name = $writeOffers->get()->isNotEmpty() ? $writeOffers->first()->username : NULL;
 
                 return $item;
-            })
+            })->filter()->values()
         );
     }
 }

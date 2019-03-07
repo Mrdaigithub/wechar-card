@@ -25,7 +25,7 @@ class UpdateShopRequest extends FormRequest {
         return [
             "shop_name"     => [
                 "string",
-                "regex:/^(\w|[\x{4e00}-\x{9fa5}])+$/u",
+                "regex:/^(\w|[\x{4e00}-\x{9fa5}]|\/)+$/u",
             ],
             "shop_location" => [
                 "string",
@@ -37,7 +37,7 @@ class UpdateShopRequest extends FormRequest {
             ],
             "started_at"    => "nullable|date",
             "activity_id"   => "nullable|numeric",
-            "remarks"       => ["nullable", "regex:/^(\w|[\x{4e00}-\x{9fa5}])+$/u"],
+            "remarks"       => ["nullable", "regex:/^(\w|[\x{4e00}-\x{9fa5}]|\/)+$/u"],
             "state"         => "boolean",
         ];
     }

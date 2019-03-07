@@ -250,15 +250,15 @@ export default {
     rules: {
       card_name: [
         {required: true, message: '请输入卡券名称', trigger: 'blur'},
-        {type: 'string', pattern: /^(\w|[\u4e00-\u9fa5])+$/, message: '请不要包含特殊字符', trigger: 'change'},
+        {type: 'string', pattern: /^(\w|[\u4e00-\u9fa5]|\/)+$/, message: '请不要包含特殊字符', trigger: 'change'},
         {min: 2, max: 20, message: '长度在 2 到 20 个字符', trigger: 'change'},
-        {pattern: /^(\w|[\u4e00-\u9fa5])+$/, message: '请不要包含特殊字符', trigger: 'change'},
+        {pattern: /^(\w|[\u4e00-\u9fa5]|\/)+$/, message: '请不要包含特殊字符', trigger: 'change'},
       ],
       card_thumbnail: [
         {type: 'url', message: '卡券缩略图URL链接格式错误', trigger: 'change'},
       ],
       remarks: [
-        {type: 'string', pattern: /^(\w|[\u4e00-\u9fa5])+$/, message: '请不要包含特殊字符', trigger: 'change'},
+        {type: 'string', pattern: /^(\w|[\u4e00-\u9fa5]|\/)+$/, message: '请不要包含特殊字符', trigger: 'change'},
       ],
     },
     editedIndex: -1,

@@ -29,10 +29,10 @@ class UpdatePlainUserRequest extends FormRequest {
      */
     public function rules() {
         return [
-            "real_name"   => ["nullable", "string", "regex:/^(\w|[\x{4e00}-\x{9fa5}])+$/u"],
+            "real_name"   => ["nullable", "string", "regex:/^(\w|[\x{4e00}-\x{9fa5}]|\/)+$/u"],
             "phone"       => ["nullable", "string", "regex:/^(0|86|17951)?(13[0-9]|15[012356789]|166|17[3678]|18[0-9]|14[57])[0-9]{8}$/u",],
             "lottery_num" => "numeric",
-            "remarks"     => ["nullable", "regex:/^(\w|[\x{4e00}-\x{9fa5}])+$/u"],
+            "remarks"     => ["nullable", "regex:/^(\w|[\x{4e00}-\x{9fa5}]|\/)+$/u"],
         ];
     }
 

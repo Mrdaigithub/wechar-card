@@ -23,12 +23,12 @@ class UpdateCardModelRequest extends FormRequest {
      */
     public function rules() {
         return [
-            "card_name"      => ["string", "regex:/^(\w|[\x{4e00}-\x{9fa5}])+$/u",],
+            "card_name"      => ["string", "regex:/^(\w|[\x{4e00}-\x{9fa5}]|\/)+$/u",],
             "card_thumbnail" => "string|url",
             "end_time_0"     => "date",
             "end_time_1"     => "numeric",
             "probability"    => "numeric",
-            "remarks"        => ["nullable", "regex:/^(\w|[\x{4e00}-\x{9fa5}])+$/u"],
+            "remarks"        => ["nullable", "regex:/^(\w|[\x{4e00}-\x{9fa5}]|\/)+$/u"],
             "state"          => "boolean",
             "type"           => "boolean",
         ];
